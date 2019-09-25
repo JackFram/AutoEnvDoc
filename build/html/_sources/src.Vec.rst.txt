@@ -1,0 +1,37 @@
+src.Vec package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   src.Vec.geom
+
+Submodules
+----------
+
+src.Vec.VecE2 module
+--------------------
+
+.. automodule:: src.Vec.VecE2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.Vec.VecSE2 module
+---------------------
+
+.. automodule:: src.Vec.VecSE2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.Vec
+   :members:
+   :undoc-members:
+   :show-inheritance:

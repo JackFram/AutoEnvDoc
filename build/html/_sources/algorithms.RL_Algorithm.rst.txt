@@ -1,0 +1,30 @@
+algorithms.RL\_Algorithm package
+================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   algorithms.RL_Algorithm.GAIL
+   algorithms.RL_Algorithm.optimizers
+
+Submodules
+----------
+
+algorithms.RL\_Algorithm.utils module
+-------------------------------------
+
+.. automodule:: algorithms.RL_Algorithm.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.RL_Algorithm
+   :members:
+   :undoc-members:
+   :show-inheritance:

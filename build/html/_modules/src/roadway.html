@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.roadway &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.roadway</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Zhihao Zhang</span>
+<span class="c1"># NGSIM dataset processor roadway class</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src.Vec</span> <span class="k">import</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">VecSE2</span>
+<span class="kn">from</span> <span class="nn">src.curves</span> <span class="k">import</span> <span class="n">CurvePt</span>
+<span class="kn">from</span> <span class="nn">src.Roadway</span> <span class="k">import</span> <span class="n">roadway</span>
+<span class="kn">from</span> <span class="nn">src.splines</span> <span class="k">import</span> <span class="n">fit_cubic_spline</span><span class="p">,</span> <span class="n">calc_curve_length_2</span><span class="p">,</span> <span class="n">calc_curve_param_given_arclen</span><span class="p">,</span> <span class="n">sample_spline_2</span><span class="p">,</span> \
+    <span class="n">sample_spline_theta_2</span><span class="p">,</span> <span class="n">sample_spline_curvature_2</span><span class="p">,</span> <span class="n">sample_spline_derivative_of_curvature_2</span>
+
+<span class="n">FLOATING_POINT_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?&#39;</span>
+<span class="n">METERS_PER_FOOT</span> <span class="o">=</span> <span class="mf">0.3048</span>
+
+<span class="n">DIR</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="NGSIMRoadway"><a class="viewcode-back" href="../../src.html#src.roadway.NGSIMRoadway">[docs]</a><span class="k">class</span> <span class="nc">NGSIMRoadway</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">centerlines</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        NGSIMRoadway class</span>
+<span class="sd">        :param name: name</span>
+<span class="sd">        :param boundaries: list of boundaries</span>
+<span class="sd">        :param centerlines: list of centerlines</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundaries</span> <span class="o">=</span> <span class="n">boundaries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerlines</span> <span class="o">=</span> <span class="n">centerlines</span></div>
+
+
+<div class="viewcode-block" id="RoadwayInputParams"><a class="viewcode-back" href="../../src.html#src.roadway.RoadwayInputParams">[docs]</a><span class="k">class</span> <span class="nc">RoadwayInputParams</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath_boundaries</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filepath_centerlines</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        RoadwayInputParams</span>
+<span class="sd">        :param filepath_boundaries: file path for boundary file</span>
+<span class="sd">        :param filepath_centerlines: file path for centerline file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath_boundaries</span> <span class="o">=</span> <span class="n">filepath_boundaries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath_centerlines</span> <span class="o">=</span> <span class="n">filepath_centerlines</span></div>
+
+
+<div class="viewcode-block" id="read_boundaries"><a class="viewcode-back" href="../../src.html#src.roadway.read_boundaries">[docs]</a><span class="k">def</span> <span class="nf">read_boundaries</span><span class="p">(</span><span class="n">filepath_boundaries</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load boundaries from a file given the file path</span>
+<span class="sd">    :param filepath_boundaries: the file path of the boundary</span>
+<span class="sd">    :return: the loaded boundary</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath_boundaries</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;BOUNDARIES&#39;</span>
+
+    <span class="n">n_boundaries</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">assert</span> <span class="n">n_boundaries</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Array{Vector{VecE2}}</span>
+
+    <span class="n">line_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_boundaries</span><span class="p">):</span>
+        <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;BOUNDARY </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Array{VecE2}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+            <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">FLOATING_POINT_REGEX</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+        <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="read_centerlines"><a class="viewcode-back" href="../../src.html#src.roadway.read_centerlines">[docs]</a><span class="k">def</span> <span class="nf">read_centerlines</span><span class="p">(</span><span class="n">filepath_centerlines</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load centerlines from a file given the file path</span>
+<span class="sd">    :param filepath_centerlines: the file path of the center line</span>
+<span class="sd">    :return: the loaded center line</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath_centerlines</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;CENTERLINES&#39;</span>
+    <span class="n">n_centerlines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">n_centerlines</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="n">line_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_centerlines</span><span class="p">):</span>
+        <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;CENTERLINE&quot;</span>
+        <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span>
+        <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+            <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">FLOATING_POINT_REGEX</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">line_index</span><span class="p">])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+        <span class="n">centerline</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">atan</span><span class="p">()</span>
+        <span class="n">centerline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CurvePt</span><span class="o">.</span><span class="n">CurvePt</span><span class="p">(</span><span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">centerline</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">s</span> <span class="o">+</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">hypot</span><span class="p">()</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="p">((</span><span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">atan</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">atan</span><span class="p">())</span><span class="o">/</span><span class="mi">2</span>  <span class="c1"># mean angle</span>
+            <span class="n">centerline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CurvePt</span><span class="o">.</span><span class="n">CurvePt</span><span class="p">(</span><span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">),</span> <span class="n">s</span><span class="p">))</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">centerline</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">s</span> <span class="o">+</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">hypot</span><span class="p">()</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">atan</span><span class="p">()</span>
+        <span class="n">centerline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CurvePt</span><span class="o">.</span><span class="n">CurvePt</span><span class="p">(</span><span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">),</span> <span class="n">s</span><span class="p">))</span>
+        <span class="n">retval</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">centerline</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="read_roadway"><a class="viewcode-back" href="../../src.html#src.roadway.read_roadway">[docs]</a><span class="k">def</span> <span class="nf">read_roadway</span><span class="p">(</span><span class="n">input_params</span><span class="p">:</span> <span class="n">RoadwayInputParams</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load roadway</span>
+<span class="sd">    :param input_params: RoadwayInputParams</span>
+<span class="sd">    :return: the loaded NGSIMRoadway object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="n">read_boundaries</span><span class="p">(</span><span class="n">input_params</span><span class="o">.</span><span class="n">filepath_boundaries</span><span class="p">)</span>
+    <span class="n">centerlines</span> <span class="o">=</span> <span class="n">read_centerlines</span><span class="p">(</span><span class="n">input_params</span><span class="o">.</span><span class="n">filepath_centerlines</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;../data/centerlinesHOLO.txt&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">NGSIMRoadway</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">centerlines</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="get_segid"><a class="viewcode-back" href="../../src.html#src.roadway.get_segid">[docs]</a><span class="k">def</span> <span class="nf">get_segid</span><span class="p">(</span><span class="n">lane</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param lane: list of CurvePt</span>
+<span class="sd">    :return: get the segment id of corresponding lane</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">1</span>  <span class="c1"># for now</span></div>
+
+
+<div class="viewcode-block" id="convert_curves_feet_to_meters"><a class="viewcode-back" href="../../src.html#src.roadway.convert_curves_feet_to_meters">[docs]</a><span class="k">def</span> <span class="nf">convert_curves_feet_to_meters</span><span class="p">(</span><span class="n">roadWay</span><span class="p">:</span> <span class="n">roadway</span><span class="o">.</span><span class="n">Roadway</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    convert all feet unit to meters</span>
+<span class="sd">    :param roadWay: Roadway object</span>
+<span class="sd">    :return: converted Roadway object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">roadWay</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">lane</span> <span class="ow">in</span> <span class="n">seg</span><span class="o">.</span><span class="n">lanes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">curve</span><span class="p">):</span>
+                <span class="n">lane</span><span class="o">.</span><span class="n">curve</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">CurvePt</span><span class="p">(</span>
+                    <span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">θ</span><span class="p">),</span>
+                    <span class="n">P</span><span class="o">.</span><span class="n">s</span> <span class="o">*</span> <span class="n">METERS_PER_FOOT</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">k</span> <span class="o">/</span> <span class="n">METERS_PER_FOOT</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">kd</span> <span class="o">/</span> <span class="n">METERS_PER_FOOT</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">roadWay</span></div>
+
+
+<div class="viewcode-block" id="integrate"><a class="viewcode-back" href="../../src.html#src.roadway.integrate">[docs]</a><span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="n">centerline_fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">boundary_fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">dist_threshold_lane_connect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+              <span class="n">desired_distance_between_curve_samples</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param centerline_path: center line file path</span>
+<span class="sd">    :param boundary_path: boundary file path</span>
+<span class="sd">    :param dist_threshold_lane_connect: [m]</span>
+<span class="sd">    :param desired_distance_between_curve_samples: [m]</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">centerline_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/&quot;</span><span class="p">,</span> <span class="n">centerline_fn</span><span class="p">)</span>
+    <span class="n">boundary_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/&quot;</span><span class="p">,</span> <span class="n">boundary_fn</span><span class="p">)</span>
+    <span class="n">input_params</span> <span class="o">=</span> <span class="n">RoadwayInputParams</span><span class="p">(</span><span class="n">filepath_boundaries</span><span class="o">=</span><span class="n">boundary_path</span><span class="p">,</span> <span class="n">filepath_centerlines</span><span class="o">=</span><span class="n">centerline_path</span><span class="p">)</span>
+    <span class="n">roadway_data</span> <span class="o">=</span> <span class="n">read_roadway</span><span class="p">(</span><span class="n">input_params</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish loading centerlines and boundaries.&quot;</span><span class="p">)</span>
+    <span class="n">lane_pts_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">handle_int</span><span class="p">,</span> <span class="n">lane</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roadway_data</span><span class="o">.</span><span class="n">centerlines</span><span class="p">):</span>
+        <span class="n">segid</span> <span class="o">=</span> <span class="n">get_segid</span><span class="p">(</span><span class="n">lane</span><span class="p">)</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lane</span><span class="p">)</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>  <span class="c1"># VecE2 list</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">lane</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">lane</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">laneid</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">segment</span> <span class="o">==</span> <span class="n">segid</span><span class="p">:</span>
+                <span class="n">laneid</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">roadway</span><span class="o">.</span><span class="n">LaneTag</span><span class="p">(</span><span class="n">segid</span><span class="p">,</span> <span class="n">laneid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pts</span>
+
+    <span class="c1">###################################################</span>
+    <span class="c1"># Shift pts to connect to previous / next pts</span>
+
+    <span class="n">lane_next_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">lane_prev_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># see if can connect to next</span>
+        <span class="n">best_tag</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">NULL_LANETAG</span>
+        <span class="n">best_ind</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">best_sq_dist</span> <span class="o">=</span> <span class="n">dist_threshold_lane_connect</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">tag2</span><span class="p">,</span> <span class="n">pts2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tag2</span><span class="o">.</span><span class="n">segment</span> <span class="o">!=</span> <span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">pt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pts2</span><span class="p">):</span>
+                    <span class="n">sq_dist</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">normsquared</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">pt</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="k">if</span> <span class="n">sq_dist</span> <span class="o">&lt;</span> <span class="n">best_sq_dist</span><span class="p">:</span>
+                        <span class="n">best_sq_dist</span> <span class="o">=</span> <span class="n">sq_dist</span>
+                        <span class="n">best_ind</span> <span class="o">=</span> <span class="n">ind</span>
+                        <span class="n">best_tag</span> <span class="o">=</span> <span class="n">tag2</span>
+        <span class="k">if</span> <span class="n">best_tag</span> <span class="o">!=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">NULL_LANETAG</span><span class="p">:</span>
+            <span class="c1"># remove our last pt and set next to pt to their pt</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">lane_next_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">best_tag</span><span class="p">][</span><span class="n">best_ind</span><span class="p">],</span> <span class="n">best_tag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">best_ind</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># set connect prev as well</span>
+                <span class="n">lane_prev_dict</span><span class="p">[</span><span class="n">best_tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tag</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># see if can connect to prev</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lane_prev_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">best_tag</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">NULL_LANETAG</span>
+            <span class="n">best_ind</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">best_sq_dist</span> <span class="o">=</span> <span class="n">dist_threshold_lane_connect</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">tag2</span><span class="p">,</span> <span class="n">pts2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">tag2</span><span class="o">.</span><span class="n">segment</span> <span class="o">!=</span> <span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">pt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pts2</span><span class="p">):</span>
+                        <span class="n">sq_dist</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">normsquared</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">pt</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="k">if</span> <span class="n">sq_dist</span> <span class="o">&lt;</span> <span class="n">best_sq_dist</span><span class="p">:</span>
+                            <span class="n">best_sq_dist</span> <span class="o">=</span> <span class="n">sq_dist</span>
+                            <span class="n">best_ind</span> <span class="o">=</span> <span class="n">ind</span>
+                            <span class="n">best_tag</span> <span class="o">=</span> <span class="n">tag2</span>
+            <span class="k">if</span> <span class="n">best_tag</span> <span class="o">!=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">NULL_LANETAG</span><span class="p">:</span>
+                <span class="n">lane_prev_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">best_tag</span><span class="p">][</span><span class="n">best_ind</span><span class="p">],</span> <span class="n">best_tag</span><span class="p">)</span>
+
+    <span class="c1">###################################################</span>
+    <span class="c1"># Build the roadway</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">Roadway</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">pts</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="o">.</span><span class="n">has_segment</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">):</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roadway</span><span class="o">.</span><span class="n">RoadSegment</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">))</span>
+    <span class="n">lane_new_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># old -&gt; new tag</span>
+    <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">retval</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+
+        <span class="c1"># pull lanetags for this seg</span>
+        <span class="n">lanetags</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># LaneTag</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">lane_pts_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">segment</span> <span class="o">==</span> <span class="n">seg</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                <span class="n">lanetags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="c1"># sort the lanes such that the rightmost lane is lane 1</span>
+        <span class="c1"># do this by taking the first lane,</span>
+        <span class="c1"># then project each lane&#39;s midpoint to the perpendicular at the midpoint</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">lanetags</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">proj_positions</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lanetags</span><span class="p">))]</span>  <span class="c1"># list of float</span>
+        <span class="n">first_lane_pts</span> <span class="o">=</span> <span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">lanetags</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_lane_pts</span><span class="p">)</span>
+        <span class="n">lo</span> <span class="o">=</span> <span class="n">first_lane_pts</span><span class="p">[</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">hi</span> <span class="o">=</span> <span class="n">first_lane_pts</span><span class="p">[</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">midpt_orig</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="nb">dir</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">polar</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span><span class="p">)</span><span class="o">.</span><span class="n">atan</span><span class="p">()</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># direction perpendicular (left) of lane</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lanetags</span><span class="p">):</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+            <span class="n">midpt</span> <span class="o">=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">pts</span><span class="p">[</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">proj_positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">proj_</span><span class="p">(</span><span class="n">midpt</span> <span class="o">-</span> <span class="n">midpt_orig</span><span class="p">,</span> <span class="nb">dir</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">proj_positions</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="n">proj_positions</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">)):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">lanetags</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="n">boundary_left</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneBoundary</span><span class="p">(</span><span class="s2">&quot;solid&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">proj_positions</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> \
+                <span class="k">else</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneBoundary</span><span class="p">(</span><span class="s2">&quot;broken&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+            <span class="n">boundary_right</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneBoundary</span><span class="p">(</span><span class="s2">&quot;solid&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> \
+                <span class="k">else</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneBoundary</span><span class="p">(</span><span class="s2">&quot;broken&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">lane_pts_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="n">pt_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+                <span class="n">pt_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">x</span>
+                <span class="n">pt_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">y</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fitting curve &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">),</span> <span class="s2">&quot;  &quot;</span><span class="p">)</span>
+            <span class="n">curve</span> <span class="o">=</span> <span class="n">_fit_curve</span><span class="p">(</span><span class="n">pt_matrix</span><span class="p">,</span> <span class="n">desired_distance_between_curve_samples</span><span class="p">)</span>
+
+            <span class="n">tag_new</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneTag</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">lanes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">lane</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">Lane</span><span class="p">(</span><span class="n">tag_new</span><span class="p">,</span> <span class="n">curve</span><span class="p">,</span>
+                                <span class="n">boundary_left</span><span class="o">=</span><span class="n">boundary_left</span><span class="p">,</span>
+                                <span class="n">boundary_right</span><span class="o">=</span><span class="n">boundary_right</span><span class="p">)</span>
+            <span class="n">seg</span><span class="o">.</span><span class="n">lanes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lane</span><span class="p">)</span>
+            <span class="n">lane_new_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_new</span>
+
+    <span class="c1">###################################################</span>
+    <span class="c1"># Connect the lanes</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">tag_old</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_next_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">next_pt</span><span class="p">,</span> <span class="n">next_tag_old</span> <span class="o">=</span> <span class="n">tup</span>
+        <span class="n">lane</span> <span class="o">=</span> <span class="n">retval</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">lane_new_dict</span><span class="p">[</span><span class="n">tag_old</span><span class="p">])</span>
+        <span class="n">next_tag_new</span> <span class="o">=</span> <span class="n">lane_new_dict</span><span class="p">[</span><span class="n">next_tag_old</span><span class="p">]</span>
+        <span class="n">dest</span> <span class="o">=</span> <span class="n">retval</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">next_tag_new</span><span class="p">)</span>
+        <span class="n">roadproj</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">proj_1</span><span class="p">(</span><span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">next_pt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">dest</span><span class="p">,</span> <span class="n">retval</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;connecting </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">dest</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+        <span class="n">cindS</span> <span class="o">=</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">curveindex_end</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">curve</span><span class="p">)</span>
+        <span class="n">cindD</span> <span class="o">=</span> <span class="n">roadproj</span><span class="o">.</span><span class="n">curveproj</span><span class="o">.</span><span class="n">ind</span>
+
+        <span class="k">if</span> <span class="n">cindD</span> <span class="o">==</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">CURVEINDEX_START</span><span class="p">:</span>  <span class="c1"># a standard connection</span>
+            <span class="n">lane</span><span class="p">,</span> <span class="n">dest</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+            <span class="c1"># remove any similar connection from lane_prev_dict</span>
+            <span class="k">if</span> <span class="n">next_tag_old</span> <span class="ow">in</span> <span class="n">lane_prev_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">lane_prev_dict</span><span class="p">[</span><span class="n">next_tag_old</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">tag_old</span><span class="p">:</span>
+                <span class="n">lane_prev_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">next_tag_old</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lane</span><span class="o">.</span><span class="n">exits</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneConnection</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span>  <span class="n">cindS</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">cindD</span><span class="p">,</span> <span class="n">dest</span><span class="o">.</span><span class="n">tag</span><span class="p">)))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">entrances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roadway</span><span class="o">.</span><span class="n">LaneConnection</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">cindD</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">cindS</span><span class="p">,</span> <span class="n">lane</span><span class="o">.</span><span class="n">tag</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">tag_old</span><span class="p">,</span> <span class="n">tup</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lane_prev_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">prev_pt</span><span class="p">,</span> <span class="n">prev_tag_old</span> <span class="o">=</span> <span class="n">tup</span>
+        <span class="n">lane</span> <span class="o">=</span> <span class="n">retval</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">lane_new_dict</span><span class="p">[</span><span class="n">tag_old</span><span class="p">])</span>
+        <span class="n">prev_tag_new</span> <span class="o">=</span> <span class="n">lane_new_dict</span><span class="p">[</span><span class="n">prev_tag_old</span><span class="p">]</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">retval</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">prev_tag_new</span><span class="p">)</span>
+        <span class="n">roadproj</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">proj_1</span><span class="p">(</span><span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">prev_pt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">prev</span><span class="p">,</span> <span class="n">retval</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;connecting </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">prev</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+        <span class="n">cindS</span> <span class="o">=</span> <span class="n">roadproj</span><span class="o">.</span><span class="n">curveproj</span><span class="o">.</span><span class="n">ind</span>
+        <span class="n">cindD</span> <span class="o">=</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">CURVEINDEX_START</span>
+        <span class="k">if</span> <span class="n">cindS</span> <span class="o">==</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">curveindex_end</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">curve</span><span class="p">):</span>  <span class="c1"># a standard connection</span>
+            <span class="k">assert</span> <span class="n">roadway</span><span class="o">.</span><span class="n">has_prev</span><span class="p">(</span><span class="n">prev</span><span class="p">)</span>
+            <span class="n">prev</span><span class="p">,</span> <span class="n">lane</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">lane</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># a standard connection</span>
+            <span class="n">prev</span><span class="o">.</span><span class="n">exits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roadway</span><span class="o">.</span><span class="n">LaneConnection</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span>  <span class="n">cindS</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">cindD</span><span class="p">,</span> <span class="n">lane</span><span class="o">.</span><span class="n">tag</span><span class="p">)))</span>
+            <span class="n">lane</span><span class="o">.</span><span class="n">entrances</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">LaneConnection</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">cindD</span><span class="p">,</span> <span class="n">roadway</span><span class="o">.</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">cindS</span><span class="p">,</span> <span class="n">prev</span><span class="o">.</span><span class="n">tag</span><span class="p">)))</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">convert_curves_feet_to_meters</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_fit_curve</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">desired_distance_between_samples</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+               <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">n_intervals_in_arclen</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    Curve Fitting</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">assert</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">spline_coeffs</span> <span class="o">=</span> <span class="n">fit_cubic_spline</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">calc_curve_length_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_intervals_per_segment</span><span class="o">=</span><span class="n">n_intervals_in_arclen</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="n">desired_distance_between_samples</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">s_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="n">L</span><span class="o">/</span><span class="n">n</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
+    <span class="n">t_arr</span> <span class="o">=</span> <span class="n">calc_curve_param_given_arclen</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_arr</span><span class="p">,</span>
+                                          <span class="n">curve_length</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="n">max_iterations</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">,</span>
+                                          <span class="n">n_intervals_in_arclen</span><span class="o">=</span><span class="n">n_intervals_in_arclen</span><span class="p">)</span>
+
+    <span class="n">x_arr</span> <span class="o">=</span> <span class="n">sample_spline_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t_arr</span><span class="p">)</span>
+    <span class="n">y_arr</span> <span class="o">=</span> <span class="n">sample_spline_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_arr</span><span class="p">)</span>
+    <span class="n">theta_arr</span> <span class="o">=</span> <span class="n">sample_spline_theta_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_arr</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish sampling theta&quot;</span><span class="p">)</span>
+
+    <span class="n">k_arr</span> <span class="o">=</span> <span class="n">sample_spline_curvature_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_arr</span><span class="p">)</span>
+    <span class="n">kd_arr</span> <span class="o">=</span> <span class="n">sample_spline_derivative_of_curvature_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_arr</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish sampling curvature&quot;</span><span class="p">)</span>
+
+    <span class="c1"># assert(!any(s-&gt;isnan(s), s_arr))</span>
+    <span class="c1"># assert(!any(s-&gt;isnan(s), x_arr))</span>
+    <span class="c1"># assert(!any(s-&gt;isnan(s), y_arr))</span>
+    <span class="c1"># assert(!any(s-&gt;isnan(s), θ_arr))</span>
+
+    <span class="n">curve</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">theta_arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">curve</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">CurvePt</span><span class="o">.</span><span class="n">CurvePt</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">s_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">k_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">kd_arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">curve</span>
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

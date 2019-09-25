@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.policy package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="envs package" href="envs.html" />
+    <link rel="prev" title="algorithms.distribution package" href="algorithms.distribution.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="algorithms-policy-package">
+<h1>algorithms.policy package<a class="headerlink" href="#algorithms-policy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.policy.GRUCell">
+<span id="algorithms-policy-grucell-module"></span><h2>algorithms.policy.GRUCell module<a class="headerlink" href="#module-algorithms.policy.GRUCell" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.policy.GRUCell.GRUCell">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUCell.</code><code class="sig-name descname">GRUCell</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUCell.html#GRUCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="algorithms.policy.GRUCell.GRUCell.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUCell.html#GRUCell.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.policy.GRUNetwork">
+<span id="algorithms-policy-grunetwork-module"></span><h2>algorithms.policy.GRUNetwork module<a class="headerlink" href="#module-algorithms.policy.GRUNetwork" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.policy.GRUNetwork.GRUNetwork">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUNetwork.</code><code class="sig-name descname">GRUNetwork</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">hidden_dim</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUNetwork.html#GRUNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="algorithms.policy.GRUNetwork.GRUNetwork.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUNetwork.html#GRUNetwork.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.policy.GaussianGRUPolicy">
+<span id="algorithms-policy-gaussiangrupolicy-module"></span><h2>algorithms.policy.GaussianGRUPolicy module<a class="headerlink" href="#module-algorithms.policy.GaussianGRUPolicy" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianGRUPolicy.</code><code class="sig-name descname">GaussianGRUPolicy</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">hidden_dim=32</em>, <em class="sig-param">feature_network=None</em>, <em class="sig-param">state_include_action=True</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em>, <em class="sig-param">mode: int = 0</em>, <em class="sig-param">log_std=0</em>, <em class="sig-param">cuda_enable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.action_space">
+<em class="property">property </em><code class="sig-name descname">action_space</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.action_space" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.dist_info_sym">
+<code class="sig-name descname">dist_info_sym</code><span class="sig-paren">(</span><em class="sig-param">obs_var</em>, <em class="sig-param">state_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.dist_info_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.dist_info_sym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.distribution">
+<em class="property">property </em><code class="sig-name descname">distribution</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.distribution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – input feature</p></li>
+<li><p><strong>h</strong> – hidden layer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>output mean, log std for action and hidden layer for next round</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_action">
+<code class="sig-name descname">get_action</code><span class="sig-paren">(</span><em class="sig-param">observation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_action" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>observation</strong> – input observation</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>get actions from the given observation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions">
+<code class="sig-name descname">get_actions</code><span class="sig-paren">(</span><em class="sig-param">observations</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>observations</strong> – a batch of observations</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>get the corresponding batch of actions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions_with_prev">
+<code class="sig-name descname">get_actions_with_prev</code><span class="sig-paren">(</span><em class="sig-param">observations</em>, <em class="sig-param">prev_actions</em>, <em class="sig-param">prev_hiddens</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions_with_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions_with_prev" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observations</strong> – input batch of observations</p></li>
+<li><p><strong>prev_actions</strong> – previous batch of actions</p></li>
+<li><p><strong>prev_hiddens</strong> – previous hidden layer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>actions for the current batch of observations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_fim">
+<code class="sig-name descname">get_fim</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_fim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_fim" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – input observation feature</p></li>
+<li><p><strong>actions</strong> – input actions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>get fisher information matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_kl">
+<code class="sig-name descname">get_kl</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_kl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_kl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – input feature</p></li>
+<li><p><strong>actions</strong> – actions</p></li>
+<li><p><strong>h</strong> – hidden layer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>KL divergence of updated policy and the old one</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_log_prob">
+<code class="sig-name descname">get_log_prob</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_log_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_log_prob" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – input obs feature</p></li>
+<li><p><strong>actions</strong> – input actions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>log likelihood of the actions given the distribution output by the network</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.load_param">
+<code class="sig-name descname">load_param</code><span class="sig-paren">(</span><em class="sig-param">param_path: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.load_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.load_param" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>param_path</strong> – saved parameter file path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, load the parameter into the current model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.observation_space">
+<em class="property">property </em><code class="sig-name descname">observation_space</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.observation_space" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.recurrent">
+<em class="property">property </em><code class="sig-name descname">recurrent</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.recurrent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dones=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.reset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dones</strong> – indicators of whether all the agent have finished their episode or not</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, update some information according the given list of dones</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.state_info_specs">
+<em class="property">property </em><code class="sig-name descname">state_info_specs</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.state_info_specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.vectorized">
+<em class="property">property </em><code class="sig-name descname">vectorized</code><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.vectorized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.policy.GaussianMLPBaseline">
+<span id="algorithms-policy-gaussianmlpbaseline-module"></span><h2>algorithms.policy.GaussianMLPBaseline module<a class="headerlink" href="#module-algorithms.policy.GaussianMLPBaseline" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLP</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">mean_network=None</em>, <em class="sig-param">optimizer=None</em>, <em class="sig-param">hidden_size=(32</em>, <em class="sig-param">32)</em>, <em class="sig-param">step_size=0.01</em>, <em class="sig-param">init_std=1.0</em>, <em class="sig-param">normalize_inputs=True</em>, <em class="sig-param">normalize_outputs=True</em>, <em class="sig-param">subsample_factor=1.0</em>, <em class="sig-param">max_itr=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">ys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> – feature</p></li>
+<li><p><strong>ys</strong> – ground truth y</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, fit our model accordingly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">xs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xs</strong> – input feature</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predicted y given input feature using the model</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLPBaseline</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">subsample_factor=1</em>, <em class="sig-param">num_seq_inputs=1</em>, <em class="sig-param">regressor_args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Baseline model to reduce variance</p>
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>paths</strong> – observations and rewards</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>fitting the baseline model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – giving observations</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predict reward given observations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.set_cuda">
+<code class="sig-name descname">set_cuda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.set_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.set_cuda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.policy.MLP">
+<span id="algorithms-policy-mlp-module"></span><h2>algorithms.policy.MLP module<a class="headerlink" href="#module-algorithms.policy.MLP" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.policy.MLP.MLP">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.MLP.</code><code class="sig-name descname">MLP</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em>, <em class="sig-param">output_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/MLP.html#MLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="algorithms.policy.MLP.MLP.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/MLP.html#MLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.policy">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-algorithms.policy" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="algorithms.html">algorithms package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="algorithms.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="algorithms.AGen.html">algorithms.AGen package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.dataset.html">algorithms.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.distribution.html">algorithms.distribution package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">algorithms.policy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy.GRUCell">algorithms.policy.GRUCell module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy.GRUNetwork">algorithms.policy.GRUNetwork module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy.GaussianGRUPolicy">algorithms.policy.GaussianGRUPolicy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy.GaussianMLPBaseline">algorithms.policy.GaussianMLPBaseline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy.MLP">algorithms.policy.MLP module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.policy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms.utils">algorithms.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="algorithms.html">algorithms package</a><ul>
+      <li>Previous: <a href="algorithms.distribution.html" title="previous chapter">algorithms.distribution package</a></li>
+      <li>Next: <a href="envs.html" title="next chapter">envs package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/algorithms.policy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

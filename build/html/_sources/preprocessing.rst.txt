@@ -1,0 +1,30 @@
+preprocessing package
+=====================
+
+Submodules
+----------
+
+preprocessing.clean\_holo module
+--------------------------------
+
+.. automodule:: preprocessing.clean_holo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+preprocessing.extract\_feature module
+-------------------------------------
+
+.. automodule:: preprocessing.extract_feature
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

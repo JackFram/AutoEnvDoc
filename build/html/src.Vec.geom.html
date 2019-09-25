@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Vec.geom package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.curves package" href="src.curves.html" />
+    <link rel="prev" title="src.Vec package" href="src.Vec.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="src-vec-geom-package">
+<h1>src.Vec.geom package<a class="headerlink" href="#src-vec-geom-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.Vec.geom.geom">
+<span id="src-vec-geom-geom-module"></span><h2>src.Vec.geom.geom module<a class="headerlink" href="#module-src.Vec.geom.geom" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="src.Vec.geom.geom.are_collinear">
+<code class="sig-prename descclassname">src.Vec.geom.geom.</code><code class="sig-name descname">are_collinear</code><span class="sig-paren">(</span><em class="sig-param">a: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">b: src.Vec.VecE2.VecE2</em>, <em class="sig-param">c: src.Vec.VecE2.VecE2</em>, <em class="sig-param">tol: float = 1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/geom.html#are_collinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.geom.are_collinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.geom.cross_product">
+<code class="sig-prename descclassname">src.Vec.geom.geom.</code><code class="sig-name descname">cross_product</code><span class="sig-paren">(</span><em class="sig-param">a: src.Vec.VecE2.VecE2</em>, <em class="sig-param">b: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/geom.html#cross_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.geom.cross_product" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.geom.dot_product">
+<code class="sig-prename descclassname">src.Vec.geom.geom.</code><code class="sig-name descname">dot_product</code><span class="sig-paren">(</span><em class="sig-param">a: src.Vec.VecE2.VecE2</em>, <em class="sig-param">b: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/geom.html#dot_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.geom.dot_product" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.geom.inertial2body">
+<code class="sig-prename descclassname">src.Vec.geom.geom.</code><code class="sig-name descname">inertial2body</code><span class="sig-paren">(</span><em class="sig-param">point</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/geom.html#inertial2body"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.geom.inertial2body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a point in an inertial cartesian coordinate frame
+to be relative to a body’s coordinate frame
+The body’s position is given relative to the same inertial coordinate frame</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.geom.sign">
+<code class="sig-prename descclassname">src.Vec.geom.geom.</code><code class="sig-name descname">sign</code><span class="sig-paren">(</span><em class="sig-param">a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/geom.html#sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.geom.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-src.Vec.geom.line_segment">
+<span id="src-vec-geom-line-segment-module"></span><h2>src.Vec.geom.line_segment module<a class="headerlink" href="#module-src.Vec.geom.line_segment" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.Vec.geom.line_segment.LineSegment">
+<em class="property">class </em><code class="sig-prename descclassname">src.Vec.geom.line_segment.</code><code class="sig-name descname">LineSegment</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.VecE2.VecE2</em>, <em class="sig-param">B: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/line_segment.html#LineSegment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.line_segment.LineSegment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>line segment class</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.line_segment.get_polar_angle">
+<code class="sig-prename descclassname">src.Vec.geom.line_segment.</code><code class="sig-name descname">get_polar_angle</code><span class="sig-paren">(</span><em class="sig-param">seg: src.Vec.geom.line_segment.LineSegment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/line_segment.html#get_polar_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.line_segment.get_polar_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-src.Vec.geom.projectile">
+<span id="src-vec-geom-projectile-module"></span><h2>src.Vec.geom.projectile module<a class="headerlink" href="#module-src.Vec.geom.projectile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.Vec.geom.projectile.Projectile">
+<em class="property">class </em><code class="sig-prename descclassname">src.Vec.geom.projectile.</code><code class="sig-name descname">Projectile</code><span class="sig-paren">(</span><em class="sig-param">pos: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">v: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/projectile.html#Projectile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.projectile.Projectile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Vec.geom.projectile.get_intersection_time">
+<code class="sig-prename descclassname">src.Vec.geom.projectile.</code><code class="sig-name descname">get_intersection_time</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.geom.projectile.Projectile</em>, <em class="sig-param">seg: src.Vec.geom.line_segment.LineSegment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Vec/geom/projectile.html#get_intersection_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Vec.geom.projectile.get_intersection_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>how long does it take for the Projectile to hit a given LineSegment
+:param A: Projectile object
+:param seg: LineSegment
+:return: the time</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.Vec.geom">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.Vec.geom" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.Basic.html">src.Basic package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.MvNormal.html">src.MvNormal package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Record.html">src.Record package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Roadway.html">src.Roadway package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="src.Vec.html">src.Vec package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.Vec.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.Vec.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.Vec.html#module-src.Vec.VecE2">src.Vec.VecE2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.Vec.html#module-src.Vec.VecSE2">src.Vec.VecSE2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.Vec.html#module-src.Vec">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.curves.html">src.curves package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.const">src.const module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.ngsim_trajdata">src.ngsim_trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.roadway">src.roadway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.splines">src.splines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajdata">src.trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajectory_smoothing">src.trajectory_smoothing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="src.html">src package</a><ul>
+  <li><a href="src.Vec.html">src.Vec package</a><ul>
+      <li>Previous: <a href="src.Vec.html" title="previous chapter">src.Vec package</a></li>
+      <li>Next: <a href="src.curves.html" title="next chapter">src.curves package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/src.Vec.geom.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

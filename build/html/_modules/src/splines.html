@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.splines &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.splines</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="k">import</span> <span class="n">linalg</span><span class="p">,</span> <span class="n">lil_matrix</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">used to interpolate and smooth the roadway</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_fit_open</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    fitting open curve</span>
+<span class="sd">    :param pts: points to be fitted</span>
+<span class="sd">    :return: fitted points</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">M</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">M</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">lil_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">ind_hi</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ind_lo</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">ind_hi</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">ind_lo</span><span class="p">])</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">lsqr</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">spline_coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">]</span>  <span class="c1"># x₀</span>
+        <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>  <span class="c1"># x&#39;₀</span>
+        <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">D</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">D</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># -3x₀ + 3x₁ - 2x&#39;₀ - x&#39;₁</span>
+        <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">D</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">D</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># 2x₀ - 2x₁ +  x&#39;₀ + x&#39;₁</span>
+
+        <span class="n">retval</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">spline_coeffs</span>
+    <span class="k">return</span> <span class="n">retval</span>
+
+
+<div class="viewcode-block" id="fit_cubic_spline"><a class="viewcode-back" href="../../src.html#src.splines.fit_cubic_spline">[docs]</a><span class="k">def</span> <span class="nf">fit_cubic_spline</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">open</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_fit_open</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_derivative"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_derivative">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_derivative</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="c1"># here t is generally expected to be t ∈ [0,1]</span>
+    <span class="k">return</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_derivative2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_derivative2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_derivative2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="c1"># here t is generally expected to be t ∈ [0,1]</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_speed_1"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_speed_1">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">dxdt</span> <span class="o">=</span> <span class="n">sample_spline_derivative</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">dydt</span> <span class="o">=</span> <span class="n">sample_spline_derivative</span><span class="p">(</span><span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dxdt</span><span class="p">,</span> <span class="n">dydt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_speed_2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_speed_2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_speed_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">n</span> <span class="o">==</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">col_ind</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">t</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t</span> <span class="o">-</span> <span class="n">col_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calc_curve_length_1"><a class="viewcode-back" href="../../src.html#src.splines.calc_curve_length_1">[docs]</a><span class="k">def</span> <span class="nf">calc_curve_length_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">n_intervals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+
+    <span class="c1"># integrate using Simpson&#39;s rule</span>
+    <span class="c1"># _integrate_simpsons(t-&gt;sample_spline_speed(spline_coeffs_x, spline_coeffs_y, t), 0.0, 1.0, n_intervals)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n_intervals</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span>
+                                                                                                <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">flip</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">+=</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">flip</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">flip</span>
+    <span class="k">return</span> <span class="n">h</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="calc_curve_length_2"><a class="viewcode-back" href="../../src.html#src.splines.calc_curve_length_2">[docs]</a><span class="k">def</span> <span class="nf">calc_curve_length_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">n_intervals_per_segment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="nb">len</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cal curve length: </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="nb">len</span> <span class="o">+=</span> <span class="n">calc_curve_length_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">n_intervals</span><span class="o">=</span><span class="n">n_intervals_per_segment</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span></div>
+
+
+<div class="viewcode-block" id="calc_curve_param_given_arclen"><a class="viewcode-back" href="../../src.html#src.splines.calc_curve_param_given_arclen">[docs]</a><span class="k">def</span> <span class="nf">calc_curve_param_given_arclen</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">s_arr</span><span class="p">,</span> <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                                  <span class="n">curve_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">n_intervals_in_arclen</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="n">n_segments</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n_segments</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_arr</span><span class="p">)</span>
+    <span class="n">t_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,))</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">s</span> <span class="o">/</span> <span class="n">curve_length</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">elif</span> <span class="n">s</span> <span class="o">&gt;=</span> <span class="n">curve_length</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_segments</span><span class="p">)</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="c1"># print(&quot;L: &quot;, curve_length)</span>
+    <span class="c1"># print(&quot;s_max: &quot;, s_arr[-1])</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">s_arr</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">t_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">&gt;=</span> <span class="n">curve_length</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_segments</span><span class="p">)</span>
+            <span class="n">t_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="k">continue</span>
+        <span class="n">hi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_segments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">arclength_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n_intervals_in_arclen</span><span class="p">)</span> <span class="o">-</span> <span class="n">s</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">F</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">DF</span> <span class="o">=</span> <span class="n">sample_spline_speed_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">tCandidate</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">F</span> <span class="o">/</span> <span class="n">DF</span>
+            <span class="k">if</span> <span class="n">F</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">hi</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span> <span class="k">if</span> <span class="n">tCandidate</span> <span class="o">&lt;=</span> <span class="n">lo</span> <span class="k">else</span> <span class="n">tCandidate</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lo</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span> <span class="k">if</span> <span class="n">tCandidate</span> <span class="o">&gt;=</span> <span class="n">hi</span> <span class="k">else</span> <span class="n">tCandidate</span>
+        <span class="n">t_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="k">return</span> <span class="n">t_arr</span></div>
+
+
+<div class="viewcode-block" id="arclength_1"><a class="viewcode-back" href="../../src.html#src.splines.arclength_1">[docs]</a><span class="k">def</span> <span class="nf">arclength_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">t_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_intervals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">t_min</span><span class="p">,</span> <span class="n">t_max</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">t_min</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">t_max</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n_intervals</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span>
+                                                                                                <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">flip</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">+=</span> <span class="n">sample_spline_speed_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">flip</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">flip</span>
+    <span class="k">return</span> <span class="n">h</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="arclength_2"><a class="viewcode-back" href="../../src.html#src.splines.arclength_2">[docs]</a><span class="k">def</span> <span class="nf">arclength_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">t_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">n_intervals_per_segment</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">t_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">t_max</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">t_min</span><span class="p">,</span> <span class="n">t_max</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="nb">len</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">t_min</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">t_max</span><span class="p">)),</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">i</span> <span class="o">+</span> <span class="mf">1.0</span>
+
+        <span class="n">spline_ind</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">t_in_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">t_lo</span><span class="p">,</span> <span class="n">t_min</span><span class="p">)</span> <span class="o">-</span> <span class="n">t_lo</span>
+        <span class="n">t_in_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">t_hi</span><span class="p">,</span> <span class="n">t_max</span><span class="p">)</span> <span class="o">-</span> <span class="n">t_lo</span>
+
+        <span class="nb">len</span> <span class="o">+=</span> <span class="n">arclength_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">spline_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">spline_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_in_min</span><span class="p">,</span> <span class="n">t_in_max</span><span class="p">,</span>
+                           <span class="n">n_intervals_per_segment</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">len</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_1"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_1">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="c1"># here t is generally expected to be t ∈ [0,1]</span>
+    <span class="k">return</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">spline_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_2</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">,</span> <span class="n">t_arr</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t_arr</span><span class="p">,)))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">t_arr</span><span class="p">):</span>
+        <span class="n">col_ind</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">t</span><span class="p">))))</span>
+        <span class="n">retval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t</span> <span class="o">-</span> <span class="n">col_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_theta_1"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_theta_1">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_theta_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">stepsize</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">):</span>
+    <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span> <span class="o">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">stepsize</span>
+    <span class="k">if</span> <span class="n">t_hi</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="n">stepsize</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">t</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">t_lo</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">t_hi</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_lo</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">sample_spline_1</span><span class="p">(</span><span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_hi</span><span class="p">)</span>
+
+    <span class="c1"># println(&quot;(t, lo, hi)  $t   $t_lo   $t_hi, ($(atan(y2-y1, x2-x1)))&quot;)</span>
+
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_theta_2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_theta_2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_theta_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_arr</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t_arr</span><span class="p">),))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">t_arr</span><span class="p">):</span>
+        <span class="n">col_ind</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">t</span><span class="p">))))</span>
+        <span class="n">retval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_spline_theta_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                                          <span class="n">t</span> <span class="o">-</span> <span class="n">col_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_curvature_1"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_curvature_1">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="c1"># computes the signed curvature</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">sample_spline_derivative</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">sample_spline_derivative</span><span class="p">(</span><span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">ddx</span> <span class="o">=</span> <span class="n">sample_spline_derivative2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">ddy</span> <span class="o">=</span> <span class="n">sample_spline_derivative2</span><span class="p">(</span><span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">ddy</span> <span class="o">-</span> <span class="n">dy</span><span class="o">*</span><span class="n">ddx</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span><span class="o">*</span><span class="n">dy</span><span class="p">)</span><span class="o">**</span><span class="mf">1.5</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_curvature_2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_curvature_2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_curvature_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_arr</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t_arr</span><span class="p">),))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">t_arr</span><span class="p">):</span>
+        <span class="n">col_ind</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">t</span><span class="p">))))</span>
+        <span class="n">retval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_spline_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                                              <span class="n">t</span> <span class="o">-</span> <span class="n">col_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_derivative_of_curvature_1"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_derivative_of_curvature_1">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_derivative_of_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">stepsize</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">):</span>
+    <span class="c1"># computes the derivative of the signed curvature</span>
+    <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span> <span class="o">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">stepsize</span>
+    <span class="k">if</span> <span class="n">t_hi</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">t</span>
+    <span class="n">k_hi</span> <span class="o">=</span> <span class="n">sample_spline_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_hi</span><span class="p">)</span>
+    <span class="n">k_lo</span> <span class="o">=</span> <span class="n">sample_spline_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_lo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">k_hi</span> <span class="o">-</span> <span class="n">k_lo</span><span class="p">)</span> <span class="o">/</span> <span class="n">stepsize</span></div>
+
+
+<div class="viewcode-block" id="sample_spline_derivative_of_curvature_2"><a class="viewcode-back" href="../../src.html#src.splines.sample_spline_derivative_of_curvature_2">[docs]</a><span class="k">def</span> <span class="nf">sample_spline_derivative_of_curvature_2</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">,</span> <span class="n">spline_coeffs_y</span><span class="p">,</span> <span class="n">t_arr</span><span class="p">,</span> <span class="n">stepsize</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span>
+    <span class="k">assert</span> <span class="n">spline_coeffs_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">spline_coeffs_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t_arr</span><span class="p">),))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">t_arr</span><span class="p">):</span>
+        <span class="n">col_ind</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">t</span><span class="p">))))</span>
+        <span class="n">retval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_spline_derivative_of_curvature_1</span><span class="p">(</span><span class="n">spline_coeffs_x</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">spline_coeffs_y</span><span class="p">[:,</span> <span class="n">col_ind</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                                                            <span class="n">t</span> <span class="o">-</span> <span class="n">col_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">stepsize</span> <span class="o">=</span> <span class="n">stepsize</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

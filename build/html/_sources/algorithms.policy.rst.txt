@@ -1,0 +1,54 @@
+algorithms.policy package
+=========================
+
+Submodules
+----------
+
+algorithms.policy.GRUCell module
+--------------------------------
+
+.. automodule:: algorithms.policy.GRUCell
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.policy.GRUNetwork module
+-----------------------------------
+
+.. automodule:: algorithms.policy.GRUNetwork
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.policy.GaussianGRUPolicy module
+------------------------------------------
+
+.. automodule:: algorithms.policy.GaussianGRUPolicy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.policy.GaussianMLPBaseline module
+--------------------------------------------
+
+.. automodule:: algorithms.policy.GaussianMLPBaseline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.policy.MLP module
+----------------------------
+
+.. automodule:: algorithms.policy.MLP
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.policy
+   :members:
+   :undoc-members:
+   :show-inheritance:

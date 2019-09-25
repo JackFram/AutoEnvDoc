@@ -1,0 +1,74 @@
+src package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+
+   src.Basic
+   src.MvNormal
+   src.Record
+   src.Roadway
+   src.Vec
+   src.curves
+
+Submodules
+----------
+
+src.const module
+----------------
+
+.. automodule:: src.const
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.ngsim\_trajdata module
+--------------------------
+
+.. automodule:: src.ngsim_trajdata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.roadway module
+------------------
+
+.. automodule:: src.roadway
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.splines module
+------------------
+
+.. automodule:: src.splines
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.trajdata module
+-------------------
+
+.. automodule:: src.trajdata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.trajectory\_smoothing module
+--------------------------------
+
+.. automodule:: src.trajectory_smoothing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src
+   :members:
+   :undoc-members:
+   :show-inheritance:

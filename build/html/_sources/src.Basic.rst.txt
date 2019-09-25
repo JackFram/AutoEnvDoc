@@ -1,0 +1,22 @@
+src.Basic package
+=================
+
+Submodules
+----------
+
+src.Basic.Vehicle module
+------------------------
+
+.. automodule:: src.Basic.Vehicle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.Basic
+   :members:
+   :undoc-members:
+   :show-inheritance:

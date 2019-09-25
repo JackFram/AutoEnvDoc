@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.AGen.my_gaussian_gru_policy &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.AGen.my_gaussian_gru_policy</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sandbox.rocky.tf.core.layers</span> <span class="k">as</span> <span class="nn">L</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.core.layers_powered</span> <span class="k">import</span> <span class="n">LayersPowered</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.core.network</span> <span class="k">import</span> <span class="n">GRUNetwork</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.distributions.recurrent_diagonal_gaussian</span> <span class="k">import</span> <span class="n">RecurrentDiagonalGaussian</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.misc</span> <span class="k">import</span> <span class="n">tensor_utils</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.policies.base</span> <span class="k">import</span> <span class="n">StochasticPolicy</span>
+
+<span class="kn">from</span> <span class="nn">rllab.core.serializable</span> <span class="k">import</span> <span class="n">Serializable</span>
+<span class="kn">from</span> <span class="nn">rllab.misc.overrides</span> <span class="k">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">rllab.misc</span> <span class="k">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="myGaussianGRUPolicy"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy">[docs]</a><span class="k">class</span> <span class="nc">myGaussianGRUPolicy</span><span class="p">(</span><span class="n">StochasticPolicy</span><span class="p">,</span> <span class="n">LayersPowered</span><span class="p">,</span> <span class="n">Serializable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">env_spec</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+            <span class="n">feature_network</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">state_include_action</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">hidden_nonlinearity</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
+            <span class="n">gru_layer_cls</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">GRULayer</span><span class="p">,</span>
+            <span class="n">learn_std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">init_std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">output_nonlinearity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param env_spec: A spec for the env.</span>
+<span class="sd">        :param hidden_dim: dimension of hidden layer</span>
+<span class="sd">        :param hidden_nonlinearity: nonlinearity used for each hidden layer</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">Serializable</span><span class="o">.</span><span class="n">quick_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">myGaussianGRUPolicy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">env_spec</span><span class="p">)</span>
+
+            <span class="n">obs_dim</span> <span class="o">=</span> <span class="n">env_spec</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">flat_dim</span>
+            <span class="n">action_dim</span> <span class="o">=</span> <span class="n">env_spec</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flat_dim</span>
+
+            <span class="k">if</span> <span class="n">state_include_action</span><span class="p">:</span>
+                <span class="n">input_dim</span> <span class="o">=</span> <span class="n">obs_dim</span> <span class="o">+</span> <span class="n">action_dim</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_dim</span> <span class="o">=</span> <span class="n">obs_dim</span>
+
+            <span class="n">l_input</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">InputLayer</span><span class="p">(</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;input&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">feature_network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">feature_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+                <span class="n">l_flat_feature</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">l_feature</span> <span class="o">=</span> <span class="n">l_input</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">feature_dim</span> <span class="o">=</span> <span class="n">feature_network</span><span class="o">.</span><span class="n">output_layer</span><span class="o">.</span><span class="n">output_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">l_flat_feature</span> <span class="o">=</span> <span class="n">feature_network</span><span class="o">.</span><span class="n">output_layer</span>
+                <span class="n">l_feature</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">OpLayer</span><span class="p">(</span>
+                    <span class="n">l_flat_feature</span><span class="p">,</span>
+                    <span class="n">extras</span><span class="o">=</span><span class="p">[</span><span class="n">l_input</span><span class="p">],</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;reshape_feature&quot;</span><span class="p">,</span>
+                    <span class="n">op</span><span class="o">=</span><span class="k">lambda</span> <span class="n">flat_feature</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="n">flat_feature</span><span class="p">,</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="nb">input</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="nb">input</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="n">feature_dim</span><span class="p">])</span>
+                    <span class="p">),</span>
+                    <span class="n">shape_op</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">feature_dim</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">mean_network</span> <span class="o">=</span> <span class="n">GRUNetwork</span><span class="p">(</span>
+                <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">feature_dim</span><span class="p">,),</span>
+                <span class="n">input_layer</span><span class="o">=</span><span class="n">l_feature</span><span class="p">,</span>
+                <span class="n">output_dim</span><span class="o">=</span><span class="n">action_dim</span><span class="p">,</span>
+                <span class="n">hidden_dim</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+                <span class="n">hidden_nonlinearity</span><span class="o">=</span><span class="n">hidden_nonlinearity</span><span class="p">,</span>
+                <span class="n">output_nonlinearity</span><span class="o">=</span><span class="n">output_nonlinearity</span><span class="p">,</span>
+                <span class="n">gru_layer_cls</span><span class="o">=</span><span class="n">gru_layer_cls</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mean_network&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">l_log_std</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">ParamLayer</span><span class="p">(</span>
+                <span class="n">mean_network</span><span class="o">.</span><span class="n">input_layer</span><span class="p">,</span>
+                <span class="n">num_units</span><span class="o">=</span><span class="n">action_dim</span><span class="p">,</span>
+                <span class="n">param</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">constant_initializer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">init_std</span><span class="p">)),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;output_log_std&quot;</span><span class="p">,</span>
+                <span class="n">trainable</span><span class="o">=</span><span class="n">learn_std</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">l_step_log_std</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">ParamLayer</span><span class="p">(</span>
+                <span class="n">mean_network</span><span class="o">.</span><span class="n">step_input_layer</span><span class="p">,</span>
+                <span class="n">num_units</span><span class="o">=</span><span class="n">action_dim</span><span class="p">,</span>
+                <span class="n">param</span><span class="o">=</span><span class="n">l_log_std</span><span class="o">.</span><span class="n">param</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;step_output_log_std&quot;</span><span class="p">,</span>
+                <span class="n">trainable</span><span class="o">=</span><span class="n">learn_std</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean_network</span> <span class="o">=</span> <span class="n">mean_network</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_network</span> <span class="o">=</span> <span class="n">feature_network</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l_input</span> <span class="o">=</span> <span class="n">l_input</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span> <span class="o">=</span> <span class="n">state_include_action</span>
+
+            <span class="n">flat_input_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;flat_input&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">feature_network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">feature_var</span> <span class="o">=</span> <span class="n">flat_input_var</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">feature_var</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">l_flat_feature</span><span class="p">,</span> <span class="p">{</span><span class="n">feature_network</span><span class="o">.</span><span class="n">input_layer</span><span class="p">:</span> <span class="n">flat_input_var</span><span class="p">})</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_step_mean_std</span> <span class="o">=</span> <span class="n">tensor_utils</span><span class="o">.</span><span class="n">compile_function</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">flat_input_var</span><span class="p">,</span>
+                    <span class="n">mean_network</span><span class="o">.</span><span class="n">step_prev_state_layer</span><span class="o">.</span><span class="n">input_var</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">get_output</span><span class="p">([</span>
+                    <span class="n">mean_network</span><span class="o">.</span><span class="n">step_output_layer</span><span class="p">,</span>
+                    <span class="n">l_step_log_std</span><span class="p">,</span>
+                    <span class="n">mean_network</span><span class="o">.</span><span class="n">step_hidden_layer</span><span class="p">,</span>
+                <span class="p">],</span> <span class="p">{</span><span class="n">mean_network</span><span class="o">.</span><span class="n">step_input_layer</span><span class="p">:</span> <span class="n">feature_var</span><span class="p">})</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">l_log_std</span> <span class="o">=</span> <span class="n">l_log_std</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_dim</span> <span class="o">=</span> <span class="n">action_dim</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">RecurrentDiagonalGaussian</span><span class="p">(</span><span class="n">action_dim</span><span class="p">)</span>
+
+            <span class="n">out_layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">mean_network</span><span class="o">.</span><span class="n">output_layer</span><span class="p">,</span> <span class="n">l_log_std</span><span class="p">,</span> <span class="n">l_step_log_std</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">feature_network</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_network</span><span class="o">.</span><span class="n">output_layer</span><span class="p">)</span>
+
+            <span class="n">LayersPowered</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_layers</span><span class="p">)</span>
+
+<div class="viewcode-block" id="myGaussianGRUPolicy.dist_info_sym"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.dist_info_sym">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">dist_info_sym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">state_info_vars</span><span class="p">):</span>
+        <span class="n">n_batches</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">obs_var</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_steps</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">obs_var</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">obs_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">n_batches</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="n">prev_action_var</span> <span class="o">=</span> <span class="n">state_info_vars</span><span class="p">[</span><span class="s2">&quot;prev_action&quot;</span><span class="p">]</span>
+            <span class="n">all_input_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">obs_var</span><span class="p">,</span> <span class="n">prev_action_var</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_input_var</span> <span class="o">=</span> <span class="n">obs_var</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">means</span><span class="p">,</span> <span class="n">log_stds</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_network</span><span class="o">.</span><span class="n">output_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_log_std</span><span class="p">],</span>
+                <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">l_input</span><span class="p">:</span> <span class="n">all_input_var</span><span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flat_input_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">all_input_var</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span><span class="p">))</span>
+            <span class="n">means</span><span class="p">,</span> <span class="n">log_stds</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_network</span><span class="o">.</span><span class="n">output_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_log_std</span><span class="p">],</span>
+                <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">l_input</span><span class="p">:</span> <span class="n">all_input_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_network</span><span class="o">.</span><span class="n">input_layer</span><span class="p">:</span> <span class="n">flat_input_var</span><span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="n">log_std</span><span class="o">=</span><span class="n">log_stds</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="myGaussianGRUPolicy.reset"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dones</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dones</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dones</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span>
+        <span class="n">dones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dones</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dones</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dones</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flat_dim</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dones</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span><span class="p">[</span><span class="n">dones</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span><span class="p">[</span><span class="n">dones</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_network</span><span class="o">.</span><span class="n">hid_init_param</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
+
+    <span class="c1"># The return value is a pair. The first item is a matrix (N, A), where each</span>
+    <span class="c1"># entry corresponds to the action value taken. The second item is a vector</span>
+    <span class="c1"># of length N, where each entry is the density value for that action, under</span>
+    <span class="c1"># the current policy</span>
+<div class="viewcode-block" id="myGaussianGRUPolicy.get_action"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_action">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">get_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation</span><span class="p">):</span>
+        <span class="n">actions</span><span class="p">,</span> <span class="n">agent_infos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_actions</span><span class="p">([</span><span class="n">observation</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">agent_infos</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+<div class="viewcode-block" id="myGaussianGRUPolicy.get_actions"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">get_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observations</span><span class="p">):</span>
+        <span class="n">flat_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">flatten_n</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span>
+        <span class="c1"># self.prev_actions.shape = np.zeros([1,2], dtype=float)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">all_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+                <span class="n">flat_obs</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span>
+            <span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_input</span> <span class="o">=</span> <span class="n">flat_obs</span>
+
+        <span class="n">means</span><span class="p">,</span> <span class="n">log_stds</span><span class="p">,</span> <span class="n">hidden_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_step_mean_std</span><span class="p">(</span><span class="n">all_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span><span class="p">)</span>
+
+        <span class="n">rnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">rnd</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_stds</span><span class="p">)</span> <span class="o">+</span> <span class="n">means</span>
+        <span class="n">prev_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flatten_n</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span> <span class="o">=</span> <span class="n">hidden_vec</span>
+        <span class="n">agent_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="n">log_std</span><span class="o">=</span><span class="n">log_stds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="n">agent_info</span><span class="p">[</span><span class="s2">&quot;prev_action&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">prev_actions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">actions</span><span class="p">,</span> <span class="n">agent_info</span><span class="p">,</span> <span class="n">hidden_vec</span></div>
+
+<div class="viewcode-block" id="myGaussianGRUPolicy.get_actions_with_prev"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions_with_prev">[docs]</a>    <span class="k">def</span> <span class="nf">get_actions_with_prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observations</span><span class="p">,</span> <span class="n">prev_actions</span><span class="p">,</span> <span class="n">prev_hiddens</span><span class="p">):</span>
+        <span class="c1"># for getting back to hidden vector and action prediction before prediction</span>
+        <span class="k">if</span> <span class="n">prev_actions</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">prev_hiddens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_actions</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span>
+        <span class="n">flat_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">flatten_n</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span>
+        <span class="c1"># print(flat_obs.shape, prev_actions.shape)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">flat_obs</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">all_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+                <span class="n">flat_obs</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">prev_actions</span><span class="p">,</span> <span class="p">[</span><span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="c1"># np.zeros([h,2], dtype=float)</span>
+            <span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_input</span> <span class="o">=</span> <span class="n">flat_obs</span>
+
+        <span class="n">means</span><span class="p">,</span> <span class="n">log_stds</span><span class="p">,</span> <span class="n">hidden_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_step_mean_std</span><span class="p">(</span><span class="n">all_input</span><span class="p">,</span> <span class="n">prev_hiddens</span><span class="p">)</span>
+        <span class="n">rnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">rnd</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_stds</span><span class="p">)</span> <span class="o">+</span> <span class="n">means</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flatten_n</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_hiddens</span> <span class="o">=</span> <span class="n">hidden_vec</span>
+        <span class="n">agent_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="n">log_std</span><span class="o">=</span><span class="n">log_stds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="n">agent_info</span><span class="p">[</span><span class="s2">&quot;prev_action&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">prev_actions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">actions</span><span class="p">,</span> <span class="n">agent_info</span><span class="p">,</span> <span class="n">hidden_vec</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">recurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state_info_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_include_action</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;prev_action&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_dim</span><span class="p">,)),</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="myGaussianGRUPolicy.log_diagnostics"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.log_diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">log_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="n">log_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">path</span><span class="p">[</span><span class="s2">&quot;agent_infos&quot;</span><span class="p">][</span><span class="s2">&quot;log_std&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">record_tabular</span><span class="p">(</span><span class="s1">&#39;AveragePolicyStd&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_stds</span><span class="p">)))</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

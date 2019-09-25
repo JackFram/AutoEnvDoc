@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>envs.build_env &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for envs.build_env</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">envs.make</span> <span class="k">import</span> <span class="n">make_env</span><span class="p">,</span> <span class="n">Env</span>
+<span class="kn">from</span> <span class="nn">envs.utils</span> <span class="k">import</span> <span class="n">add_kwargs_to_reset</span>
+
+<span class="kn">from</span> <span class="nn">rllab.envs.normalized_env</span> <span class="k">import</span> <span class="n">normalize</span> <span class="k">as</span> <span class="n">normalize_env</span>
+
+<span class="kn">from</span> <span class="nn">hgail.policies.latent_sampler</span> <span class="k">import</span> <span class="n">UniformlyRandomLatentSampler</span>
+<span class="kn">from</span> <span class="nn">hgail.policies.scheduling</span> <span class="k">import</span> <span class="n">ConstantIntervalScheduler</span>
+<span class="kn">from</span> <span class="nn">hgail.envs.spec_wrapper_env</span> <span class="k">import</span> <span class="n">SpecWrapperEnv</span>
+<span class="kn">from</span> <span class="nn">hgail.policies.categorical_latent_sampler</span> <span class="k">import</span> <span class="n">CategoricalLatentSampler</span>
+<span class="kn">from</span> <span class="nn">hgail.samplers.hierarchy_sampler</span> <span class="k">import</span> <span class="n">HierarchySampler</span>
+<span class="kn">from</span> <span class="nn">hgail.algos.hgail_impl</span> <span class="k">import</span> <span class="n">Level</span>
+<span class="kn">from</span> <span class="nn">hgail.envs.vectorized_normalized_env</span> <span class="k">import</span> <span class="n">vectorized_normalized_env</span>
+<span class="kn">from</span> <span class="nn">hgail.policies.gaussian_latent_var_gru_policy</span> <span class="k">import</span> <span class="n">GaussianLatentVarGRUPolicy</span>
+<span class="kn">from</span> <span class="nn">hgail.policies.gaussian_latent_var_mlp_policy</span> <span class="k">import</span> <span class="n">GaussianLatentVarMLPPolicy</span>
+<span class="kn">from</span> <span class="nn">hgail.baselines.gaussian_mlp_baseline</span> <span class="k">import</span> <span class="n">GaussianMLPBaseline</span>
+
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.spaces.discrete</span> <span class="k">import</span> <span class="n">Discrete</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.algos.trpo</span> <span class="k">import</span> <span class="n">TRPO</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.policies.gaussian_mlp_policy</span> <span class="k">import</span> <span class="n">GaussianMLPPolicy</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.policies.gaussian_gru_policy</span> <span class="k">import</span> <span class="n">GaussianGRUPolicy</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.envs.base</span> <span class="k">import</span> <span class="n">TfEnv</span>
+
+<span class="kn">import</span> <span class="nn">hgail.misc.utils</span>
+
+
+<div class="viewcode-block" id="build_ngsim_env"><a class="viewcode-back" href="../../envs.html#envs.build_env.build_ngsim_env">[docs]</a><span class="k">def</span> <span class="nf">build_ngsim_env</span><span class="p">(</span>
+        <span class="n">args</span><span class="p">,</span>
+        <span class="n">exp_dir</span><span class="o">=</span><span class="s1">&#39;/tmp&#39;</span><span class="p">,</span>
+        <span class="n">n_veh</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">render_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">videoMaking</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    building base ngsim env</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/Autoenv/data&#39;</span><span class="p">)</span>
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ngsim_filename</span><span class="p">)]</span>
+    <span class="c1"># if render_params is None:</span>
+    <span class="c1">#     render_params = dict(</span>
+    <span class="c1">#         viz_dir=os.path.join(exp_dir, &#39;imitate/viz&#39;),</span>
+    <span class="c1">#         zoom=5.</span>
+    <span class="c1">#     )</span>
+    <span class="n">env_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">trajectory_filepaths</span><span class="o">=</span><span class="n">filepaths</span><span class="p">,</span>
+        <span class="n">H</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_H</span><span class="p">,</span>
+        <span class="n">primesteps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_primesteps</span><span class="p">,</span>
+        <span class="n">action_repeat</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_action_repeat</span><span class="p">,</span>
+        <span class="n">terminate_on_collision</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">terminate_on_off_road</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="c1"># render_params=render_params,</span>
+        <span class="n">n_envs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_envs</span><span class="p">,</span>
+        <span class="n">n_veh</span><span class="o">=</span><span class="n">n_veh</span><span class="p">,</span>
+        <span class="n">remove_ngsim_veh</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">remove_ngsim_veh</span><span class="p">,</span>
+        <span class="n">reward</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_reward</span>
+    <span class="p">)</span>
+    <span class="c1"># order matters here because multiagent is a subset of vectorized</span>
+    <span class="c1"># i.e., if you want to run with multiagent = true, then vectorize must</span>
+    <span class="c1"># also be true</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">env_multiagent</span><span class="p">:</span>
+        <span class="n">env_id</span> <span class="o">=</span> <span class="s2">&quot;MultiAgentAutoEnv&quot;</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">n_envs</span>
+        <span class="n">normalize_wrapper</span> <span class="o">=</span> <span class="n">vectorized_normalized_env</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">env_id</span> <span class="o">=</span> <span class="s2">&quot;NGSIMEnv&quot;</span>
+        <span class="n">normalize_wrapper</span> <span class="o">=</span> <span class="n">normalize_env</span>
+
+    <span class="c1"># print(env_params)</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Env</span><span class="p">(</span><span class="n">env_id</span><span class="o">=</span><span class="n">env_id</span><span class="p">,</span> <span class="n">env_params</span><span class="o">=</span><span class="n">env_params</span><span class="p">)</span>
+    <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+    <span class="n">trajinfos</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">trajinfos</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">TfEnv</span><span class="p">(</span><span class="n">normalize_wrapper</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">normalize_obs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">obs_alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="c1"># get low and high values for normalizing _real_ actions</span>
+    <span class="n">add_kwargs_to_reset</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">env</span><span class="p">,</span> <span class="n">trajinfos</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span></div>
+
+
+<div class="viewcode-block" id="build_reward_handler"><a class="viewcode-back" href="../../envs.html#envs.build_env.build_reward_handler">[docs]</a><span class="k">def</span> <span class="nf">build_reward_handler</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param args: args for building reward handler</span>
+<span class="sd">    :param writer: None</span>
+<span class="sd">    :return: a reward handler</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">reward_handler</span> <span class="o">=</span> <span class="n">hgail</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">RewardHandler</span><span class="p">(</span>
+        <span class="n">use_env_rewards</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_use_env_rewards</span><span class="p">,</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_max_epochs</span><span class="p">,</span>  <span class="c1"># epoch at which final scales are used</span>
+        <span class="n">critic_final_scale</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_critic_final_scale</span><span class="p">,</span>
+        <span class="n">recognition_initial_scale</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="n">recognition_final_scale</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_recognition_final_scale</span><span class="p">,</span>
+        <span class="n">summary_writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span>
+        <span class="n">normalize_rewards</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">critic_clip_low</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">critic_clip_high</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">reward_handler</span></div>
+
+
+<div class="viewcode-block" id="build_hierarchy"><a class="viewcode-back" href="../../envs.html#envs.build_env.build_hierarchy">[docs]</a><span class="k">def</span> <span class="nf">build_hierarchy</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    build hierarchical model</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">levels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">latent_sampler</span> <span class="o">=</span> <span class="n">UniformlyRandomLatentSampler</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;base_latent_sampler&#39;</span><span class="p">,</span>
+        <span class="n">dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+        <span class="n">scheduler</span><span class="o">=</span><span class="n">ConstantIntervalScheduler</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_H</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">level_idx</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+        <span class="c1"># wrap env in different spec depending on level</span>
+        <span class="k">if</span> <span class="n">level_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">level_env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">level_env</span> <span class="o">=</span> <span class="n">SpecWrapperEnv</span><span class="p">(</span>
+                <span class="n">env</span><span class="p">,</span>
+                <span class="n">action_space</span><span class="o">=</span><span class="n">Discrete</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">),</span>
+                <span class="n">observation_space</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s1">&#39;level_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">level_idx</span><span class="p">)):</span>
+            <span class="c1"># recognition_model = build_recognition_model(args, level_env, writer)</span>
+            <span class="n">recognition_model</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">level_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">policy</span> <span class="o">=</span> <span class="n">build_policy</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">latent_sampler</span><span class="o">=</span><span class="n">latent_sampler</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scheduler</span> <span class="o">=</span> <span class="n">ConstantIntervalScheduler</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scheduler_k</span><span class="p">)</span>
+                <span class="n">policy</span> <span class="o">=</span> <span class="n">latent_sampler</span> <span class="o">=</span> <span class="n">CategoricalLatentSampler</span><span class="p">(</span>
+                    <span class="n">scheduler</span><span class="o">=</span><span class="n">scheduler</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;latent_sampler&#39;</span><span class="p">,</span>
+                    <span class="n">policy_name</span><span class="o">=</span><span class="s1">&#39;latent_sampler_policy&#39;</span><span class="p">,</span>
+                    <span class="n">dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">latent_dim</span><span class="p">,</span>
+                    <span class="n">env_spec</span><span class="o">=</span><span class="n">level_env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+                    <span class="n">latent_sampler</span><span class="o">=</span><span class="n">latent_sampler</span><span class="p">,</span>
+                    <span class="n">max_n_envs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_envs</span>
+                <span class="p">)</span>
+            <span class="n">baseline</span> <span class="o">=</span> <span class="n">build_baseline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">level_env</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">vectorize</span><span class="p">:</span>
+                <span class="n">force_batch_sampler</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">level_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sampler_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_envs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_envs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sampler_args</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">force_batch_sampler</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">sampler_args</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">sampler_cls</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">level_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">HierarchySampler</span>
+            <span class="n">algo</span> <span class="o">=</span> <span class="n">TRPO</span><span class="p">(</span>
+                <span class="n">env</span><span class="o">=</span><span class="n">level_env</span><span class="p">,</span>
+                <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span>
+                <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">max_path_length</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_path_length</span><span class="p">,</span>
+                <span class="n">n_itr</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_itr</span><span class="p">,</span>
+                <span class="n">discount</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">discount</span><span class="p">,</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">trpo_step_size</span><span class="p">,</span>
+                <span class="n">sampler_cls</span><span class="o">=</span><span class="n">sampler_cls</span><span class="p">,</span>
+                <span class="n">force_batch_sampler</span><span class="o">=</span><span class="n">force_batch_sampler</span><span class="p">,</span>
+                <span class="n">sampler_args</span><span class="o">=</span><span class="n">sampler_args</span><span class="p">,</span>
+                <span class="n">optimizer_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">max_backtracks</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                    <span class="n">debug_nan</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">reward_handler</span> <span class="o">=</span> <span class="n">build_reward_handler</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="p">(</span>
+                <span class="n">depth</span><span class="o">=</span><span class="n">level_idx</span><span class="p">,</span>
+                <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="p">,</span>
+                <span class="n">reward_handler</span><span class="o">=</span><span class="n">reward_handler</span><span class="p">,</span>
+                <span class="n">recognition_model</span><span class="o">=</span><span class="n">recognition_model</span><span class="p">,</span>
+                <span class="n">start_itr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">end_itr</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">level_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="p">)</span>
+            <span class="n">levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1"># by convention the order of the levels should be increasing</span>
+    <span class="c1"># but they must be built in the reverse order</span>
+    <span class="c1"># so reverse the list before returning it</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">levels</span><span class="p">))</span></div>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    build policy functions</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="build_policy"><a class="viewcode-back" href="../../envs.html#envs.build_env.build_policy">[docs]</a><span class="k">def</span> <span class="nf">build_policy</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">latent_sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    building policy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_infogail</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">latent_sampler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">latent_sampler</span> <span class="o">=</span> <span class="n">UniformlyRandomLatentSampler</span><span class="p">(</span>
+                <span class="n">scheduler</span><span class="o">=</span><span class="n">ConstantIntervalScheduler</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scheduler_k</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;latent_sampler&#39;</span><span class="p">,</span>
+                <span class="n">dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">latent_dim</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">policy_recurrent</span><span class="p">:</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">GaussianLatentVarGRUPolicy</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span>
+                <span class="n">latent_sampler</span><span class="o">=</span><span class="n">latent_sampler</span><span class="p">,</span>
+                <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+                <span class="n">hidden_dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">recurrent_hidden_dim</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GaussianLatentVarMLPPolicy&quot;</span><span class="p">)</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">GaussianLatentVarMLPPolicy</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span>
+                <span class="n">latent_sampler</span><span class="o">=</span><span class="n">latent_sampler</span><span class="p">,</span>
+                <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+                <span class="n">hidden_sizes</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">policy_mean_hidden_layer_dims</span><span class="p">,</span>
+                <span class="n">std_hidden_sizes</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">policy_std_hidden_layer_dims</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">policy_recurrent</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GaussianGRUPolicy&quot;</span><span class="p">)</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">GaussianGRUPolicy</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span>
+                <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+                <span class="n">hidden_dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">recurrent_hidden_dim</span><span class="p">,</span>
+                <span class="n">output_nonlinearity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">learn_std</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GaussianMLPPolicy&quot;</span><span class="p">)</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">GaussianMLPPolicy</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span>
+                <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+                <span class="n">hidden_sizes</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">policy_mean_hidden_layer_dims</span><span class="p">,</span>
+                <span class="n">std_hidden_sizes</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">policy_std_hidden_layer_dims</span><span class="p">,</span>
+                <span class="n">adaptive_std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">output_nonlinearity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">learn_std</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">policy</span></div>
+
+
+<div class="viewcode-block" id="build_baseline"><a class="viewcode-back" href="../../envs.html#envs.build_env.build_baseline">[docs]</a><span class="k">def</span> <span class="nf">build_baseline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    building baseline</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">GaussianMLPBaseline</span><span class="p">(</span><span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

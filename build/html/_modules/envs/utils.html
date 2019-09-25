@@ -1,0 +1,1073 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>envs.utils &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for envs.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">feature_extractor.feature_extractor</span> <span class="k">import</span> <span class="n">MultiFeatureExtractor</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">src.trajdata</span> <span class="k">import</span> <span class="n">load_trajdata</span><span class="p">,</span> <span class="n">get_corresponding_roadway</span>
+<span class="kn">from</span> <span class="nn">src.Record.frame</span> <span class="k">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">src.Record.record</span> <span class="k">import</span> <span class="n">get_scene</span>
+<span class="kn">from</span> <span class="nn">src.const</span> <span class="k">import</span> <span class="n">NGSIM_FILENAME_TO_ID</span>
+<span class="kn">import</span> <span class="nn">hgail.misc.utils</span>
+<span class="kn">import</span> <span class="nn">rllab.spaces</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+
+
+<div class="viewcode-block" id="build_space"><a class="viewcode-back" href="../../envs.html#envs.utils.build_space">[docs]</a><span class="k">def</span> <span class="nf">build_space</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">space_type</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param shape: shape</span>
+<span class="sd">    :param space_type: space type</span>
+<span class="sd">    :param info: information</span>
+<span class="sd">    :return: space box</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">space_type</span> <span class="o">==</span> <span class="s1">&#39;Box&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;low&#39;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="s1">&#39;high&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;low&#39;</span><span class="p">])</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;high&#39;</span><span class="p">])</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;shape = </span><span class="si">{}</span><span class="se">\t</span><span class="s1">low.shape = </span><span class="si">{}</span><span class="se">\t</span><span class="s1">high.shape=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">shape</span><span class="p">,</span> <span class="n">low</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">high</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">shape</span> <span class="o">==</span> <span class="n">low</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="n">shape</span> <span class="o">==</span> <span class="n">high</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">msg</span>
+            <span class="k">return</span> <span class="n">rllab</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rllab</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">space_type</span> <span class="o">==</span> <span class="s1">&#39;Discrete&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;invalid shape for Discrete space&#39;</span>
+        <span class="k">return</span> <span class="n">rllab</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Discrete</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;space type not implemented: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">space_type</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="dict_get"><a class="viewcode-back" href="../../envs.html#envs.utils.dict_get">[docs]</a><span class="k">def</span> <span class="nf">dict_get</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span></div>
+
+
+<div class="viewcode-block" id="max_n_objects"><a class="viewcode-back" href="../../envs.html#envs.utils.max_n_objects">[docs]</a><span class="k">def</span> <span class="nf">max_n_objects</span><span class="p">(</span><span class="n">trajdatas</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">cur_max</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">trajdata</span> <span class="ow">in</span> <span class="n">trajdatas</span><span class="p">:</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">n_objects_in_frame</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">nframes</span><span class="p">))</span>
+        <span class="n">cur_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">cur_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cur_max</span></div>
+
+
+<div class="viewcode-block" id="fill_infos_cache"><a class="viewcode-back" href="../../envs.html#envs.utils.fill_infos_cache">[docs]</a><span class="k">def</span> <span class="nf">fill_infos_cache</span><span class="p">(</span><span class="n">ext</span><span class="p">:</span> <span class="n">MultiFeatureExtractor</span><span class="p">):</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;feature_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">feature_names</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">&quot;feature_names&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="s2">&quot;is_colliding&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;is_colliding_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;out_of_lane&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;out_of_lane_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;markerdist_left&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;markerdist_left_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;markerdist_right&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;markerdist_right_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;accel&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;accel_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;distance_road_edge_right&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;distance_road_edge_right_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="s2">&quot;distance_road_edge_left&quot;</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;distance_road_edge_left_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">cache</span></div>
+
+
+<div class="viewcode-block" id="index_ngsim_trajectory"><a class="viewcode-back" href="../../envs.html#envs.utils.index_ngsim_trajectory">[docs]</a><span class="k">def</span> <span class="nf">index_ngsim_trajectory</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">minlength</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepath: file path to load trajectory</span>
+<span class="sd">    :param minlength: minimum length for trajectory</span>
+<span class="sd">    :param offset: offset frame</span>
+<span class="sd">    :param verbose:</span>
+<span class="sd">    :return: indexed trajectory data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># setup</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">trajdata</span> <span class="o">=</span> <span class="n">load_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">nframes</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_frames: &quot;</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">)</span>
+    <span class="n">scene_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">n_objects_in_frame</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">nframes</span><span class="p">))</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">()</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">scene_length</span><span class="p">)</span>
+    <span class="n">prev</span><span class="p">,</span> <span class="n">cur</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># iterate each frame collecting info about the vehicles</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">n_frames</span> <span class="o">-</span> <span class="n">offset</span><span class="p">):</span>
+        <span class="c1"># if verbose &gt; 0:</span>
+        <span class="c1">#     print(&quot;\rframe {} / {}&quot;.format(frame, n_frames - offset))</span>
+
+        <span class="n">cur</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">get_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">trajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+        <span class="c1"># add all the vehicles to the current set</span>
+        <span class="c1"># print(&quot;=======frame {}: vehicle num: {}==========\n&quot;.format(frame, scene.n))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">veh</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="c1"># print(&quot;vehicle id: {}&quot;.format(veh.id))</span>
+            <span class="c1"># insert previously unseen vehicles into the index</span>
+            <span class="k">if</span> <span class="n">veh</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prev</span><span class="p">:</span>
+                <span class="n">index</span><span class="p">[</span><span class="n">veh</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="p">}</span>
+                <span class="c1"># print(&quot;vehicle {} start from {}&quot;.format(veh.id, frame))</span>
+
+        <span class="c1"># find vehicles in the previous but not the current frame</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">-</span> <span class="n">cur</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="c1"># set the final frame for all these vehicles</span>
+            <span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># step forward</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">cur</span>
+
+    <span class="c1"># at this point, any ids in cur are in the last frame, so add them in</span>
+    <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+        <span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_frames</span> <span class="o">-</span> <span class="n">offset</span>
+
+    <span class="c1"># postprocess to remove undesirable trajectories</span>
+    <span class="n">del_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">vehid</span><span class="p">,</span> <span class="n">infos</span><span class="p">)</span> <span class="ow">in</span> <span class="n">index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># check for start and end frames</span>
+        <span class="k">if</span> <span class="s2">&quot;ts&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">infos</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;te&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">infos</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;delete vehid </span><span class="si">{}</span><span class="s2"> for missing keys&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vehid</span><span class="p">))</span>
+            <span class="n">del_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">infos</span><span class="p">[</span><span class="s2">&quot;te&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">infos</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minlength</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;delete vehid </span><span class="si">{}</span><span class="s2"> for below minlength&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vehid</span><span class="p">))</span>
+            <span class="n">del_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vehid</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">del_items</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="random_sample_from_set_without_replacement"><a class="viewcode-back" href="../../envs.html#envs.utils.random_sample_from_set_without_replacement">[docs]</a><span class="k">def</span> <span class="nf">random_sample_from_set_without_replacement</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param s: set to sample from</span>
+<span class="sd">    :param n: the number of samples</span>
+<span class="sd">    :return: sampled result</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">n</span>
+    <span class="n">sampled</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="n">sampled</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sample_trajdata_vehicle"><a class="viewcode-back" href="../../envs.html#envs.utils.sample_trajdata_vehicle">[docs]</a><span class="k">def</span> <span class="nf">sample_trajdata_vehicle</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">traj_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">egoid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">traj_idx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">egoid</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">traj_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">egoid</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span>
+        <span class="n">te</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">te</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">te</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">offset</span>
+
+    <span class="k">return</span> <span class="n">traj_idx</span><span class="p">,</span> <span class="n">egoid</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">te</span></div>
+
+
+<div class="viewcode-block" id="sample_multiple_trajdata_vehicle"><a class="viewcode-back" href="../../envs.html#envs.utils.sample_multiple_trajdata_vehicle">[docs]</a><span class="k">def</span> <span class="nf">sample_multiple_trajdata_vehicle</span><span class="p">(</span><span class="n">n_veh</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trajinfos</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_resamples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">egoid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">traj_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">rseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">multiple</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param n_veh: number of vehicles</span>
+<span class="sd">    :param trajinfos: trajectory information</span>
+<span class="sd">    :param offset: offset frame</span>
+<span class="sd">    :param max_resamples: maximum re-sample number</span>
+<span class="sd">    :param egoid: id for the ego vehicle</span>
+<span class="sd">    :param traj_idx: trajectory index</span>
+<span class="sd">    :param verbose: print information or not</span>
+<span class="sd">    :param rseed: random seed</span>
+<span class="sd">    :param multiple: if sample multiple vehicles simultaneously</span>
+<span class="sd">    :return: trajectory index, id for each vehicle, start frame, end frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">rseed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rseed</span><span class="p">)</span>
+    <span class="c1"># if passed in egoid and traj_idx, use those, otherwise, sample</span>
+    <span class="k">if</span> <span class="n">egoid</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">traj_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">traj_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">egoid</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span>
+    <span class="n">te</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span>
+    <span class="c1"># this sampling assumes ts:te-offset is a valid range</span>
+    <span class="c1"># this is enforced by the initial computation of the index / trajinfo</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">te</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+    <span class="c1"># after setting the start timestep randomly from the valid range, next</span>
+    <span class="c1"># update the end timestep to be offset timesteps following it</span>
+    <span class="c1"># this assume that we just want to simulate for offset timesteps</span>
+    <span class="n">te</span> <span class="o">=</span> <span class="n">ts</span> <span class="o">+</span> <span class="n">offset</span>
+    <span class="c1"># find all other vehicles that have at least &#39;offset&#39; many steps in common</span>
+    <span class="c1"># with the first sampled egoid starting from ts. If the number of such</span>
+    <span class="c1"># vehicles is fewer than n_veh, then resample</span>
+    <span class="c1"># start with the set containing the first egoid so we don&#39;t double count it</span>
+    <span class="n">egoids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">egoids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">egoid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">multiple</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">othid</span> <span class="ow">in</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">oth_ts</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">othid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span>
+            <span class="n">oth_te</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">othid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span>
+            <span class="c1"># other vehicle must start at or before ts and must end at or after te</span>
+            <span class="k">if</span> <span class="n">oth_ts</span> <span class="o">&lt;=</span> <span class="n">ts</span> <span class="ow">and</span> <span class="n">te</span> <span class="o">&lt;=</span> <span class="n">oth_te</span><span class="p">:</span>
+                <span class="n">egoids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">othid</span><span class="p">)</span>
+
+    <span class="c1"># check that there are enough valid ids from which to sample</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">egoids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_veh</span><span class="p">:</span>
+        <span class="c1"># if not, resample</span>
+        <span class="c1"># this is not ideal, but dramatically simplifies the multiagent env</span>
+        <span class="c1"># if it becomes a problem, implement a version of the multiagent env</span>
+        <span class="c1"># with asynchronous resets</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;WARNING: insuffcient sampling ids in sample_multiple_trajdata_vehicle,</span><span class="se">\</span>
+<span class="s2">                 resamples remaining: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_resamples</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_resamples</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ERROR: reached maximum resamples in sample_multiple_trajdata_vehicle&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sample_multiple_trajdata_vehicle</span><span class="p">(</span>
+                <span class="n">n_veh</span><span class="p">,</span>
+                <span class="n">trajinfos</span><span class="p">,</span>
+                <span class="n">offset</span><span class="p">,</span>
+                <span class="n">max_resamples</span><span class="o">=</span><span class="n">max_resamples</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+            <span class="p">)</span>
+
+    <span class="c1"># reaching this point means there are sufficient ids, sample the ones to use</span>
+    <span class="n">egoids</span> <span class="o">=</span> <span class="n">random_sample_from_set_without_replacement</span><span class="p">(</span><span class="n">egoids</span><span class="p">,</span> <span class="n">n_veh</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">traj_idx</span><span class="p">,</span> <span class="n">egoids</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">te</span></div>
+
+
+<div class="viewcode-block" id="select_multiple_trajdata_vehicle"><a class="viewcode-back" href="../../envs.html#envs.utils.select_multiple_trajdata_vehicle">[docs]</a><span class="k">def</span> <span class="nf">select_multiple_trajdata_vehicle</span><span class="p">(</span><span class="n">n_veh</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trajinfos</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_resamples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">egoid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">traj_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">period_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">period_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">,</span>
+                                     <span class="n">rseed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multiple</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param n_veh: number of vehicles</span>
+<span class="sd">    :param trajinfos: trajectory information</span>
+<span class="sd">    :param offset: offset frame</span>
+<span class="sd">    :param egoid: id for the ego vehicle</span>
+<span class="sd">    :param traj_idx: trajectory index</span>
+<span class="sd">    :param verbose: print information or not</span>
+<span class="sd">    :param rseed: random seed</span>
+<span class="sd">    :param multiple: if sample multiple vehicles simultaneously</span>
+<span class="sd">    :return: trajectory index, id for each vehicle, start frame, end frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">assert</span> <span class="n">traj_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">egoid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">rseed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rseed</span><span class="p">)</span>
+
+    <span class="n">ts</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">],</span> <span class="n">period_start</span><span class="p">)</span>
+    <span class="n">te</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">],</span> <span class="n">period_end</span><span class="p">)</span>
+    <span class="c1"># find all other vehicles that have at least &#39;offset&#39; many steps in common</span>
+    <span class="c1"># with the first sampled egoid starting from ts. If the number of such</span>
+    <span class="c1"># vehicles is fewer than n_veh, then resample</span>
+    <span class="c1"># start with the set containing the first egoid so we don&#39;t double count it</span>
+    <span class="c1"># print(&quot;id ts te&quot;)</span>
+    <span class="c1"># print(&quot;egoid: &quot;)</span>
+    <span class="c1"># print(&quot;{} {} {}&quot;.format(egoid, ts, te))</span>
+    <span class="n">egoids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">egoid</span><span class="p">])</span>
+    <span class="c1"># print(&quot;egoids: &quot;)</span>
+    <span class="k">if</span> <span class="n">multiple</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">othid</span> <span class="ow">in</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">oth_ts</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">othid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span>
+            <span class="n">oth_te</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">othid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span>
+            <span class="c1"># print(&quot;{} {} {}&quot;.format(othid, oth_ts, oth_te))</span>
+            <span class="n">ts_</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span>
+            <span class="n">te_</span> <span class="o">=</span> <span class="n">trajinfos</span><span class="p">[</span><span class="n">traj_idx</span><span class="p">][</span><span class="n">egoid</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">]</span>
+            <span class="c1"># other vehicle must start at or before ts and must end at or after te</span>
+            <span class="k">if</span> <span class="n">oth_ts</span> <span class="o">&lt;=</span> <span class="n">ts_</span> <span class="ow">and</span> <span class="n">te_</span> <span class="o">&lt;=</span> <span class="n">oth_te</span><span class="p">:</span>
+                <span class="c1"># print(&quot;pushing &quot; + str(othid) + &quot; into egoids&quot;)</span>
+                <span class="n">egoids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">othid</span><span class="p">)</span>
+    <span class="n">n_veh</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">egoids</span><span class="p">)</span>
+    <span class="c1"># print(&quot;n_veh: &quot;, n_veh)</span>
+    <span class="c1"># check that there are enough valid ids from which to select</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">egoids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_veh</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;WARNING: insuffcient sampling ids in sample_multiple_trajdata_vehicle, </span><span class="se">\</span>
+<span class="s2">                resamples remaining: $(max_resamples)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># This should be based on relative distance or something.</span>
+    <span class="n">egoids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">egoids</span><span class="p">)</span>
+    <span class="n">egoids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">egoids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">traj_idx</span><span class="p">,</span> <span class="n">egoids</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">te</span></div>
+
+
+<div class="viewcode-block" id="load_ngsim_trajdatas"><a class="viewcode-back" href="../../envs.html#envs.utils.load_ngsim_trajdatas">[docs]</a><span class="k">def</span> <span class="nf">load_ngsim_trajdatas</span><span class="p">(</span><span class="n">filepaths</span><span class="p">,</span> <span class="n">minlength</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepaths: file path to load trajectory data</span>
+<span class="sd">    :param minlength: minimum length for trajectory</span>
+<span class="sd">    :return: laoded data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># check that indexes exist for the relevant trajdatas</span>
+    <span class="c1"># if they are missing, create the index</span>
+    <span class="c1"># the index is just a collection of metadata that is saved with the</span>
+    <span class="c1"># trajdatas to allow for a more efficient environment implementation</span>
+
+    <span class="n">indexes_filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;-index-</span><span class="si">{}</span><span class="s2">-ids.h5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">minlength</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filepaths</span><span class="p">]</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">index_filepath</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indexes_filepaths</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">index_filepath</span><span class="p">)</span>
+        <span class="c1"># if not os.path.isfile(index_filepath):</span>
+        <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index_ngsim_trajectory</span><span class="p">(</span><span class="n">filepaths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">minlength</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="c1"># print(&quot;index ids: &quot;, ids)</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">te</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+                <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">])</span>
+                <span class="n">te</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">])</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">index_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ids&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;te&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">te</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ids_file</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">index_filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="n">ids_file</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">ids_file</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">te</span> <span class="o">=</span> <span class="n">ids_file</span><span class="p">[</span><span class="s1">&#39;te&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+                <span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="n">ts</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s2">&quot;te&quot;</span><span class="p">:</span> <span class="n">te</span><span class="p">[</span><span class="n">j</span><span class="p">]}</span>
+        <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="n">trajdatas</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of Records.ListRecord</span>
+    <span class="n">roadways</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of Roadway</span>
+
+    <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">filepaths</span><span class="p">:</span>
+        <span class="n">trajdata</span> <span class="o">=</span> <span class="n">load_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">trajdatas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trajdata</span><span class="p">)</span>
+        <span class="n">roadway</span> <span class="o">=</span> <span class="n">get_corresponding_roadway</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">roadways</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roadway</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">trajdatas</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">roadways</span></div>
+
+
+<div class="viewcode-block" id="create_index_file"><a class="viewcode-back" href="../../envs.html#envs.utils.create_index_file">[docs]</a><span class="k">def</span> <span class="nf">create_index_file</span><span class="p">(</span><span class="n">filepaths</span><span class="p">,</span> <span class="n">minlength</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepaths: index file path</span>
+<span class="sd">    :param minlength: minimum length for indexes</span>
+<span class="sd">    :return: no return, create the index file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">indexes_filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;-index-</span><span class="si">{}</span><span class="s2">-ids.h5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">minlength</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filepaths</span><span class="p">]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">index_filepath</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indexes_filepaths</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">index_filepath</span><span class="p">)</span>
+        <span class="c1"># if not os.path.isfile(index_filepath):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index_ngsim_trajectory</span><span class="p">(</span><span class="n">filepaths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">minlength</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;index ids: &quot;</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">te</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;ts&quot;</span><span class="p">])</span>
+            <span class="n">te</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;te&quot;</span><span class="p">])</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">index_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ids&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;te&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">te</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="load_x_feature_names"><a class="viewcode-back" href="../../envs.html#envs.utils.load_x_feature_names">[docs]</a><span class="k">def</span> <span class="nf">load_x_feature_names</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">ngsim_filename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load feature from file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;obs feature: h5 file path: </span><span class="si">{}</span><span class="s2">, ngsim file name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">ngsim_filename</span><span class="p">))</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">traj_id</span> <span class="o">=</span> <span class="n">NGSIM_FILENAME_TO_ID</span><span class="p">[</span><span class="n">ngsim_filename</span><span class="p">]</span>
+    <span class="c1"># in case this nees to allow for multiple files in the future</span>
+    <span class="n">traj_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">traj_id</span><span class="p">]</span>
+    <span class="n">veh_2_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">traj_ids</span><span class="p">:</span>
+        <span class="n">feature_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_feature&quot;</span>
+        <span class="n">index_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span>
+        <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">feature_name</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid key to trajectory data: </span><span class="si">{}</span><span class="s1">_feature&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">index_name</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">veh_2_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">index_name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid key to trajectory index: </span><span class="si">{}</span><span class="s1">_index&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;feature_names&#39;</span><span class="p">]:</span>
+        <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_name</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+    <span class="c1"># f.close()</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">veh_2_index</span><span class="p">,</span> <span class="n">feature_names</span></div>
+
+
+<div class="viewcode-block" id="compute_lengths"><a class="viewcode-back" href="../../envs.html#envs.utils.compute_lengths">[docs]</a><span class="k">def</span> <span class="nf">compute_lengths</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param arr: array</span>
+<span class="sd">    :return: the length of the minimum non-zero list in the array, start index, end index</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">sums</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sums</span><span class="p">:</span>
+        <span class="n">zero_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sample</span> <span class="o">!=</span> <span class="mf">0.</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zero_idxs</span><span class="p">))</span>
+        <span class="n">start</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zero_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">end</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zero_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lengths</span><span class="p">),</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span></div>
+
+
+<div class="viewcode-block" id="normalize"><a class="viewcode-back" href="../../envs.html#envs.utils.normalize">[docs]</a><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">clip_std_multiple</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    apply normalization</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">mean</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-8</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">clip_std_multiple</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="o">-</span> <span class="n">std</span> <span class="o">*</span> <span class="n">clip_std_multiple</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">up</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">std</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span></div>
+
+
+<div class="viewcode-block" id="normalize_range"><a class="viewcode-back" href="../../envs.html#envs.utils.normalize_range">[docs]</a><span class="k">def</span> <span class="nf">normalize_range</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    apply normalize with clipped range</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">low</span><span class="p">)</span>
+    <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">high</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">+</span> <span class="n">low</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="n">half_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">-</span> <span class="n">low</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">half_range</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="load_data"><a class="viewcode-back" href="../../envs.html#envs.utils.load_data">[docs]</a><span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">act_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accel&#39;</span><span class="p">,</span> <span class="s1">&#39;turn_rate_global&#39;</span><span class="p">],</span>
+        <span class="n">ngsim_filename</span><span class="o">=</span><span class="s1">&#39;trajdata_holo_trajectories.txt&#39;</span><span class="p">,</span>
+        <span class="n">debug_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">normalize_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">act_low</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">act_high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">clip_std_multiple</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepath:</span>
+<span class="sd">    :param act_keys:</span>
+<span class="sd">    :param ngsim_filename:</span>
+<span class="sd">    :param debug_size:</span>
+<span class="sd">    :param min_length:</span>
+<span class="sd">    :param normalize_data:</span>
+<span class="sd">    :param shuffle:</span>
+<span class="sd">    :param act_low:</span>
+<span class="sd">    :param act_high:</span>
+<span class="sd">    :param clip_std_multiple:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># loading varies based on dataset type</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">veh_2_index</span><span class="p">,</span> <span class="n">feature_names</span> <span class="o">=</span> <span class="n">load_x_feature_names</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">ngsim_filename</span><span class="p">)</span>
+
+    <span class="c1"># optionally keep it to a reasonable size</span>
+    <span class="k">if</span> <span class="n">debug_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="n">debug_size</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
+
+    <span class="c1"># compute lengths of the samples before anything else b/c this is fragile</span>
+    <span class="n">lengths</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">compute_lengths</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># flatten the dataset to (n_samples, n_features)</span>
+    <span class="c1"># taking only the valid timesteps from each sample</span>
+    <span class="c1"># i.e., throw out timeseries information</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lengths</span><span class="p">):</span>
+        <span class="c1"># enforce minimum length constraint</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="n">min_length</span><span class="p">:</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">start</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">end</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inadequate trajectory length, skipping&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+    <span class="c1"># split into observations and actions</span>
+    <span class="c1"># redundant because the environment is not able to extract actions</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="n">act_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">act_keys</span><span class="p">]</span>
+    <span class="n">act</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">act_idxs</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">normalize_data</span><span class="p">:</span>
+
+        <span class="c1"># normalize it all, _no_ test / val split</span>
+        <span class="n">obs</span><span class="p">,</span> <span class="n">obs_mean</span><span class="p">,</span> <span class="n">obs_std</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">clip_std_multiple</span><span class="p">)</span>
+        <span class="c1"># normalize actions to between -1 and 1</span>
+        <span class="n">act</span> <span class="o">=</span> <span class="n">normalize_range</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">act_low</span><span class="p">,</span> <span class="n">act_high</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">obs_mean</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">obs_std</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">observations</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span>
+        <span class="n">actions</span><span class="o">=</span><span class="n">act</span><span class="p">,</span>
+        <span class="n">obs_mean</span><span class="o">=</span><span class="n">obs_mean</span><span class="p">,</span>
+        <span class="n">obs_std</span><span class="o">=</span><span class="n">obs_std</span><span class="p">,</span>
+    <span class="p">),</span> <span class="n">veh_2_index</span></div>
+
+
+<div class="viewcode-block" id="keep_vehicle_subset"><a class="viewcode-back" href="../../envs.html#envs.utils.keep_vehicle_subset">[docs]</a><span class="k">def</span> <span class="nf">keep_vehicle_subset</span><span class="p">(</span><span class="n">scene</span><span class="p">:</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">keep_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="n">scene_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">scene_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scene</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">scene_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">scene_ids</span><span class="p">)</span>
+    <span class="n">remove_ids</span> <span class="o">=</span> <span class="n">scene_ids</span> <span class="o">-</span> <span class="n">keep_ids</span>
+    <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">remove_ids</span><span class="p">:</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">delete_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scene</span></div>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This is about as hacky as it gets, but I want to avoid editing the rllab </span>
+<span class="sd">source code as much as possible, so it will have to do for now.</span>
+<span class="sd">Add a reset(self, kwargs**) function to the normalizing environment</span>
+<span class="sd">https://stackoverflow.com/questions/972/adding-a-method-to-an-existing-object-instance</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="normalize_env_reset_with_kwargs"><a class="viewcode-back" href="../../envs.html#envs.utils.normalize_env_reset_with_kwargs">[docs]</a><span class="k">def</span> <span class="nf">normalize_env_reset_with_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped_env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_obs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_normalize_obs</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="add_kwargs_to_reset"><a class="viewcode-back" href="../../envs.html#envs.utils.add_kwargs_to_reset">[docs]</a><span class="k">def</span> <span class="nf">add_kwargs_to_reset</span><span class="p">(</span><span class="n">env</span><span class="p">):</span>
+    <span class="n">normalize_env</span> <span class="o">=</span> <span class="n">hgail</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">extract_normalizing_env</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalize_env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">normalize_env</span><span class="o">.</span><span class="n">reset</span> <span class="o">=</span> <span class="n">normalize_env_reset_with_kwargs</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">normalize_env</span><span class="p">)</span></div>
+
+<span class="sd">&#39;&#39;&#39;end of hack, back to our regularly scheduled programming&#39;&#39;&#39;</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Common </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="maybe_mkdir"><a class="viewcode-back" href="../../envs.html#envs.utils.maybe_mkdir">[docs]</a><span class="k">def</span> <span class="nf">maybe_mkdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="str2bool"><a class="viewcode-back" href="../../envs.html#envs.utils.str2bool">[docs]</a><span class="k">def</span> <span class="nf">str2bool</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="write_trajectories"><a class="viewcode-back" href="../../envs.html#envs.utils.write_trajectories">[docs]</a><span class="k">def</span> <span class="nf">write_trajectories</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">trajs</span><span class="p">):</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">trajs</span><span class="o">=</span><span class="n">trajs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="partition_list"><a class="viewcode-back" href="../../envs.html#envs.utils.partition_list">[docs]</a><span class="k">def</span> <span class="nf">partition_list</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">sublists</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+        <span class="n">sublists</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sublists</span></div>
+
+
+<div class="viewcode-block" id="cal_overall_rmse"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_overall_rmse">[docs]</a><span class="k">def</span> <span class="nf">cal_overall_rmse</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">totalStep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">totalStep</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;======================================&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating overall RMSE:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;total step: &quot;</span><span class="p">,</span> <span class="n">totalStep</span><span class="p">)</span>
+    <span class="n">sum_dx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dy</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])):</span>
+                <span class="n">sum_dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+                <span class="n">sum_dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+                <span class="n">sum_dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+                <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">avg_dx</span> <span class="o">=</span> <span class="n">sum_dx</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dy</span> <span class="o">=</span> <span class="n">sum_dy</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dist</span> <span class="o">=</span> <span class="n">sum_dist</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dx: &quot;</span><span class="p">,</span> <span class="n">avg_dx</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dy: &quot;</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dist: &quot;</span><span class="p">,</span> <span class="n">avg_dist</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="n">avg_dx</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="n">avg_dy</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">avg_dist</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="cal_step_rmse"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_step_rmse">[docs]</a><span class="k">def</span> <span class="nf">cal_step_rmse</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">totalStep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">predict_span</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">n_agent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating step RMSE at step </span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;total step: &quot;</span><span class="p">,</span> <span class="n">totalStep</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict span: &quot;</span><span class="p">,</span> <span class="n">predict_span</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_agent: &quot;</span><span class="p">,</span> <span class="n">n_agent</span><span class="p">)</span>
+    <span class="n">sum_dx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dy</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">predict_span</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_agent</span><span class="p">):</span>
+            <span class="n">sum_dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">sum_dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+            <span class="n">sum_dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+    <span class="n">avg_dx</span> <span class="o">=</span> <span class="n">sum_dx</span> <span class="o">/</span> <span class="p">(</span><span class="n">predict_span</span> <span class="o">*</span> <span class="n">n_agent</span><span class="p">)</span>
+    <span class="n">avg_dy</span> <span class="o">=</span> <span class="n">sum_dy</span> <span class="o">/</span> <span class="p">(</span><span class="n">predict_span</span> <span class="o">*</span> <span class="n">n_agent</span><span class="p">)</span>
+    <span class="n">avg_dist</span> <span class="o">=</span> <span class="n">sum_dist</span> <span class="o">/</span> <span class="p">(</span><span class="n">predict_span</span> <span class="o">*</span> <span class="n">n_agent</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dx: &quot;</span><span class="p">,</span> <span class="n">avg_dx</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dy: &quot;</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dist: &quot;</span><span class="p">,</span> <span class="n">avg_dist</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">avg_dx</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">,</span> <span class="n">avg_dist</span></div>
+
+
+<div class="viewcode-block" id="cal_lookahead_rmse"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_lookahead_rmse">[docs]</a><span class="k">def</span> <span class="nf">cal_lookahead_rmse</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">totalStep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">totalStep</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">predict_span</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;======================================&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating look ahead RMSE at step </span><span class="si">{}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;total step: &quot;</span><span class="p">,</span> <span class="n">totalStep</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict span: &quot;</span><span class="p">,</span> <span class="n">predict_span</span><span class="p">)</span>
+    <span class="n">sum_dx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dy</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">totalStep</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+            <span class="k">break</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">sum_dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">sum_dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+            <span class="n">sum_dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+            <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">avg_dx</span> <span class="o">=</span> <span class="n">sum_dx</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dy</span> <span class="o">=</span> <span class="n">sum_dy</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dist</span> <span class="o">=</span> <span class="n">sum_dist</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dx: &quot;</span><span class="p">,</span> <span class="n">avg_dx</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dy: &quot;</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dist: &quot;</span><span class="p">,</span> <span class="n">avg_dist</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">avg_dx</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">,</span> <span class="n">avg_dist</span></div>
+
+
+<div class="viewcode-block" id="cal_agent_rmse"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_agent_rmse">[docs]</a><span class="k">def</span> <span class="nf">cal_agent_rmse</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lookahead_span</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">totalStep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">predict_span</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">n_agent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;======================================&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating agent </span><span class="si">{}</span><span class="s2"> RMSE:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;total step: &quot;</span><span class="p">,</span> <span class="n">totalStep</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;predict span: &quot;</span><span class="p">,</span> <span class="n">predict_span</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;n_agent: &quot;</span><span class="p">,</span> <span class="n">n_agent</span><span class="p">)</span>
+    <span class="n">sum_dx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dy</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+            <span class="n">sum_dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">sum_dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+            <span class="n">sum_dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+            <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">avg_dx</span> <span class="o">=</span> <span class="n">sum_dx</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dy</span> <span class="o">=</span> <span class="n">sum_dy</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="n">avg_dist</span> <span class="o">=</span> <span class="n">sum_dist</span> <span class="o">/</span> <span class="n">step</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dx: &quot;</span><span class="p">,</span> <span class="n">avg_dx</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dy: &quot;</span><span class="p">,</span> <span class="n">avg_dy</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;avg dist: &quot;</span><span class="p">,</span> <span class="n">avg_dist</span><span class="p">)</span>
+    <span class="n">step_error_dx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">step_error_dy</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">step_error_dist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lookahead_span</span><span class="p">):</span>
+        <span class="n">per_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">per_sum_dx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">per_sum_dy</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">per_sum_dist</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="k">break</span>
+            <span class="n">per_sum_dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">per_sum_dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+            <span class="n">per_sum_dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+            <span class="n">per_step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">step_error_dx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">per_sum_dx</span> <span class="o">/</span> <span class="n">per_step</span><span class="p">)</span>
+        <span class="n">step_error_dy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">per_sum_dy</span> <span class="o">/</span> <span class="n">per_step</span><span class="p">)</span>
+        <span class="n">step_error_dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">per_sum_dist</span> <span class="o">/</span> <span class="n">per_step</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;look ahead avg dx: &quot;</span><span class="p">,</span> <span class="n">step_error_dx</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;look ahead avg dy: &quot;</span><span class="p">,</span> <span class="n">step_error_dy</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;look ahead avg dist: &quot;</span><span class="p">,</span> <span class="n">step_error_dist</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="n">avg_dx</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="n">avg_dy</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">avg_dist</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="cal_m_stability"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_m_stability">[docs]</a><span class="k">def</span> <span class="nf">cal_m_stability</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># error (step, predicted_span, n_agent)</span>
+    <span class="n">n_agent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">error_time</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">h</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_agent</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">error</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">error</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">error</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">j</span>
+                <span class="k">break</span>
+        <span class="n">error_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">error_time</span></div>
+
+
+<div class="viewcode-block" id="cal_lookahead"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_lookahead">[docs]</a><span class="k">def</span> <span class="nf">cal_lookahead</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">predict_span</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">rmse_over_lookahead_dx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rmse_over_lookahead_dy</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rmse_over_lookahead_dist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">predict_span</span><span class="p">):</span>  <span class="c1"># this should be the span you want to test</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">cal_lookahead_rmse</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">rmse_over_lookahead_dx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
+        <span class="n">rmse_over_lookahead_dy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span>
+        <span class="n">rmse_over_lookahead_dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmse_over_lookahead_dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="n">rmse_over_lookahead_dx</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="n">rmse_over_lookahead_dy</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">rmse_over_lookahead_dist</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="cal_avg"><a class="viewcode-back" href="../../envs.html#envs.utils.cal_avg">[docs]</a><span class="k">def</span> <span class="nf">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dx_std</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dy_std</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dist_std</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">lookahead_dx</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">lookahead_dy</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">lookahead_dist</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">lookahead_dx_std</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">lookahead_dy_std</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">lookahead_dist_std</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">lh_step</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)]</span>
+
+    <span class="c1"># calculate mean</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">type</span> <span class="ow">and</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dx</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">dy</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+            <span class="n">dist</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span>
+            <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">in</span> <span class="nb">type</span> <span class="ow">and</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lookahead_step</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">])</span>
+            <span class="c1"># print(i, type, lookahead_step)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lookahead_step</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">lookahead_dx</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                    <span class="n">lookahead_dy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                    <span class="n">lookahead_dist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+    <span class="c1"># calculate std</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">type</span> <span class="ow">and</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dx_std</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span><span class="o">/</span><span class="n">step</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">dy_std</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dy</span><span class="o">/</span><span class="n">step</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">dist_std</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dist</span><span class="o">/</span><span class="n">step</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">in</span> <span class="nb">type</span> <span class="ow">and</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lookahead_step</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">])</span>
+            <span class="c1"># print(i, type, lookahead_step)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lookahead_step</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">lookahead_dx_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">lookahead_dx</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">/</span><span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="n">lookahead_dy_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">lookahead_dy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">/</span><span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="n">lookahead_dist_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;dist&quot;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">lookahead_dist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">/</span><span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+    <span class="k">if</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">lookahead_dx</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lookahead_dx</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">lookahead_dy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lookahead_dy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">lookahead_dist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lookahead_dist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">lookahead_dx_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lookahead_dx_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">lookahead_dy_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lookahead_dy_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">lookahead_dist_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lookahead_dist_std</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">lh_step</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="n">lookahead_dx</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="n">lookahead_dy</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">lookahead_dist</span><span class="p">,</span> <span class="s2">&quot;dx_std&quot;</span><span class="p">:</span> <span class="n">lookahead_dx_std</span><span class="p">,</span>
+                <span class="s2">&quot;dy_std&quot;</span><span class="p">:</span> <span class="n">lookahead_dy_std</span><span class="p">,</span> <span class="s2">&quot;dist_std&quot;</span><span class="p">:</span> <span class="n">lookahead_dist_std</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dx_std&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dy_std&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dist_std&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;lookahead&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">step</span><span class="p">,</span> <span class="s2">&quot;dy&quot;</span><span class="p">:</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">step</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">dist</span> <span class="o">/</span> <span class="n">step</span><span class="p">,</span>
+                    <span class="s2">&quot;dx_std&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx_std</span> <span class="o">/</span> <span class="n">step</span><span class="p">),</span> <span class="s2">&quot;dy_std&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dy_std</span> <span class="o">/</span> <span class="n">step</span><span class="p">),</span>
+                    <span class="s2">&quot;dist_std&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist_std</span> <span class="o">/</span> <span class="n">step</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="save_error"><a class="viewcode-back" href="../../envs.html#envs.utils.save_error">[docs]</a><span class="k">def</span> <span class="nf">save_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">overall_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;overall_rmse&quot;</span><span class="p">)</span>
+    <span class="n">curve_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;curve_rmse&quot;</span><span class="p">)</span>
+    <span class="n">lane_change_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;lane_change_rmse&quot;</span><span class="p">)</span>
+    <span class="n">straight_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;straight_rmse&quot;</span><span class="p">)</span>
+    <span class="n">lh_overall_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;overall_lookahead_rmse&quot;</span><span class="p">)</span>
+    <span class="n">lh_curve_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;curve_lookahead_rmse&quot;</span><span class="p">)</span>
+    <span class="n">lh_laneChange_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;lane_change_lookahead_rmse&quot;</span><span class="p">)</span>
+    <span class="n">lh_straight_rmse</span> <span class="o">=</span> <span class="n">cal_avg</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;straight_lookahead_rmse&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==========================================================&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dx: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dy: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dist: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">  [m]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span> <span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dx_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span> <span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dy_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">overall_rmse</span><span class="p">[</span><span class="s1">&#39;dist_std&#39;</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Curve RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dx: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dy: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dist: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">  [m]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span> <span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dx_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span> <span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dy_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">curve_rmse</span><span class="p">[</span><span class="s1">&#39;dist_std&#39;</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lane Change RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dx: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dy: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dist: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">  [m]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span> <span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dx_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span> <span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dy_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">lane_change_rmse</span><span class="p">[</span><span class="s1">&#39;dist_std&#39;</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Straight RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dx: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dy: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">   dist: </span><span class="si">{}</span><span class="s2"> +- </span><span class="si">{}</span><span class="s2">  [m]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span> <span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dx_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span> <span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dy_std&#39;</span><span class="p">],</span>
+                                                            <span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">straight_rmse</span><span class="p">[</span><span class="s1">&#39;dist_std&#39;</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==========================================================&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_overall_rmse</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist std&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_overall_rmse</span><span class="p">[</span><span class="s2">&quot;dist_std&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Curve RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_curve_rmse</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist std&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_curve_rmse</span><span class="p">[</span><span class="s2">&quot;dist_std&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lane Change RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_laneChange_rmse</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist std&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_laneChange_rmse</span><span class="p">[</span><span class="s2">&quot;dist_std&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Straight RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_straight_rmse</span><span class="p">[</span><span class="s2">&quot;dist&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dist std&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lh_straight_rmse</span><span class="p">[</span><span class="s2">&quot;dist_std&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==========================================================&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="print_error"><a class="viewcode-back" href="../../envs.html#envs.utils.print_error">[docs]</a><span class="k">def</span> <span class="nf">print_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">overall_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;overall&quot;</span><span class="p">])</span>
+    <span class="n">curve_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;curve&quot;</span><span class="p">])</span>
+    <span class="n">lane_change_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;lane_change&quot;</span><span class="p">])</span>
+    <span class="n">straight_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;straight&quot;</span><span class="p">])</span>
+    <span class="n">time_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;time_info&quot;</span><span class="p">])</span>
+    <span class="n">orig_traj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;orig_traj&quot;</span><span class="p">])</span>
+    <span class="n">pred_traj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error</span><span class="p">[</span><span class="s2">&quot;pred_traj&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========================================================================================================&quot;</span><span class="p">)</span>
+    <span class="c1"># np.savez(&quot;./orig_traj.npz&quot;, orig_traj)</span>
+    <span class="c1"># np.savez(&quot;./pred_traj.npz&quot;, pred_traj)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;overall lane number: </span><span class="si">{}</span><span class="s2">, curve: </span><span class="si">{}</span><span class="s2">, lane_change: </span><span class="si">{}</span><span class="s2">, straight: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                                                     <span class="n">curve_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                                                     <span class="n">lane_change_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                                                     <span class="n">straight_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;50 steps, 0.1s/step:&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average trajectory prediction time: </span><span class="si">{}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_list</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Look head RMSE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall: &quot;</span><span class="p">,</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Curve: &quot;</span><span class="p">,</span> <span class="n">curve_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lane Change: &quot;</span><span class="p">,</span> <span class="n">lane_change_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Straight: &quot;</span><span class="p">,</span> <span class="n">straight_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Look head RMSE std:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall: &quot;</span><span class="p">,</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Curve: &quot;</span><span class="p">,</span> <span class="n">curve_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lane Change: &quot;</span><span class="p">,</span> <span class="n">lane_change_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Straight: &quot;</span><span class="p">,</span> <span class="n">straight_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Range of RMSE per step:&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overall_error</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">max: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RMSE of Last predicted step: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Std of Last predicted step: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Range of last step RMSE: &quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min: </span><span class="si">{}</span><span class="s2">, max: </span><span class="si">{}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;20 steps, 0.1s/step:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average trajectory prediction time: </span><span class="si">{}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_list</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">overall_error</span> <span class="o">=</span> <span class="n">overall_error</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall: &quot;</span><span class="p">,</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Look head RMSE std:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall: &quot;</span><span class="p">,</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Range of RMSE per step:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">max: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RMSE of Last predicted step: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Std of Last predicted step: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Range of last step RMSE: &quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min: </span><span class="si">{}</span><span class="s2">, max: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">overall_error</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">overall_error</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========================================================================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

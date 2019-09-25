@@ -1,0 +1,468 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Roadway package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.Vec package" href="src.Vec.html" />
+    <link rel="prev" title="src.Record package" href="src.Record.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="src-roadway-package">
+<h1>src.Roadway package<a class="headerlink" href="#src-roadway-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.Roadway.roadway">
+<span id="src-roadway-roadway-module"></span><h2>src.Roadway.roadway module<a class="headerlink" href="#module-src.Roadway.roadway" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.Roadway.roadway.Lane">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">Lane</code><span class="sig-paren">(</span><em class="sig-param">tag: src.Roadway.roadway.LaneTag</em>, <em class="sig-param">curve: list</em>, <em class="sig-param">width: float = 3.0</em>, <em class="sig-param">speed_limit: src.Roadway.roadway.SpeedLimit = &lt;src.Roadway.roadway.SpeedLimit object&gt;</em>, <em class="sig-param">boundary_left: src.Roadway.roadway.LaneBoundary = &lt;src.Roadway.roadway.LaneBoundary object&gt;</em>, <em class="sig-param">boundary_right: src.Roadway.roadway.LaneBoundary = &lt;src.Roadway.roadway.LaneBoundary object&gt;</em>, <em class="sig-param">exits: list = []</em>, <em class="sig-param">entrances: list = []</em>, <em class="sig-param">next: src.Roadway.roadway.RoadIndex = &lt;src.Roadway.roadway.RoadIndex object&gt;</em>, <em class="sig-param">prev: src.Roadway.roadway.RoadIndex = &lt;src.Roadway.roadway.RoadIndex object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Lane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Lane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Lane class</p>
+<dl class="method">
+<dt id="src.Roadway.roadway.Lane.get_by_ind_roadway">
+<code class="sig-name descname">get_by_ind_roadway</code><span class="sig-paren">(</span><em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em>, <em class="sig-param">roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Lane.get_by_ind_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Lane.get_by_ind_roadway" title="Permalink to this definition">¶</a></dt>
+<dd><p>get CurvePt by Curve Index and roadway
+:param ind: Curve Index
+:param roadway: Roadway object
+:return: the corresponding CurvePt object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.LaneBoundary">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">LaneBoundary</code><span class="sig-paren">(</span><em class="sig-param">style: str</em>, <em class="sig-param">color: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#LaneBoundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.LaneBoundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.LaneConnection">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">LaneConnection</code><span class="sig-paren">(</span><em class="sig-param">downstream: bool</em>, <em class="sig-param">mylane: src.curves.CurvePt.CurveIndex</em>, <em class="sig-param">target: src.Roadway.roadway.RoadIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#LaneConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.LaneConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>LaneConnection{I &lt;: Integer, T &lt;: Real}</p>
+</div></blockquote>
+<p>Data structure to specify the connection of a lane. It connects <cite>mylane</cite> to the point <cite>target</cite>.
+<cite>target</cite> would typically be the starting point of a new lane.
+- <cite>downstream::Bool</cite>
+- <cite>mylane::CurveIndex{I,T}</cite>
+- <cite>target::RoadIndex{I,T}</cite></p>
+<dl class="method">
+<dt id="src.Roadway.roadway.LaneConnection.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#LaneConnection.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.LaneConnection.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.LaneTag">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">LaneTag</code><span class="sig-paren">(</span><em class="sig-param">segment: int</em>, <em class="sig-param">lane: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#LaneTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.LaneTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.RoadIndex">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">RoadIndex</code><span class="sig-paren">(</span><em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em>, <em class="sig-param">tag: src.Roadway.roadway.LaneTag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#RoadIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.RoadIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>RoadIndex{I &lt;: Integer, T &lt;: Real}</p>
+</div></blockquote>
+<p>A data structure to index points in a roadway. Calling <cite>roadway[roadind]</cite> will return the point
+associated to the road index.
+# Fields
+- <cite>ind::CurveIndex{I,T}</cite> the index of the point in the curve
+- <cite>tag::LaneTag</cite> the lane tag of the point</p>
+<dl class="method">
+<dt id="src.Roadway.roadway.RoadIndex.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#RoadIndex.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.RoadIndex.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.RoadProjection">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">RoadProjection</code><span class="sig-paren">(</span><em class="sig-param">curveproj: src.curves.CurvePt.CurveProjection</em>, <em class="sig-param">tag: src.Roadway.roadway.LaneTag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#RoadProjection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.RoadProjection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.RoadSegment">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">RoadSegment</code><span class="sig-paren">(</span><em class="sig-param">id: int</em>, <em class="sig-param">lanes: list = []</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#RoadSegment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.RoadSegment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.Roadway">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">Roadway</code><span class="sig-paren">(</span><em class="sig-param">segments: list = []</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.Roadway.roadway.Roadway.get_by_id">
+<code class="sig-name descname">get_by_id</code><span class="sig-paren">(</span><em class="sig-param">segid: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>get seg by a query seg id
+:param segid: query seg id
+:return: the seg correspond to the query seg id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Roadway.roadway.Roadway.get_by_roadindex">
+<code class="sig-name descname">get_by_roadindex</code><span class="sig-paren">(</span><em class="sig-param">roadindex: src.Roadway.roadway.RoadIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway.get_by_roadindex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway.get_by_roadindex" title="Permalink to this definition">¶</a></dt>
+<dd><p>get lane by a query road index
+:param roadindex: query road index
+:return: the lane correspond to the query road index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Roadway.roadway.Roadway.get_by_tag">
+<code class="sig-name descname">get_by_tag</code><span class="sig-paren">(</span><em class="sig-param">tag: src.Roadway.roadway.LaneTag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway.get_by_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway.get_by_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>get lane by a query lane tag
+:param tag: query LaneTag
+:return: the lane correspond to the query lane tag</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Roadway.roadway.Roadway.has_segment">
+<code class="sig-name descname">has_segment</code><span class="sig-paren">(</span><em class="sig-param">segid: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway.has_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway.has_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the roadway object has a seg given the seg id
+:param segid: seg id
+:return: true if there is, false otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Roadway.roadway.Roadway.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#Roadway.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.Roadway.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the roadway information to the file given the filepath
+:param filepath: the file to write, string
+:return: no return</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Roadway.roadway.SpeedLimit">
+<em class="property">class </em><code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">SpeedLimit</code><span class="sig-paren">(</span><em class="sig-param">lo: float</em>, <em class="sig-param">hi: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#SpeedLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.SpeedLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.connect">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param">source: src.Roadway.roadway.Lane</em>, <em class="sig-param">dest: src.Roadway.roadway.Lane</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.get_closest_perpendicular_point_between_points">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">get_closest_perpendicular_point_between_points</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">B: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">Q: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">tolerance: float = 0.01</em>, <em class="sig-param">max_iter: int = 50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#get_closest_perpendicular_point_between_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.get_closest_perpendicular_point_between_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>get closest perpendicular point between given points
+CONDITIONS: a &lt; b, either f(a) &lt; 0 and f(b) &gt; 0 or f(a) &gt; 0 and f(b) &lt; 0
+:param A: start point
+:param B: end point
+:param Q: query point
+:param tolerance: acceptable error in perpendicular component
+:param max_iter: maximum number of iterations
+:return: value which differs from a root of f(x)=0 by less than TOL</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.has_next">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">has_next</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#has_next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given lane has next lane
+:param lane: the given lane
+:return: true if there is, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.has_prev">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">has_prev</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#has_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.has_prev" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given lane has previous lane
+:param lane: the given lane
+:return: true if there is, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.is_between_segments_hi">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">is_between_segments_hi</code><span class="sig-paren">(</span><em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em>, <em class="sig-param">curve: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#is_between_segments_hi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.is_between_segments_hi" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given CurveIndex is the last
+:param ind: CurveIndex
+:return: true if is the last, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.is_between_segments_lo">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">is_between_segments_lo</code><span class="sig-paren">(</span><em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#is_between_segments_lo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.is_between_segments_lo" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given CurveIndex is the first
+:param ind: CurveIndex
+:return: true if is the first, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.is_in_entrances">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">is_in_entrances</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">target: src.Roadway.roadway.LaneTag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#is_in_entrances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.is_in_entrances" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given LaneTag object is in entrances list
+:param lane: Lane object
+:param target: LaneTag object
+:return: true if in entrances list, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.is_in_exits">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">is_in_exits</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">target: src.Roadway.roadway.LaneTag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#is_in_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.is_in_exits" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if the given LaneTag object is in exits list
+:param lane: Lane object
+:param target: LaneTag object
+:return: true if in exits list, false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.n_lanes_left">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">n_lanes_left</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#n_lanes_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.n_lanes_left" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lane</strong> – Lane object</p></li>
+<li><p><strong>roadway</strong> – Roadway object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>how many lane on the right of the given lane</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.n_lanes_right">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">n_lanes_right</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#n_lanes_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.n_lanes_right" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lane</strong> – Lane object</p></li>
+<li><p><strong>roadway</strong> – Roadway object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>how many lane on the left of the given lane</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.next_lane">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">next_lane</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#next_lane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.next_lane" title="Permalink to this definition">¶</a></dt>
+<dd><p>get next lane
+:param lane: Lane object
+:param roadway: Roadway object
+:return: the lane after the given lane</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.next_lane_point">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">next_lane_point</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#next_lane_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.next_lane_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>get next lane point
+:param lane: Lane object
+:param roadway: Roadway object
+:return: the lane point after the given lane</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.parse_lane_connection">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">parse_lane_connection</code><span class="sig-paren">(</span><em class="sig-param">line: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#parse_lane_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.parse_lane_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.prev_lane">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">prev_lane</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#prev_lane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.prev_lane" title="Permalink to this definition">¶</a></dt>
+<dd><p>get previous lane
+:param lane: Lane object
+:param roadway: Roadway object
+:return: the lane before the given lane</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.prev_lane_point">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">prev_lane_point</code><span class="sig-paren">(</span><em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#prev_lane_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.prev_lane_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>get previous lane point
+:param lane: Lane object
+:param roadway: Roadway object
+:return: the lane point before the given lane</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.proj_1">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">proj_1</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">lane: src.Roadway.roadway.Lane</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">move_along_curves: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#proj_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.proj_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>proj(posG::VecSE2, lane::Lane, roadway::Roadway; move_along_curves::Bool=true)
+Return the RoadProjection for projecting posG onto the lane.
+This will automatically project to the next or prev curve as appropriate.
+if <cite>move_along_curves</cite> is false, will only project to lane.curve</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.proj_2">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">proj_2</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#proj_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.proj_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>proj(posG::VecSE2, seg::RoadSegment, roadway::Roadway)
+Return the RoadProjection for projecting posG onto the roadway.
+Tries all of the lanes and gets the closest one</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.read_roadway">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">read_roadway</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#read_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.read_roadway" title="Permalink to this definition">¶</a></dt>
+<dd><p>parse roadway file and read it to a file given the file pointer
+:param fp: the file pointer
+:return: no return</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Roadway.roadway.sign">
+<code class="sig-prename descclassname">src.Roadway.roadway.</code><code class="sig-name descname">sign</code><span class="sig-paren">(</span><em class="sig-param">a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/roadway.html#sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.roadway.sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the sign of a given real number
+:param a: the given real number
+:return: 1 if &gt;0, -1 if &lt;0, 0 if ==0</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.Roadway.utils">
+<span id="src-roadway-utils-module"></span><h2>src.Roadway.utils module<a class="headerlink" href="#module-src.Roadway.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="src.Roadway.utils.mod2pi2">
+<code class="sig-prename descclassname">src.Roadway.utils.</code><code class="sig-name descname">mod2pi2</code><span class="sig-paren">(</span><em class="sig-param">x: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Roadway/utils.html#mod2pi2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Roadway.utils.mod2pi2" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – angle x</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>x mod 2*pi</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.Roadway">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.Roadway" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.Basic.html">src.Basic package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.MvNormal.html">src.MvNormal package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Record.html">src.Record package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">src.Roadway package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.Roadway.roadway">src.Roadway.roadway module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.Roadway.utils">src.Roadway.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.Roadway">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.Vec.html">src.Vec package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.curves.html">src.curves package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.const">src.const module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.ngsim_trajdata">src.ngsim_trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.roadway">src.roadway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.splines">src.splines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajdata">src.trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajectory_smoothing">src.trajectory_smoothing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="src.html">src package</a><ul>
+      <li>Previous: <a href="src.Record.html" title="previous chapter">src.Record package</a></li>
+      <li>Next: <a href="src.Vec.html" title="next chapter">src.Vec package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/src.Roadway.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

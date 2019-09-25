@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Basic package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.MvNormal package" href="src.MvNormal.html" />
+    <link rel="prev" title="src package" href="src.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="src-basic-package">
+<h1>src.Basic package<a class="headerlink" href="#src-basic-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.Basic.Vehicle">
+<span id="src-basic-vehicle-module"></span><h2>src.Basic.Vehicle module<a class="headerlink" href="#module-src.Basic.Vehicle" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.Basic.Vehicle.AgentClass">
+<em class="property">class </em><code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">AgentClass</code><a class="reference internal" href="_modules/src/Basic/Vehicle.html#AgentClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.AgentClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="src.Basic.Vehicle.AgentClass.CAR">
+<code class="sig-name descname">CAR</code><em class="property"> = 2</em><a class="headerlink" href="#src.Basic.Vehicle.AgentClass.CAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.Basic.Vehicle.AgentClass.MOTORCYCLE">
+<code class="sig-name descname">MOTORCYCLE</code><em class="property"> = 1</em><a class="headerlink" href="#src.Basic.Vehicle.AgentClass.MOTORCYCLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.Basic.Vehicle.AgentClass.PEDESTRIAN">
+<code class="sig-name descname">PEDESTRIAN</code><em class="property"> = 4</em><a class="headerlink" href="#src.Basic.Vehicle.AgentClass.PEDESTRIAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="src.Basic.Vehicle.AgentClass.TRUCK">
+<code class="sig-name descname">TRUCK</code><em class="property"> = 3</em><a class="headerlink" href="#src.Basic.Vehicle.AgentClass.TRUCK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Basic.Vehicle.Frenet">
+<em class="property">class </em><code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">Frenet</code><span class="sig-paren">(</span><em class="sig-param">roadind: src.Roadway.roadway.RoadIndex = None</em>, <em class="sig-param">s: float = None</em>, <em class="sig-param">t: float = None</em>, <em class="sig-param">phi: float = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#Frenet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.Frenet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>the relative position of a global point</p>
+<dl class="method">
+<dt id="src.Basic.Vehicle.Frenet.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">roadWay: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#Frenet.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.Frenet.set" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>posG</strong> – the position, a VecSE2 object</p></li>
+<li><p><strong>roadWay</strong> – roadway information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>set the Frenet by projecting posG on the roadway</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Basic.Vehicle.Vehicle">
+<em class="property">class </em><code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">Vehicle</code><span class="sig-paren">(</span><em class="sig-param">state_: src.Basic.Vehicle.VehicleState</em>, <em class="sig-param">def_: src.Basic.Vehicle.VehicleDef</em>, <em class="sig-param">id: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#Vehicle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.Vehicle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.Basic.Vehicle.Vehicle.get_center">
+<em class="property">property </em><code class="sig-name descname">get_center</code><a class="headerlink" href="#src.Basic.Vehicle.Vehicle.get_center" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>global position</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Basic.Vehicle.Vehicle.get_footpoint">
+<em class="property">property </em><code class="sig-name descname">get_footpoint</code><a class="headerlink" href="#src.Basic.Vehicle.Vehicle.get_footpoint" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>get the global position of the rear of the vehicle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Basic.Vehicle.Vehicle.get_targetpoint_delta">
+<code class="sig-name descname">get_targetpoint_delta</code><span class="sig-paren">(</span><em class="sig-param">part: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#Vehicle.get_targetpoint_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.Vehicle.get_targetpoint_delta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>part</strong> – Front or Center or Rear</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>global position of Front or Center or Rear</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Basic.Vehicle.VehicleDef">
+<em class="property">class </em><code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">VehicleDef</code><span class="sig-paren">(</span><em class="sig-param">class_: int = 2</em>, <em class="sig-param">length_: float = 4.0</em>, <em class="sig-param">width_: float = 1.8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#VehicleDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.VehicleDef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.Basic.Vehicle.VehicleDef.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#VehicleDef.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.VehicleDef.write" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fp</strong> – the file pointer to write</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>write Vehicle definition to file, no return</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.Basic.Vehicle.VehicleState">
+<em class="property">class </em><code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">VehicleState</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2 = None</em>, <em class="sig-param">posF: src.Basic.Vehicle.Frenet = None</em>, <em class="sig-param">v: float = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#VehicleState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.VehicleState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.Basic.Vehicle.VehicleState.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">roadWay: src.Roadway.roadway.Roadway</em>, <em class="sig-param">v: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#VehicleState.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.VehicleState.set" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>posG</strong> – global position</p></li>
+<li><p><strong>roadWay</strong> – roadway</p></li>
+<li><p><strong>v</strong> – velocity</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>set value, no return</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Basic.Vehicle.VehicleState.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#VehicleState.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.VehicleState.write" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fp</strong> – file pointer to wirte</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>write vehicle state to file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Basic.Vehicle.get_lane_width">
+<code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">get_lane_width</code><span class="sig-paren">(</span><em class="sig-param">veh: src.Basic.Vehicle.Vehicle</em>, <em class="sig-param">roadway_: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#get_lane_width"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.get_lane_width" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>veh</strong> – Vehicle</p></li>
+<li><p><strong>roadway</strong> – roadway</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>get the lane width of where the current vehicle is</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Basic.Vehicle.get_markerdist_left">
+<code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">get_markerdist_left</code><span class="sig-paren">(</span><em class="sig-param">veh: src.Basic.Vehicle.Vehicle</em>, <em class="sig-param">roadway_: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#get_markerdist_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.get_markerdist_left" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>veh</strong> – Vehicle</p></li>
+<li><p><strong>roadway</strong> – Roadway</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the distance between the vehicle and the left boundary of the lane</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Basic.Vehicle.get_markerdist_right">
+<code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">get_markerdist_right</code><span class="sig-paren">(</span><em class="sig-param">veh: src.Basic.Vehicle.Vehicle</em>, <em class="sig-param">roadway_: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#get_markerdist_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.get_markerdist_right" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>veh</strong> – Vehicle</p></li>
+<li><p><strong>roadway</strong> – Roadway</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the distance between the vehicle and the right boundary of the lane</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Basic.Vehicle.read_def">
+<code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">read_def</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#read_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.read_def" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fp</strong> – the file pointer to read</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the vehicle definition</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.Basic.Vehicle.read_state">
+<code class="sig-prename descclassname">src.Basic.Vehicle.</code><code class="sig-name descname">read_state</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/Basic/Vehicle.html#read_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Basic.Vehicle.read_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fp</strong> – file pointer to read</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>VehicleState object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.Basic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.Basic" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">src.Basic package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.Basic.Vehicle">src.Basic.Vehicle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.Basic">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.MvNormal.html">src.MvNormal package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Record.html">src.Record package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Roadway.html">src.Roadway package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Vec.html">src.Vec package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.curves.html">src.curves package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.const">src.const module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.ngsim_trajdata">src.ngsim_trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.roadway">src.roadway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.splines">src.splines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajdata">src.trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajectory_smoothing">src.trajectory_smoothing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="src.html">src package</a><ul>
+      <li>Previous: <a href="src.html" title="previous chapter">src package</a></li>
+      <li>Next: <a href="src.MvNormal.html" title="next chapter">src.MvNormal package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/src.Basic.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.RL_Algorithm.GAIL.gail &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.RL_Algorithm.GAIL.gail</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">julia</span>
+
+<span class="kn">import</span> <span class="nn">algorithms.RL_Algorithm.utils</span>
+<span class="kn">from</span> <span class="nn">algorithms.utils</span> <span class="k">import</span> <span class="n">save_params</span><span class="p">,</span> <span class="n">extract_normalizing_env</span><span class="p">,</span> <span class="n">load_params</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.samplers.batch_sampler</span> <span class="k">import</span> <span class="n">BatchSampler</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.samplers.vectorized_sampler</span> <span class="k">import</span> <span class="n">VectorizedSampler</span>
+<span class="kn">from</span> <span class="nn">algorithms.RL_Algorithm.optimizers.trpo</span> <span class="k">import</span> <span class="n">trpo_step</span>
+<span class="kn">from</span> <span class="nn">algorithms.RL_Algorithm.optimizers.utils</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">algorithms</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">envs.utils</span> <span class="k">import</span> <span class="n">load_data</span>
+<span class="kn">from</span> <span class="nn">preprocessing.clean_holo</span> <span class="k">import</span> <span class="n">clean_data</span><span class="p">,</span> <span class="n">csv2txt</span><span class="p">,</span> <span class="n">create_lane</span>
+<span class="kn">from</span> <span class="nn">src.trajdata</span> <span class="k">import</span> <span class="n">convert_raw_ngsim_to_trajdatas</span>
+<span class="kn">from</span> <span class="nn">preprocessing.extract_feature</span> <span class="k">import</span> <span class="n">extract_ngsim_features</span>
+
+
+<div class="viewcode-block" id="GAIL"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL">[docs]</a><span class="k">class</span> <span class="nc">GAIL</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">env</span><span class="p">,</span>
+                 <span class="n">policy</span><span class="p">,</span>
+                 <span class="n">baseline</span><span class="p">,</span>
+                 <span class="n">critic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">recognition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">step_size</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                 <span class="n">reward_handler</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">RL_Algorithm</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">RewardHandler</span><span class="p">(),</span>
+                 <span class="n">saver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">saver_filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">snapshot_env</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">n_itr</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">start_itr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">batch_size</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
+                 <span class="n">max_path_length</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">discount</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+                 <span class="n">gae_lambda</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">pause_for_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">center_adv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">positive_adv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">store_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">whole_paths</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">fixed_horizon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">sampler_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sampler_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">force_batch_sampler</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">max_kl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">damping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">l2_reg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">policy_filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">critic_filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">env_filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cuda_enable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">args</span><span class="o">=</span><span class="kc">None</span>
+                 <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param env: Environment</span>
+<span class="sd">        :param policy: Policy</span>
+<span class="sd">        :type policy: Policy</span>
+<span class="sd">        :param baseline: Baseline</span>
+<span class="sd">        :param scope: Scope for identifying the algorithm. Must be specified if running multiple algorithms</span>
+<span class="sd">        simultaneously, each using different environments and policies</span>
+<span class="sd">        :param n_itr: Number of iterations.</span>
+<span class="sd">        :param start_itr: Starting iteration.</span>
+<span class="sd">        :param batch_size: Number of samples per iteration.</span>
+<span class="sd">        :param max_path_length: Maximum length of a single rollout.</span>
+<span class="sd">        :param discount: Discount.</span>
+<span class="sd">        :param gae_lambda: Lambda used for generalized advantage estimation.</span>
+<span class="sd">        :param plot: Plot evaluation run after each iteration.</span>
+<span class="sd">        :param pause_for_plot: Whether to pause before contiuing when plotting.</span>
+<span class="sd">        :param center_adv: Whether to rescale the advantages so that they have mean 0 and standard deviation 1.</span>
+<span class="sd">        :param positive_adv: Whether to shift the advantages so that they are always positive. When used in</span>
+<span class="sd">        conjunction with center_adv the advantages will be standardized before shifting.</span>
+<span class="sd">        :param store_paths: Whether to save all paths data to the snapshot.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline</span> <span class="o">=</span> <span class="n">baseline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_itr</span> <span class="o">=</span> <span class="n">n_itr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_itr</span> <span class="o">=</span> <span class="n">start_itr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_path_length</span> <span class="o">=</span> <span class="n">max_path_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discount</span> <span class="o">=</span> <span class="n">discount</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gae_lambda</span> <span class="o">=</span> <span class="n">gae_lambda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pause_for_plot</span> <span class="o">=</span> <span class="n">pause_for_plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_adv</span> <span class="o">=</span> <span class="n">center_adv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_adv</span> <span class="o">=</span> <span class="n">positive_adv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_paths</span> <span class="o">=</span> <span class="n">store_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">whole_paths</span> <span class="o">=</span> <span class="n">whole_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_horizon</span> <span class="o">=</span> <span class="n">fixed_horizon</span>
+        <span class="k">if</span> <span class="n">sampler_cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">vectorized</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_batch_sampler</span><span class="p">:</span>
+                <span class="n">sampler_cls</span> <span class="o">=</span> <span class="n">VectorizedSampler</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sampler_cls</span> <span class="o">=</span> <span class="n">BatchSampler</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampler_cls</span> <span class="o">=</span> <span class="n">sampler_cls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="n">sampler_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">sampler_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler_args</span> <span class="o">=</span> <span class="n">sampler_args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic</span> <span class="o">=</span> <span class="n">critic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recognition</span> <span class="o">=</span> <span class="n">recognition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_handler</span> <span class="o">=</span> <span class="n">reward_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saver</span> <span class="o">=</span> <span class="n">saver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saver_filepath</span> <span class="o">=</span> <span class="n">saver_filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_env</span> <span class="o">=</span> <span class="n">snapshot_env</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_kl</span> <span class="o">=</span> <span class="n">max_kl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">damping</span> <span class="o">=</span> <span class="n">damping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l2_reg</span> <span class="o">=</span> <span class="n">l2_reg</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic_filepath</span> <span class="o">=</span> <span class="n">critic_filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy_filepath</span> <span class="o">=</span> <span class="n">policy_filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_filepath</span> <span class="o">=</span> <span class="n">env_filepath</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cuda_enable</span> <span class="o">=</span> <span class="n">cuda_enable</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cuda_enable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline</span><span class="o">.</span><span class="n">set_cuda</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">j</span> <span class="o">=</span> <span class="n">julia</span><span class="o">.</span><span class="n">Julia</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="s2">&quot;NGSIM&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_itr</span> <span class="o">=</span> <span class="mi">650</span>
+
+<div class="viewcode-block" id="GAIL.start_worker"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.start_worker">[docs]</a>    <span class="k">def</span> <span class="nf">start_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">start_worker</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GAIL.shutdown_worker"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.shutdown_worker">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">shutdown_worker</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GAIL.obtain_samples"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.obtain_samples">[docs]</a>    <span class="k">def</span> <span class="nf">obtain_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">obtain_samples</span><span class="p">(</span><span class="n">itr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GAIL.process_samples"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.process_samples">[docs]</a>    <span class="k">def</span> <span class="nf">process_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Augment path rewards with critic and recognition model rewards</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            itr: iteration counter</span>
+<span class="sd">            paths: list of dictionaries</span>
+<span class="sd">                each containing info for a single trajectory</span>
+<span class="sd">                each with keys &#39;observations&#39;, &#39;actions&#39;, &#39;agent_infos&#39;, &#39;env_infos&#39;, &#39;rewards&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># compute critic and recognition rewards and combine them with the path rewards</span>
+        <span class="n">critic_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">critique</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">recognition_rewards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognition</span><span class="o">.</span><span class="n">recognize</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognition</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_handler</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">critic_rewards</span><span class="p">,</span> <span class="n">recognition_rewards</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">process_samples</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save a tf checkpoint of the session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># using keep_checkpoint_every_n_hours as proxy for iterations between saves</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">itr</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_itr</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">itr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># collect params (or stuff to keep in general)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="p">:</span>
+                <span class="n">critic_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saver_filepath</span><span class="p">,</span> <span class="s2">&quot;critic_</span><span class="si">{}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                           <span class="n">critic_save_path</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;critic params has been saved to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">critic_save_path</span><span class="p">))</span>
+            <span class="n">policy_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saver_filepath</span><span class="p">,</span> <span class="s2">&quot;policy_</span><span class="si">{}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                       <span class="n">policy_save_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;policy params has been saved to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">policy_save_path</span><span class="p">))</span>
+            <span class="c1"># if the environment is wrapped in a normalizing env, save those stats</span>
+            <span class="n">normalized_env</span> <span class="o">=</span> <span class="n">extract_normalizing_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">normalized_env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="s1">&#39;normalzing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">obs_mean</span><span class="o">=</span><span class="n">normalized_env</span><span class="o">.</span><span class="n">_obs_mean</span><span class="p">,</span>
+                    <span class="n">obs_var</span><span class="o">=</span><span class="n">normalized_env</span><span class="o">.</span><span class="n">_obs_var</span>
+                <span class="p">)</span>
+
+            <span class="c1"># save params</span>
+            <span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saver_filepath</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">save_params</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">max_to_keep</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GAIL.load"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Load parameters from a filepath. Symmetric to _save. This is not ideal,</span>
+<span class="sd">        but it&#39;s easier than keeping track of everything separately.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">load_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_filepath</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;load env normalization param from: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_filepath</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_policy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy_filepath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_critic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critic_filepath</span><span class="p">)</span>
+        <span class="c1"># self.policy.set_param_values(params[&#39;policy&#39;])</span>
+        <span class="n">normalized_env</span> <span class="o">=</span> <span class="n">extract_normalizing_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">normalized_env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">normalized_env</span><span class="o">.</span><span class="n">_obs_mean</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;normalzing&#39;</span><span class="p">][</span><span class="s1">&#39;obs_mean&#39;</span><span class="p">]</span>
+            <span class="n">normalized_env</span><span class="o">.</span><span class="n">_obs_var</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;normalzing&#39;</span><span class="p">][</span><span class="s1">&#39;obs_var&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GAIL.load_critic"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.load_critic">[docs]</a>    <span class="k">def</span> <span class="nf">load_critic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">critic_param_path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;critic loading params from: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">critic_param_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">critic_param_path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GAIL.load_policy"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.load_policy">[docs]</a>    <span class="k">def</span> <span class="nf">load_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_param_path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;policy loading params from: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">policy_param_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">policy_param_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">float</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run validation functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">:</span>
+            <span class="n">objs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">policy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span>
+                <span class="n">critic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="p">,</span>
+                <span class="n">samples_data</span><span class="o">=</span><span class="n">samples_data</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">objs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GAIL.log_diagnostics"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.log_diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">log_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">log_diagnostics</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">log_diagnostics</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline</span><span class="o">.</span><span class="n">log_diagnostics</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GAIL.get_itr_snapshot"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.get_itr_snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">get_itr_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Snapshot critic and recognition model as well</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">itr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">)</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">itr</span><span class="o">=</span><span class="n">itr</span><span class="p">,</span>
+            <span class="n">policy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span>
+            <span class="n">baseline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">baseline</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_env</span><span class="p">:</span>
+            <span class="n">snapshot</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span>
+        <span class="k">if</span> <span class="n">samples_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">snapshot</span><span class="p">[</span><span class="s1">&#39;samples_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s1">&#39;actions&#39;</span> <span class="ow">in</span> <span class="n">samples_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">snapshot</span><span class="p">[</span><span class="s1">&#39;samples_data&#39;</span><span class="p">][</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;mean&#39;</span> <span class="ow">in</span> <span class="n">samples_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">snapshot</span><span class="p">[</span><span class="s1">&#39;samples_data&#39;</span><span class="p">][</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">snapshot</span></div>
+
+<div class="viewcode-block" id="GAIL.optimize_policy"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.optimize_policy">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the critic and recognition model in addition to the policy</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            itr: iteration counter</span>
+<span class="sd">            samples_data: dictionary resulting from process_samples</span>
+<span class="sd">                keys: &#39;rewards&#39;, &#39;observations&#39;, &#39;agent_infos&#39;, &#39;env_infos&#39;, &#39;returns&#39;,</span>
+<span class="sd">                      &#39;actions&#39;, &#39;advantages&#39;, &#39;paths&#39;</span>
+<span class="sd">                the values in the infos dicts can be accessed for example as:</span>
+<span class="sd">                    samples_data[&#39;agent_infos&#39;][&#39;prob&#39;]</span>
+
+<span class="sd">                and the returned value will be an array of shape (batch_size, prob_dim)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obes</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span>
+        <span class="n">advantages</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;advantages&#39;</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;obs shape: </span><span class="si">{}</span><span class="s2">, action shape: </span><span class="si">{}</span><span class="s2">, return shape: </span><span class="si">{}</span><span class="s2">, advantages shape: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;returns&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">samples_data</span><span class="p">[</span><span class="s1">&#39;advantages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">))</span>
+
+        <span class="n">trpo_step</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span>
+            <span class="n">obes</span><span class="p">,</span>
+            <span class="n">actions</span><span class="p">,</span>
+            <span class="n">advantages</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_kl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">damping</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># train critic</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recognition</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GAIL.init_env"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.init_env">[docs]</a>    <span class="k">def</span> <span class="nf">init_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">data_base_dir</span> <span class="o">=</span> <span class="s2">&quot;./preprocessing/data&quot;</span>
+            <span class="n">file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_base_dir</span><span class="p">)</span>
+            <span class="n">dir_name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_base_dir</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)):</span>
+                <span class="n">dir_name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sample from directory: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
+            <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_base_dir</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="s2">&quot;section&quot;</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+                    <span class="n">orig_traj_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">orig_traj_file</span><span class="p">)</span>
+            <span class="n">lane_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="s2">&quot;processed&quot;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_lane&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">[:</span><span class="mi">19</span><span class="p">]))</span>
+            <span class="n">create_lane</span><span class="p">(</span><span class="n">lane_file</span><span class="p">)</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/Autoenv/data/&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="o">.</span><span class="n">write_roadways_to_dxf</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="o">.</span><span class="n">write_roadways_from_dxf</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish generating roadway&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_set</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">trajectory_file</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_set</span><span class="p">))</span>
+        <span class="n">processed_data_path</span> <span class="o">=</span> <span class="s1">&#39;holo_</span><span class="si">{}</span><span class="s1">_perfect_cleaned.csv&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trajectory_file</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">19</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">trajectory_file</span><span class="p">)</span>
+        <span class="n">df_len</span> <span class="o">=</span> <span class="n">clean_data</span><span class="p">(</span><span class="n">trajectory_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">df_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file, skipping&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">csv2txt</span><span class="p">(</span><span class="n">processed_data_path</span><span class="p">)</span>
+        <span class="n">convert_raw_ngsim_to_trajdatas</span><span class="p">()</span>
+        <span class="n">extract_ngsim_features</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="s2">&quot;ngsim_holo_new.h5&quot;</span><span class="p">,</span> <span class="n">n_expert_files</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish converting and feature extraction&quot;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">env</span><span class="p">,</span> <span class="n">trajinfos</span><span class="p">,</span> <span class="n">act_low</span><span class="p">,</span> <span class="n">act_high</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">build_ngsim_env</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">veh_2_index</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">expert_filepath</span><span class="p">,</span>
+            <span class="n">act_low</span><span class="o">=</span><span class="n">act_low</span><span class="p">,</span>
+            <span class="n">act_high</span><span class="o">=</span><span class="n">act_high</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_H</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">env_primesteps</span><span class="p">,</span>
+            <span class="n">clip_std_multiple</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">normalize_clip_std_multiple</span><span class="p">,</span>
+            <span class="n">ngsim_filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">ngsim_filename</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">critic_param_cache</span> <span class="o">=</span> <span class="s1">&#39;./data/experiments/NGSIM-gail/imitate/model/critic_cache.pkl&#39;</span>
+        <span class="n">policy_param_cache</span> <span class="o">=</span> <span class="s1">&#39;./data/experiments/NGSIM-gail/imitate/model/policy_cache.pkl&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="p">:</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">critic_param_cache</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">policy_param_cache</span><span class="p">)</span>
+        <span class="n">critic</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">build_critic</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic</span> <span class="o">=</span> <span class="n">critic</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">critic_param_cache</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_critic</span><span class="p">(</span><span class="n">critic_param_cache</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_critic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critic_filepath</span><span class="p">)</span>
+        <span class="c1"># self.shutdown_worker()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_worker</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cuda_enable</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critic</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="GAIL.train"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.GAIL.html#algorithms.RL_Algorithm.GAIL.gail.GAIL.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_worker</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_filepath</span> <span class="o">=</span> <span class="s2">&quot;./data/experiments/NGSIM-gail/imitate/itr_600.npz&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic_filepath</span> <span class="o">=</span> <span class="s2">&quot;./data/experiments/NGSIM-gail/imitate/model/critic_</span><span class="si">{}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_itr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy_filepath</span> <span class="o">=</span> <span class="s2">&quot;./data/experiments/NGSIM-gail/imitate/model/policy_</span><span class="si">{}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_itr</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loading critic and policy params from file&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">itr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_itr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_itr</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">itr_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing AutoEnv...&quot;</span><span class="p">)</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_env</span><span class="p">(</span><span class="n">itr</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid data, initialize again!&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Obtaining samples...&quot;</span><span class="p">)</span>
+                <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obtain_samples</span><span class="p">(</span><span class="n">itr</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing samples...&quot;</span><span class="p">)</span>
+                <span class="n">samples_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_samples</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logging diagnostics...&quot;</span><span class="p">)</span>
+                <span class="c1"># self.log_diagnostics(paths)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimizing policy...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optimize_policy</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving snapshot...&quot;</span><span class="p">)</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_itr_snapshot</span><span class="p">(</span><span class="n">itr</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_paths</span><span class="p">:</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples_data</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">]</span>
+                <span class="c1"># logger.save_itr_params(itr, params)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ItrTime&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">itr_start_time</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***************************************</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Some error occurred, which is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skip to next iteration&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown_worker</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

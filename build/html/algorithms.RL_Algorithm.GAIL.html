@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.RL_Algorithm.GAIL package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="algorithms.RL_Algorithm.optimizers package" href="algorithms.RL_Algorithm.optimizers.html" />
+    <link rel="prev" title="algorithms.RL_Algorithm package" href="algorithms.RL_Algorithm.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="algorithms-rl-algorithm-gail-package">
+<h1>algorithms.RL_Algorithm.GAIL package<a class="headerlink" href="#algorithms-rl-algorithm-gail-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.GAIL.gail">
+<span id="algorithms-rl-algorithm-gail-gail-module"></span><h2>algorithms.RL_Algorithm.GAIL.gail module<a class="headerlink" href="#module-algorithms.RL_Algorithm.GAIL.gail" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.RL_Algorithm.GAIL.gail.</code><code class="sig-name descname">GAIL</code><span class="sig-paren">(</span><em class="sig-param">env</em>, <em class="sig-param">policy</em>, <em class="sig-param">baseline</em>, <em class="sig-param">critic=None</em>, <em class="sig-param">recognition=None</em>, <em class="sig-param">step_size=0.01</em>, <em class="sig-param">reward_handler=&lt;algorithms.RL_Algorithm.utils.RewardHandler object&gt;</em>, <em class="sig-param">saver=None</em>, <em class="sig-param">saver_filepath=None</em>, <em class="sig-param">validator=None</em>, <em class="sig-param">snapshot_env=True</em>, <em class="sig-param">scope=None</em>, <em class="sig-param">n_itr=500</em>, <em class="sig-param">start_itr=0</em>, <em class="sig-param">batch_size=5000</em>, <em class="sig-param">max_path_length=500</em>, <em class="sig-param">discount=0.99</em>, <em class="sig-param">gae_lambda=1</em>, <em class="sig-param">plot=False</em>, <em class="sig-param">pause_for_plot=False</em>, <em class="sig-param">center_adv=True</em>, <em class="sig-param">positive_adv=False</em>, <em class="sig-param">store_paths=False</em>, <em class="sig-param">whole_paths=True</em>, <em class="sig-param">fixed_horizon=False</em>, <em class="sig-param">sampler_cls=None</em>, <em class="sig-param">sampler_args=None</em>, <em class="sig-param">force_batch_sampler=False</em>, <em class="sig-param">max_kl=None</em>, <em class="sig-param">damping=None</em>, <em class="sig-param">l2_reg=None</em>, <em class="sig-param">policy_filepath=None</em>, <em class="sig-param">critic_filepath=None</em>, <em class="sig-param">env_filepath=None</em>, <em class="sig-param">cuda_enable=True</em>, <em class="sig-param">args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.get_itr_snapshot">
+<code class="sig-name descname">get_itr_snapshot</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">samples_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.get_itr_snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.get_itr_snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Snapshot critic and recognition model as well</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.init_env">
+<code class="sig-name descname">init_env</code><span class="sig-paren">(</span><em class="sig-param">itr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.init_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.init_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load parameters from a filepath. Symmetric to _save. This is not ideal,
+but it’s easier than keeping track of everything separately.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.load_critic">
+<code class="sig-name descname">load_critic</code><span class="sig-paren">(</span><em class="sig-param">critic_param_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.load_critic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.load_critic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.load_policy">
+<code class="sig-name descname">load_policy</code><span class="sig-paren">(</span><em class="sig-param">policy_param_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.load_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.load_policy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.log_diagnostics">
+<code class="sig-name descname">log_diagnostics</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.log_diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.log_diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.obtain_samples">
+<code class="sig-name descname">obtain_samples</code><span class="sig-paren">(</span><em class="sig-param">itr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.obtain_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.obtain_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.optimize_policy">
+<code class="sig-name descname">optimize_policy</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">samples_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.optimize_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.optimize_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the critic and recognition model in addition to the policy</p>
+<dl>
+<dt>Args:</dt><dd><p>itr: iteration counter
+samples_data: dictionary resulting from process_samples</p>
+<blockquote>
+<div><dl class="simple">
+<dt>keys: ‘rewards’, ‘observations’, ‘agent_infos’, ‘env_infos’, ‘returns’,</dt><dd><p>‘actions’, ‘advantages’, ‘paths’</p>
+</dd>
+<dt>the values in the infos dicts can be accessed for example as:</dt><dd><p>samples_data[‘agent_infos’][‘prob’]</p>
+</dd>
+</dl>
+<p>and the returned value will be an array of shape (batch_size, prob_dim)</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.process_samples">
+<code class="sig-name descname">process_samples</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.process_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.process_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Augment path rewards with critic and recognition model rewards</p>
+<dl>
+<dt>Args:</dt><dd><p>itr: iteration counter
+paths: list of dictionaries</p>
+<blockquote>
+<div><p>each containing info for a single trajectory
+each with keys ‘observations’, ‘actions’, ‘agent_infos’, ‘env_infos’, ‘rewards’</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.shutdown_worker">
+<code class="sig-name descname">shutdown_worker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.shutdown_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.shutdown_worker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.start_worker">
+<code class="sig-name descname">start_worker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.start_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.start_worker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.GAIL.train">
+<code class="sig-name descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/GAIL/gail.html#GAIL.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.GAIL.train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.ones">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.GAIL.gail.</code><code class="sig-name descname">ones</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.ones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>1</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 1.,  1.,  1.],</span>
+<span class="go">        [ 1.,  1.,  1.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 1.,  1.,  1.,  1.,  1.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.tensor">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.GAIL.gail.</code><code class="sig-name descname">tensor</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em>, <em class="sig-param">pin_memory=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a tensor with <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code> always copies <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>. If you have a Tensor
+<code class="docutils literal notranslate"><span class="pre">data</span></code> and want to avoid a copy, use <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.requires_grad_()</span></code>
+or <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.detach()</span></code>.
+If you have a NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> and want to avoid a copy, use
+<code class="xref py py-func docutils literal notranslate"><span class="pre">torch.as_tensor()</span></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When data is a tensor <cite>x</cite>, <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code> reads out ‘the data’ from whatever it is passed,
+and constructs a leaf variable. Therefore <code class="docutils literal notranslate"><span class="pre">torch.tensor(x)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">torch.tensor(x,</span> <span class="pre">requires_grad=True)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach().requires_grad_(True)</span></code>.
+The equivalents using <code class="docutils literal notranslate"><span class="pre">clone()</span></code> and <code class="docutils literal notranslate"><span class="pre">detach()</span></code> are recommended.</p>
+</div>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>data (array_like): Initial data for the tensor. Can be a list, tuple,</dt><dd><p>NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, scalar, and other types.</p>
+</dd>
+<dt>dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, infers data type from <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt>pin_memory (bool, optional): If set, returned tensor would be allocated in</dt><dd><p>the pinned memory. Works only for CPU tensors. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.9</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">]])</span>
+<span class="go">tensor([[ 0.1000,  1.2000],</span>
+<span class="go">        [ 2.2000,  3.1000],</span>
+<span class="go">        [ 4.9000,  5.2000]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># Type inference on data</span>
+<span class="go">tensor([ 0,  1])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.11111</span><span class="p">,</span> <span class="mf">0.222222</span><span class="p">,</span> <span class="mf">0.3333333</span><span class="p">]],</span>
+<span class="go">                 dtype=torch.float64,</span>
+<span class="go">                 device=torch.device(&#39;cuda:0&#39;))  # creates a torch.cuda.DoubleTensor</span>
+<span class="go">tensor([[ 0.1111,  0.2222,  0.3333]], dtype=torch.float64, device=&#39;cuda:0&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>  <span class="c1"># Create a scalar (zero-dimensional tensor)</span>
+<span class="go">tensor(3.1416)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>  <span class="c1"># Create an empty tensor (of size (0,))</span>
+<span class="go">tensor([])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.GAIL.gail.zeros">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.GAIL.gail.</code><code class="sig-name descname">zeros</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.GAIL.gail.zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>0</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 0.,  0.,  0.],</span>
+<span class="go">        [ 0.,  0.,  0.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 0.,  0.,  0.,  0.,  0.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.GAIL">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-algorithms.RL_Algorithm.GAIL" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="algorithms.html">algorithms package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="algorithms.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="algorithms.AGen.html">algorithms.AGen package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="algorithms.RL_Algorithm.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#module-algorithms.RL_Algorithm.utils">algorithms.RL_Algorithm.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#module-algorithms.RL_Algorithm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.dataset.html">algorithms.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.distribution.html">algorithms.distribution package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.policy.html">algorithms.policy package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms.utils">algorithms.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="algorithms.html">algorithms package</a><ul>
+  <li><a href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a><ul>
+      <li>Previous: <a href="algorithms.RL_Algorithm.html" title="previous chapter">algorithms.RL_Algorithm package</a></li>
+      <li>Next: <a href="algorithms.RL_Algorithm.optimizers.html" title="next chapter">algorithms.RL_Algorithm.optimizers package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/algorithms.RL_Algorithm.GAIL.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

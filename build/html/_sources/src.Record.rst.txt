@@ -1,0 +1,30 @@
+src.Record package
+==================
+
+Submodules
+----------
+
+src.Record.frame module
+-----------------------
+
+.. automodule:: src.Record.frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.Record.record module
+------------------------
+
+.. automodule:: src.Record.record
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.Record
+   :members:
+   :undoc-members:
+   :show-inheritance:

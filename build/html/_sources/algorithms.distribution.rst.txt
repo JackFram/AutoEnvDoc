@@ -1,0 +1,38 @@
+algorithms.distribution package
+===============================
+
+Submodules
+----------
+
+algorithms.distribution.base module
+-----------------------------------
+
+.. automodule:: algorithms.distribution.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.distribution.diagonal\_gaussian module
+-------------------------------------------------
+
+.. automodule:: algorithms.distribution.diagonal_gaussian
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.distribution.recurrent\_diagonal\_gaussian module
+------------------------------------------------------------
+
+.. automodule:: algorithms.distribution.recurrent_diagonal_gaussian
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.distribution
+   :members:
+   :undoc-members:
+   :show-inheritance:

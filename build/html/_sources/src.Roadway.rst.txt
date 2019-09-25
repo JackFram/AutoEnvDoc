@@ -1,0 +1,30 @@
+src.Roadway package
+===================
+
+Submodules
+----------
+
+src.Roadway.roadway module
+--------------------------
+
+.. automodule:: src.Roadway.roadway
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.Roadway.utils module
+------------------------
+
+.. automodule:: src.Roadway.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.Roadway
+   :members:
+   :undoc-members:
+   :show-inheritance:

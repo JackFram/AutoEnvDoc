@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.dataset package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="algorithms.distribution package" href="algorithms.distribution.html" />
+    <link rel="prev" title="algorithms.RL_Algorithm.optimizers.utils package" href="algorithms.RL_Algorithm.optimizers.utils.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="algorithms-dataset-package">
+<h1>algorithms.dataset package<a class="headerlink" href="#algorithms-dataset-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.dataset.CriticDataset">
+<span id="algorithms-dataset-criticdataset-module"></span><h2>algorithms.dataset.CriticDataset module<a class="headerlink" href="#module-algorithms.dataset.CriticDataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.dataset.CriticDataset.CriticDataset">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.dataset.CriticDataset.</code><code class="sig-name descname">CriticDataset</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">shuffle=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/CriticDataset.html#CriticDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.CriticDataset.CriticDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#algorithms.dataset.CriticDataset.Dataset" title="algorithms.dataset.CriticDataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">algorithms.dataset.CriticDataset.Dataset</span></code></a></p>
+<dl class="method">
+<dt id="algorithms.dataset.CriticDataset.CriticDataset.batches">
+<code class="sig-name descname">batches</code><span class="sig-paren">(</span><em class="sig-param">samples_data</em>, <em class="sig-param">store=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/CriticDataset.html#CriticDataset.batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.CriticDataset.CriticDataset.batches" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_data</strong> – batches of sampled observation action pairs</p></li>
+<li><p><strong>store</strong> – indicator of whether store sampled data in replay buffer or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>yielded batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="algorithms.dataset.CriticDataset.Dataset">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.dataset.CriticDataset.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">batch_size</em>, <em class="sig-param">action_normalizer=None</em>, <em class="sig-param">observation_normalizer=None</em>, <em class="sig-param">replay_memory=None</em>, <em class="sig-param">recurrent=False</em>, <em class="sig-param">flat_recurrent=False</em>, <em class="sig-param">use_random_scaling=False</em>, <em class="sig-param">random_scale_factor=0.2</em>, <em class="sig-param">use_random_noise=False</em>, <em class="sig-param">random_noise_factor=0.003</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/CriticDataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.CriticDataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.dataset.CriticDataset.Dataset.batches">
+<code class="sig-name descname">batches</code><span class="sig-paren">(</span><em class="sig-param">samples_data</em>, <em class="sig-param">store=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/CriticDataset.html#Dataset.batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.CriticDataset.Dataset.batches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.dataset.CriticDataset.select_batch_idxs">
+<code class="sig-prename descclassname">algorithms.dataset.CriticDataset.</code><code class="sig-name descname">select_batch_idxs</code><span class="sig-paren">(</span><em class="sig-param">start_idx</em>, <em class="sig-param">batch_size</em>, <em class="sig-param">min_idx</em>, <em class="sig-param">max_idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/CriticDataset.html#select_batch_idxs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.CriticDataset.select_batch_idxs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_idx</strong> – starting index</p></li>
+<li><p><strong>batch_size</strong> – batch size</p></li>
+<li><p><strong>min_idx</strong> – minimum index</p></li>
+<li><p><strong>max_idx</strong> – maximum index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the selected list of indexes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.dataset.utils">
+<span id="algorithms-dataset-utils-module"></span><h2>algorithms.dataset.utils module<a class="headerlink" href="#module-algorithms.dataset.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.dataset.utils.KeyValueReplayMemory">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.dataset.utils.</code><code class="sig-name descname">KeyValueReplayMemory</code><span class="sig-paren">(</span><em class="sig-param">maxsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#KeyValueReplayMemory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.KeyValueReplayMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.dataset.utils.KeyValueReplayMemory.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">keys</em>, <em class="sig-param">values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#KeyValueReplayMemory.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.KeyValueReplayMemory.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds keys from values to memory
+Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>keys: the keys to add, list of hashable</p></li>
+<li><p>values: dict containing each key in keys</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.dataset.utils.KeyValueReplayMemory.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">keys</em>, <em class="sig-param">size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#KeyValueReplayMemory.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.KeyValueReplayMemory.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a batch of size for each key and return as a dict
+Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>keys: list of keys</p></li>
+<li><p>size: number of samples to select</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.dataset.utils.compute_n_batches">
+<code class="sig-prename descclassname">algorithms.dataset.utils.</code><code class="sig-name descname">compute_n_batches</code><span class="sig-paren">(</span><em class="sig-param">n_samples</em>, <em class="sig-param">batch_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#compute_n_batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.compute_n_batches" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_samples</strong> – how many samples</p></li>
+<li><p><strong>batch_size</strong> – how many samples in one batch</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>how many batches we need</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.dataset.utils.load_dataset">
+<code class="sig-prename descclassname">algorithms.dataset.utils.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">maxsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#load_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – file path of the data set</p></li>
+<li><p><strong>maxsize</strong> – max size default is None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>loaded data set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.dataset.utils.pad_tensor">
+<code class="sig-prename descclassname">algorithms.dataset.utils.</code><code class="sig-name descname">pad_tensor</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">max_len</em>, <em class="sig-param">axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/dataset/utils.html#pad_tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.dataset.utils.pad_tensor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – given x</p></li>
+<li><p><strong>max_len</strong> – max length</p></li>
+<li><p><strong>axis</strong> – the axis on which to be padded</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>padded x</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.dataset">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-algorithms.dataset" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="algorithms.html">algorithms package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="algorithms.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="algorithms.AGen.html">algorithms.AGen package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">algorithms.dataset package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.dataset.CriticDataset">algorithms.dataset.CriticDataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.dataset.utils">algorithms.dataset.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.dataset">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.distribution.html">algorithms.distribution package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.policy.html">algorithms.policy package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms.utils">algorithms.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="algorithms.html">algorithms package</a><ul>
+      <li>Previous: <a href="algorithms.RL_Algorithm.optimizers.utils.html" title="previous chapter">algorithms.RL_Algorithm.optimizers.utils package</a></li>
+      <li>Next: <a href="algorithms.distribution.html" title="next chapter">algorithms.distribution package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/algorithms.dataset.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

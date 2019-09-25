@@ -1,0 +1,38 @@
+algorithms.AGen.critic package
+==============================
+
+Submodules
+----------
+
+algorithms.AGen.critic.base module
+----------------------------------
+
+.. automodule:: algorithms.AGen.critic.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.AGen.critic.model module
+-----------------------------------
+
+.. automodule:: algorithms.AGen.critic.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.AGen.critic.utils module
+-----------------------------------
+
+.. automodule:: algorithms.AGen.critic.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.AGen.critic
+   :members:
+   :undoc-members:
+   :show-inheritance:

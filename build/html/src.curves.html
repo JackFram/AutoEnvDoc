@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.curves package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="algorithms package" href="algorithms.html" />
+    <link rel="prev" title="src.Vec.geom package" href="src.Vec.geom.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="src-curves-package">
+<h1>src.curves package<a class="headerlink" href="#src-curves-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.curves.CurvePt">
+<span id="src-curves-curvept-module"></span><h2>src.curves.CurvePt module<a class="headerlink" href="#module-src.curves.CurvePt" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.curves.CurvePt.CurveIndex">
+<em class="property">class </em><code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">CurveIndex</code><span class="sig-paren">(</span><em class="sig-param">i: int</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#CurveIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.CurveIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>CurveIndex{I &lt;: Integer, T &lt;: Real}</p>
+</div></blockquote>
+<p>Given a <cite>Curve</cite> object <cite>curve</cite> one can call <cite>curve[ind]</cite>
+where <cite>ind</cite> is a <cite>CurveIndex</cite>. The field <cite>t</cite> can be used to interpolate between two
+points in the curve.
+# Fields
+- <cite>i</cite>::I` index in the curve , ∈ [0:length(curve)-2]
+- <cite>t::T</cite> ∈ [0,1] for linear interpolation</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.curves.CurvePt.CurveProjection">
+<em class="property">class </em><code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">CurveProjection</code><span class="sig-paren">(</span><em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em>, <em class="sig-param">t: float</em>, <em class="sig-param">phi: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#CurveProjection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.CurveProjection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>CurveProjection{I &lt;: Integer, T &lt;: Real}</p>
+</div></blockquote>
+<p>The result of a point projected to a Curve
+# Fields
+- <cite>ind::CurveIndex{I, T}</cite>
+- <cite>t::T</cite> lane offset
+- <cite>ϕ::T</cite> lane-relative heading [rad]</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="src.curves.CurvePt.CurvePt">
+<em class="property">class </em><code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">CurvePt</code><span class="sig-paren">(</span><em class="sig-param">pos: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">s: float</em>, <em class="sig-param">k=None</em>, <em class="sig-param">kd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#CurvePt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.CurvePt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.curves.CurvePt.CurvePt.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#CurvePt.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.CurvePt.show" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>print out</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.clamp">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">clamp</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">low</em>, <em class="sig-param">high</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#clamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.clamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.curveindex_end">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">curveindex_end</code><span class="sig-paren">(</span><em class="sig-param">curve: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#curveindex_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.curveindex_end" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>curve</strong> – curve list</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last curve index of the curve list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.div">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">div</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#div"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.div" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_curve_list_by_index">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_curve_list_by_index</code><span class="sig-paren">(</span><em class="sig-param">curve: list</em>, <em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_curve_list_by_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_curve_list_by_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_curve_projection">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_curve_projection</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">footpoint: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">ind: src.curves.CurvePt.CurveIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_curve_projection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_curve_projection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_lerp_time_1">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_lerp_time_1</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.VecE2.VecE2</em>, <em class="sig-param">B: src.Vec.VecE2.VecE2</em>, <em class="sig-param">Q: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_lerp_time_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_lerp_time_1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_lerp_time_2">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_lerp_time_2</code><span class="sig-paren">(</span><em class="sig-param">A: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">B: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">Q: src.Vec.VecSE2.VecSE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_lerp_time_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_lerp_time_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_lerp_time_unclamped_1">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_lerp_time_unclamped_1</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.VecE2.VecE2</em>, <em class="sig-param">B: src.Vec.VecE2.VecE2</em>, <em class="sig-param">Q: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_lerp_time_unclamped_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_lerp_time_unclamped_1" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – VecE2 vector</p></li>
+<li><p><strong>B</strong> – VecE2 vector</p></li>
+<li><p><strong>Q</strong> – VecE2 vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Get the interpolation scalar t for the point on the line AB closest to Q, This point is P = A + (B-A)*t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_lerp_time_unclamped_2">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_lerp_time_unclamped_2</code><span class="sig-paren">(</span><em class="sig-param">A: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">B: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">Q: src.Vec.VecSE2.VecSE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_lerp_time_unclamped_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_lerp_time_unclamped_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.get_lerp_time_unclamped_3">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">get_lerp_time_unclamped_3</code><span class="sig-paren">(</span><em class="sig-param">A: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">B: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">Q: src.Vec.VecSE2.VecSE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#get_lerp_time_unclamped_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.get_lerp_time_unclamped_3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.index_closest_to_point">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">index_closest_to_point</code><span class="sig-paren">(</span><em class="sig-param">curve: list</em>, <em class="sig-param">target: src.Vec.VecSE2.VecSE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#index_closest_to_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.index_closest_to_point" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>index_closest_to_point(curve::Curve, target::posG(VecSE2))</p>
+</div></blockquote>
+<p>returns the curve index closest to the point described by <cite>target</cite>.
+<cite>target</cite> must be [x, y].</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.lerp">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">lerp</code><span class="sig-paren">(</span><em class="sig-param">a: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">b: src.curves.CurvePt.CurvePt</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#lerp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.lerp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – start point</p></li>
+<li><p><strong>b</strong> – end point</p></li>
+<li><p><strong>t</strong> – <cite>t::T</cite> ∈ [0,1] for linear interpolation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the result of interpolation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.curves.CurvePt.proj">
+<code class="sig-prename descclassname">src.curves.CurvePt.</code><code class="sig-name descname">proj</code><span class="sig-paren">(</span><em class="sig-param">posG: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">curve: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/curves/CurvePt.html#proj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.curves.CurvePt.proj" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Vec.proj(posG::VecSE2, curve::list of CurvePt)</p>
+</div></blockquote>
+<p>Return a CurveProjection obtained by projecting posG onto the curve</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.curves">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.curves" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.Basic.html">src.Basic package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.MvNormal.html">src.MvNormal package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Record.html">src.Record package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Roadway.html">src.Roadway package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.Vec.html">src.Vec package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">src.curves package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.curves.CurvePt">src.curves.CurvePt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.curves">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.const">src.const module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.ngsim_trajdata">src.ngsim_trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.roadway">src.roadway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.splines">src.splines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajdata">src.trajdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.trajectory_smoothing">src.trajectory_smoothing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="src.html">src package</a><ul>
+      <li>Previous: <a href="src.Vec.geom.html" title="previous chapter">src.Vec.geom package</a></li>
+      <li>Next: <a href="algorithms.html" title="next chapter">algorithms package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/src.curves.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

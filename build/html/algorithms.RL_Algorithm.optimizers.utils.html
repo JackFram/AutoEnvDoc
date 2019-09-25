@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.RL_Algorithm.optimizers.utils package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="algorithms.dataset package" href="algorithms.dataset.html" />
+    <link rel="prev" title="algorithms.RL_Algorithm.optimizers package" href="algorithms.RL_Algorithm.optimizers.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="algorithms-rl-algorithm-optimizers-utils-package">
+<h1>algorithms.RL_Algorithm.optimizers.utils package<a class="headerlink" href="#algorithms-rl-algorithm-optimizers-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils.math">
+<span id="algorithms-rl-algorithm-optimizers-utils-math-module"></span><h2>algorithms.RL_Algorithm.optimizers.utils.math module<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils.math" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.math.normal_entropy">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.math.</code><code class="sig-name descname">normal_entropy</code><span class="sig-paren">(</span><em class="sig-param">std</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/math.html#normal_entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.math.normal_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>std</strong> – std value</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>calculate normal distribution entropy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.math.normal_log_density">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.math.</code><code class="sig-name descname">normal_log_density</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">mean</em>, <em class="sig-param">log_std</em>, <em class="sig-param">std</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/math.html#normal_log_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.math.normal_log_density" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – x var</p></li>
+<li><p><strong>mean</strong> – mean for the normal distribution</p></li>
+<li><p><strong>log_std</strong> – log std</p></li>
+<li><p><strong>std</strong> – std</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>log density of x var given the distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils.replay_memory">
+<span id="algorithms-rl-algorithm-optimizers-utils-replay-memory-module"></span><h2>algorithms.RL_Algorithm.optimizers.utils.replay_memory module<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils.replay_memory" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.replay_memory.</code><code class="sig-name descname">Memory</code><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html#Memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.append">
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param">new_memory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html#Memory.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.push">
+<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html#Memory.push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a transition.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">batch_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html#Memory.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Memory.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.replay_memory.</code><code class="sig-name descname">Transition</code><span class="sig-paren">(</span><em class="sig-param">state</em>, <em class="sig-param">action</em>, <em class="sig-param">mask</em>, <em class="sig-param">next_state</em>, <em class="sig-param">reward</em><span class="sig-paren">)</span><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.action">
+<em class="property">property </em><code class="sig-name descname">action</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.mask">
+<em class="property">property </em><code class="sig-name descname">mask</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.next_state">
+<em class="property">property </em><code class="sig-name descname">next_state</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.next_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.reward">
+<em class="property">property </em><code class="sig-name descname">reward</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.state">
+<em class="property">property </em><code class="sig-name descname">state</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.replay_memory.Transition.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils.tools">
+<span id="algorithms-rl-algorithm-optimizers-utils-tools-module"></span><h2>algorithms.RL_Algorithm.optimizers.utils.tools module<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils.tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.tools.assets_dir">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.tools.</code><code class="sig-name descname">assets_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/tools.html#assets_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.tools.assets_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils.torch">
+<span id="algorithms-rl-algorithm-optimizers-utils-torch-module"></span><h2>algorithms.RL_Algorithm.optimizers.utils.torch module<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils.torch" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.compute_flat_grad">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">compute_flat_grad</code><span class="sig-paren">(</span><em class="sig-param">output</em>, <em class="sig-param">inputs</em>, <em class="sig-param">filter_input_ids={}</em>, <em class="sig-param">retain_graph=False</em>, <em class="sig-param">create_graph=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html#compute_flat_grad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.compute_flat_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.get_flat_grad_from">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">get_flat_grad_from</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">grad_grad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html#get_flat_grad_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.get_flat_grad_from" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.get_flat_params_from">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">get_flat_params_from</code><span class="sig-paren">(</span><em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html#get_flat_params_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.get_flat_params_from" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> – model</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the flattened param extracted from the model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.ones">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">ones</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.ones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>1</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 1.,  1.,  1.],</span>
+<span class="go">        [ 1.,  1.,  1.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 1.,  1.,  1.,  1.,  1.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.set_flat_params_to">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">set_flat_params_to</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">flat_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html#set_flat_params_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.set_flat_params_to" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – model to load the param</p></li>
+<li><p><strong>flat_params</strong> – param to pass</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, pass the given param to the model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.tensor">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">tensor</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em>, <em class="sig-param">pin_memory=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a tensor with <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code> always copies <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>. If you have a Tensor
+<code class="docutils literal notranslate"><span class="pre">data</span></code> and want to avoid a copy, use <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.requires_grad_()</span></code>
+or <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.detach()</span></code>.
+If you have a NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> and want to avoid a copy, use
+<code class="xref py py-func docutils literal notranslate"><span class="pre">torch.as_tensor()</span></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When data is a tensor <cite>x</cite>, <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code> reads out ‘the data’ from whatever it is passed,
+and constructs a leaf variable. Therefore <code class="docutils literal notranslate"><span class="pre">torch.tensor(x)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">torch.tensor(x,</span> <span class="pre">requires_grad=True)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach().requires_grad_(True)</span></code>.
+The equivalents using <code class="docutils literal notranslate"><span class="pre">clone()</span></code> and <code class="docutils literal notranslate"><span class="pre">detach()</span></code> are recommended.</p>
+</div>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>data (array_like): Initial data for the tensor. Can be a list, tuple,</dt><dd><p>NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, scalar, and other types.</p>
+</dd>
+<dt>dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, infers data type from <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt>pin_memory (bool, optional): If set, returned tensor would be allocated in</dt><dd><p>the pinned memory. Works only for CPU tensors. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.9</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">]])</span>
+<span class="go">tensor([[ 0.1000,  1.2000],</span>
+<span class="go">        [ 2.2000,  3.1000],</span>
+<span class="go">        [ 4.9000,  5.2000]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># Type inference on data</span>
+<span class="go">tensor([ 0,  1])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.11111</span><span class="p">,</span> <span class="mf">0.222222</span><span class="p">,</span> <span class="mf">0.3333333</span><span class="p">]],</span>
+<span class="go">                 dtype=torch.float64,</span>
+<span class="go">                 device=torch.device(&#39;cuda:0&#39;))  # creates a torch.cuda.DoubleTensor</span>
+<span class="go">tensor([[ 0.1111,  0.2222,  0.3333]], dtype=torch.float64, device=&#39;cuda:0&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>  <span class="c1"># Create a scalar (zero-dimensional tensor)</span>
+<span class="go">tensor(3.1416)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>  <span class="c1"># Create an empty tensor (of size (0,))</span>
+<span class="go">tensor([])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.to_device">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">to_device</code><span class="sig-paren">(</span><em class="sig-param">device</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html#to_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.to_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.torch.zeros">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.torch.</code><code class="sig-name descname">zeros</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.torch.zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>0</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 0.,  0.,  0.],</span>
+<span class="go">        [ 0.,  0.,  0.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 0.,  0.,  0.,  0.,  0.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils.zfilter">
+<span id="algorithms-rl-algorithm-optimizers-utils-zfilter-module"></span><h2>algorithms.RL_Algorithm.optimizers.utils.zfilter module<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils.zfilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.zfilter.</code><code class="sig-name descname">RunningStat</code><span class="sig-paren">(</span><em class="sig-param">shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/zfilter.html#RunningStat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.n">
+<em class="property">property </em><code class="sig-name descname">n</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.push">
+<code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/zfilter.html#RunningStat.push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.push" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.shape">
+<em class="property">property </em><code class="sig-name descname">shape</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.std">
+<em class="property">property </em><code class="sig-name descname">std</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.var">
+<em class="property">property </em><code class="sig-name descname">var</code><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.RunningStat.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zfilter.ZFilter">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.zfilter.</code><code class="sig-name descname">ZFilter</code><span class="sig-paren">(</span><em class="sig-param">shape</em>, <em class="sig-param">demean=True</em>, <em class="sig-param">destd=True</em>, <em class="sig-param">clip=10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/RL_Algorithm/optimizers/utils/zfilter.html#ZFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zfilter.ZFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>y = (x-mean)/std
+using running estimates of mean,std</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.RL_Algorithm.optimizers.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-algorithms.RL_Algorithm.optimizers.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.ones">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.</code><code class="sig-name descname">ones</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.ones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>1</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 1.,  1.,  1.],</span>
+<span class="go">        [ 1.,  1.,  1.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 1.,  1.,  1.,  1.,  1.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.tensor">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.</code><code class="sig-name descname">tensor</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em>, <em class="sig-param">pin_memory=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a tensor with <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference internal" href="#algorithms.RL_Algorithm.optimizers.utils.torch.tensor" title="algorithms.RL_Algorithm.optimizers.utils.torch.tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code></a> always copies <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>. If you have a Tensor
+<code class="docutils literal notranslate"><span class="pre">data</span></code> and want to avoid a copy, use <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.requires_grad_()</span></code>
+or <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.Tensor.detach()</span></code>.
+If you have a NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> and want to avoid a copy, use
+<code class="xref py py-func docutils literal notranslate"><span class="pre">torch.as_tensor()</span></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When data is a tensor <cite>x</cite>, <a class="reference internal" href="#algorithms.RL_Algorithm.optimizers.utils.torch.tensor" title="algorithms.RL_Algorithm.optimizers.utils.torch.tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.tensor()</span></code></a> reads out ‘the data’ from whatever it is passed,
+and constructs a leaf variable. Therefore <code class="docutils literal notranslate"><span class="pre">torch.tensor(x)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">torch.tensor(x,</span> <span class="pre">requires_grad=True)</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">x.clone().detach().requires_grad_(True)</span></code>.
+The equivalents using <code class="docutils literal notranslate"><span class="pre">clone()</span></code> and <code class="docutils literal notranslate"><span class="pre">detach()</span></code> are recommended.</p>
+</div>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>data (array_like): Initial data for the tensor. Can be a list, tuple,</dt><dd><p>NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, scalar, and other types.</p>
+</dd>
+<dt>dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, infers data type from <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt>pin_memory (bool, optional): If set, returned tensor would be allocated in</dt><dd><p>the pinned memory. Works only for CPU tensors. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.9</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">]])</span>
+<span class="go">tensor([[ 0.1000,  1.2000],</span>
+<span class="go">        [ 2.2000,  3.1000],</span>
+<span class="go">        [ 4.9000,  5.2000]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># Type inference on data</span>
+<span class="go">tensor([ 0,  1])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.11111</span><span class="p">,</span> <span class="mf">0.222222</span><span class="p">,</span> <span class="mf">0.3333333</span><span class="p">]],</span>
+<span class="go">                 dtype=torch.float64,</span>
+<span class="go">                 device=torch.device(&#39;cuda:0&#39;))  # creates a torch.cuda.DoubleTensor</span>
+<span class="go">tensor([[ 0.1111,  0.2222,  0.3333]], dtype=torch.float64, device=&#39;cuda:0&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>  <span class="c1"># Create a scalar (zero-dimensional tensor)</span>
+<span class="go">tensor(3.1416)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([])</span>  <span class="c1"># Create an empty tensor (of size (0,))</span>
+<span class="go">tensor([])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="algorithms.RL_Algorithm.optimizers.utils.zeros">
+<code class="sig-prename descclassname">algorithms.RL_Algorithm.optimizers.utils.</code><code class="sig-name descname">zeros</code><span class="sig-paren">(</span><em class="sig-param">*sizes</em>, <em class="sig-param">out=None</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">layout=torch.strided</em>, <em class="sig-param">device=None</em>, <em class="sig-param">requires_grad=False</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#algorithms.RL_Algorithm.optimizers.utils.zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensor filled with the scalar value <cite>0</cite>, with the shape defined
+by the variable argument <code class="xref py py-attr docutils literal notranslate"><span class="pre">sizes</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sizes (int…): a sequence of integers defining the shape of the output tensor.</dt><dd><p>Can be a variable number of arguments or a collection like a list or tuple.</p>
+</dd>
+</dl>
+<p>out (Tensor, optional): the output tensor
+dtype (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.dtype</span></code>, optional): the desired data type of returned tensor.</p>
+<blockquote>
+<div><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses a global default (see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>layout (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.layout</span></code>, optional): the desired layout of returned Tensor.</dt><dd><p>Default: <code class="docutils literal notranslate"><span class="pre">torch.strided</span></code>.</p>
+</dd>
+<dt>device (<code class="xref py py-class docutils literal notranslate"><span class="pre">torch.device</span></code>, optional): the desired device of returned tensor.</dt><dd><p>Default: if <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses the current device for the default tensor type
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.set_default_tensor_type()</span></code>). <code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code> will be the CPU
+for CPU tensor types and the current CUDA device for CUDA tensor types.</p>
+</dd>
+<dt>requires_grad (bool, optional): If autograd should record operations on the</dt><dd><p>returned tensor. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">tensor([[ 0.,  0.,  0.],</span>
+<span class="go">        [ 0.,  0.,  0.]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">tensor([ 0.,  0.,  0.,  0.,  0.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="algorithms.html">algorithms package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="algorithms.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="algorithms.AGen.html">algorithms.AGen package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="algorithms.RL_Algorithm.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#module-algorithms.RL_Algorithm.utils">algorithms.RL_Algorithm.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="algorithms.RL_Algorithm.html#module-algorithms.RL_Algorithm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.dataset.html">algorithms.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.distribution.html">algorithms.distribution package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.policy.html">algorithms.policy package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms.utils">algorithms.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="algorithms.html">algorithms package</a><ul>
+  <li><a href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a><ul>
+  <li><a href="algorithms.RL_Algorithm.optimizers.html">algorithms.RL_Algorithm.optimizers package</a><ul>
+      <li>Previous: <a href="algorithms.RL_Algorithm.optimizers.html" title="previous chapter">algorithms.RL_Algorithm.optimizers package</a></li>
+      <li>Next: <a href="algorithms.dataset.html" title="next chapter">algorithms.dataset package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/algorithms.RL_Algorithm.optimizers.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

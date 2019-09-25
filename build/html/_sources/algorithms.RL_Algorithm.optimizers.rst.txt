@@ -1,0 +1,29 @@
+algorithms.RL\_Algorithm.optimizers package
+===========================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   algorithms.RL_Algorithm.optimizers.utils
+
+Submodules
+----------
+
+algorithms.RL\_Algorithm.optimizers.trpo module
+-----------------------------------------------
+
+.. automodule:: algorithms.RL_Algorithm.optimizers.trpo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.RL_Algorithm.optimizers
+   :members:
+   :undoc-members:
+   :show-inheritance:

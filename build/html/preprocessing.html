@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>preprocessing package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="feature_extractor package" href="feature_extractor.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="preprocessing-package">
+<h1>preprocessing package<a class="headerlink" href="#preprocessing-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-preprocessing.clean_holo">
+<span id="preprocessing-clean-holo-module"></span><h2>preprocessing.clean_holo module<a class="headerlink" href="#module-preprocessing.clean_holo" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="preprocessing.clean_holo.clean_data">
+<code class="sig-prename descclassname">preprocessing.clean_holo.</code><code class="sig-name descname">clean_data</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/clean_holo.html#clean_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.clean_holo.clean_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – raw trajectory csv file path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a cleaned/down-sampled csv file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="preprocessing.clean_holo.create_lane">
+<code class="sig-prename descclassname">preprocessing.clean_holo.</code><code class="sig-name descname">create_lane</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/clean_holo.html#create_lane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.clean_holo.create_lane" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – name of the lane file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cleaned lane txt file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="preprocessing.clean_holo.csv2txt">
+<code class="sig-prename descclassname">preprocessing.clean_holo.</code><code class="sig-name descname">csv2txt</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/clean_holo.html#csv2txt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.clean_holo.csv2txt" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – the file name of the csv file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the converted text file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-preprocessing.extract_feature">
+<span id="preprocessing-extract-feature-module"></span><h2>preprocessing.extract_feature module<a class="headerlink" href="#module-preprocessing.extract_feature" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="preprocessing.extract_feature.extract_features">
+<code class="sig-prename descclassname">preprocessing.extract_feature.</code><code class="sig-name descname">extract_features</code><span class="sig-paren">(</span><em class="sig-param">ext</em>, <em class="sig-param">trajdata</em>, <em class="sig-param">roadway</em>, <em class="sig-param">timestep_delta</em>, <em class="sig-param">record_length</em>, <em class="sig-param">offset</em>, <em class="sig-param">prime</em>, <em class="sig-param">maxframes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/extract_feature.html#extract_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.extract_feature.extract_features" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ext</strong> – feature extractor</p></li>
+<li><p><strong>trajdata</strong> – trajectory data</p></li>
+<li><p><strong>roadway</strong> – roadway object</p></li>
+<li><p><strong>timestep_delta</strong> – time step interval</p></li>
+<li><p><strong>record_length</strong> – length of the record</p></li>
+<li><p><strong>offset</strong> – offset frame</p></li>
+<li><p><strong>prime</strong> – prime step</p></li>
+<li><p><strong>maxframes</strong> – maximum frames</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>extracted features</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="preprocessing.extract_feature.extract_ngsim_features">
+<code class="sig-prename descclassname">preprocessing.extract_feature.</code><code class="sig-name descname">extract_ngsim_features</code><span class="sig-paren">(</span><em class="sig-param">timestep_delta=1</em>, <em class="sig-param">record_length=10</em>, <em class="sig-param">offset=50</em>, <em class="sig-param">prime=10</em>, <em class="sig-param">maxframes=None</em>, <em class="sig-param">output_filename='ngsim_holo_new.h5'</em>, <em class="sig-param">n_expert_files=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/extract_feature.html#extract_ngsim_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.extract_feature.extract_ngsim_features" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestep_delta</strong> – timesteps between feature extractions</p></li>
+<li><p><strong>record_length</strong> – number of frames for record to track in the past</p></li>
+<li><p><strong>offset</strong> – from ends of the trajectories TODO: offset was 500, holo data is too short</p></li>
+<li><p><strong>prime</strong> – </p></li>
+<li><p><strong>maxframes</strong> – nothing for no max</p></li>
+<li><p><strong>output_filename</strong> – </p></li>
+<li><p><strong>n_expert_files</strong> – number of time periods for which to extract.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, write features to output file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="preprocessing.extract_feature.write_features">
+<code class="sig-prename descclassname">preprocessing.extract_feature.</code><code class="sig-name descname">write_features</code><span class="sig-paren">(</span><em class="sig-param">features</em>, <em class="sig-param">output_filepath</em>, <em class="sig-param">ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/preprocessing/extract_feature.html#write_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#preprocessing.extract_feature.write_features" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> – features</p></li>
+<li><p><strong>output_filepath</strong> – output file path</p></li>
+<li><p><strong>ext</strong> – feature extractor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>no return, write feature to file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-preprocessing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-preprocessing" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">preprocessing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing.clean_holo">preprocessing.clean_holo module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing.extract_feature">preprocessing.extract_feature module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="feature_extractor.html" title="previous chapter">feature_extractor package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/preprocessing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

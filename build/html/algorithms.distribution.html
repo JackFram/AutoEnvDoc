@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.distribution package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="algorithms.policy package" href="algorithms.policy.html" />
+    <link rel="prev" title="algorithms.dataset package" href="algorithms.dataset.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="algorithms-distribution-package">
+<h1>algorithms.distribution package<a class="headerlink" href="#algorithms-distribution-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.distribution.base">
+<span id="algorithms-distribution-base-module"></span><h2>algorithms.distribution.base module<a class="headerlink" href="#module-algorithms.distribution.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.distribution.base.Distribution">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.base.</code><code class="sig-name descname">Distribution</code><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.dim">
+<em class="property">property </em><code class="sig-name descname">dim</code><a class="headerlink" href="#algorithms.distribution.base.Distribution.dim" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dimension</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.dist_info_keys">
+<em class="property">property </em><code class="sig-name descname">dist_info_keys</code><a class="headerlink" href="#algorithms.distribution.base.Distribution.dist_info_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.dist_info_specs">
+<em class="property">property </em><code class="sig-name descname">dist_info_specs</code><a class="headerlink" href="#algorithms.distribution.base.Distribution.dist_info_specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.entropy">
+<code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param">dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.entropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.kl">
+<code class="sig-name descname">kl</code><span class="sig-paren">(</span><em class="sig-param">old_dist_info</em>, <em class="sig-param">new_dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.kl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.kl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the KL divergence of two distributions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.kl_sym">
+<code class="sig-name descname">kl_sym</code><span class="sig-paren">(</span><em class="sig-param">old_dist_info_vars</em>, <em class="sig-param">new_dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.kl_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.kl_sym" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the symbolic KL divergence of two distributions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.likelihood_ratio_sym">
+<code class="sig-name descname">likelihood_ratio_sym</code><span class="sig-paren">(</span><em class="sig-param">x_var</em>, <em class="sig-param">old_dist_info_vars</em>, <em class="sig-param">new_dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.likelihood_ratio_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.likelihood_ratio_sym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.base.Distribution.log_likelihood_sym">
+<code class="sig-name descname">log_likelihood_sym</code><span class="sig-paren">(</span><em class="sig-param">x_var</em>, <em class="sig-param">dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/base.html#Distribution.log_likelihood_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.base.Distribution.log_likelihood_sym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.distribution.diagonal_gaussian">
+<span id="algorithms-distribution-diagonal-gaussian-module"></span><h2>algorithms.distribution.diagonal_gaussian module<a class="headerlink" href="#module-algorithms.distribution.diagonal_gaussian" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.distribution.diagonal_gaussian.</code><code class="sig-name descname">DiagonalGaussian</code><span class="sig-paren">(</span><em class="sig-param">dim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#algorithms.distribution.base.Distribution" title="algorithms.distribution.base.Distribution"><code class="xref py py-class docutils literal notranslate"><span class="pre">algorithms.distribution.base.Distribution</span></code></a></p>
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.dim">
+<em class="property">property </em><code class="sig-name descname">dim</code><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.dim" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dimension of the distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.dist_info_specs">
+<em class="property">property </em><code class="sig-name descname">dist_info_specs</code><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.dist_info_specs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>distribution dimension information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.entropy">
+<code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param">dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.entropy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dist_info</strong> – distribution</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>entropy of the distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.kl">
+<code class="sig-name descname">kl</code><span class="sig-paren">(</span><em class="sig-param">old_dist_info</em>, <em class="sig-param">new_dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.kl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.kl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_dist_info</strong> – old distribution</p></li>
+<li><p><strong>new_dist_info</strong> – new distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>KL divergence of two distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.kl_sym">
+<code class="sig-name descname">kl_sym</code><span class="sig-paren">(</span><em class="sig-param">old_dist_info_vars</em>, <em class="sig-param">new_dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.kl_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.kl_sym" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_dist_info_vars</strong> – old distribution</p></li>
+<li><p><strong>new_dist_info_vars</strong> – new distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>KL divergence of two distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.likelihood_ratio_sym">
+<code class="sig-name descname">likelihood_ratio_sym</code><span class="sig-paren">(</span><em class="sig-param">x_var</em>, <em class="sig-param">old_dist_info_vars</em>, <em class="sig-param">new_dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.likelihood_ratio_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.likelihood_ratio_sym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> – x</p></li>
+<li><p><strong>dist_info</strong> – distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>log likelihood of x in the given distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.log_likelihood_sym">
+<code class="sig-name descname">log_likelihood_sym</code><span class="sig-paren">(</span><em class="sig-param">x_var</em>, <em class="sig-param">dist_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.log_likelihood_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.log_likelihood_sym" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_var</strong> – x</p></li>
+<li><p><strong>dist_info_vars</strong> – distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>log likelihood of x in the given distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="algorithms.distribution.diagonal_gaussian.DiagonalGaussian.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">dist_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/distribution/diagonal_gaussian.html#DiagonalGaussian.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.distribution.diagonal_gaussian.DiagonalGaussian.sample" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dist_info</strong> – distribution</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sampled var from the given distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-algorithms.distribution.recurrent_diagonal_gaussian">
+<span id="algorithms-distribution-recurrent-diagonal-gaussian-module"></span><h2>algorithms.distribution.recurrent_diagonal_gaussian module<a class="headerlink" href="#module-algorithms.distribution.recurrent_diagonal_gaussian" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-algorithms.distribution">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-algorithms.distribution" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="algorithms.html">algorithms package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="algorithms.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="algorithms.AGen.html">algorithms.AGen package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.RL_Algorithm.html">algorithms.RL_Algorithm package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.dataset.html">algorithms.dataset package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">algorithms.distribution package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.distribution.base">algorithms.distribution.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.distribution.diagonal_gaussian">algorithms.distribution.diagonal_gaussian module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.distribution.recurrent_diagonal_gaussian">algorithms.distribution.recurrent_diagonal_gaussian module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-algorithms.distribution">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="algorithms.policy.html">algorithms.policy package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms.utils">algorithms.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#module-algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="algorithms.html">algorithms package</a><ul>
+      <li>Previous: <a href="algorithms.dataset.html" title="previous chapter">algorithms.dataset package</a></li>
+      <li>Next: <a href="algorithms.policy.html" title="next chapter">algorithms.policy package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/algorithms.distribution.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

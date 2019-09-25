@@ -1,0 +1,33 @@
+algorithms package
+==================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   algorithms.AGen
+   algorithms.RL_Algorithm
+   algorithms.dataset
+   algorithms.distribution
+   algorithms.policy
+
+Submodules
+----------
+
+algorithms.utils module
+-----------------------
+
+.. automodule:: algorithms.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms
+   :members:
+   :undoc-members:
+   :show-inheritance:

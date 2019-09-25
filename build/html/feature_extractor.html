@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>feature_extractor package &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="preprocessing package" href="preprocessing.html" />
+    <link rel="prev" title="envs package" href="envs.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="feature-extractor-package">
+<h1>feature_extractor package<a class="headerlink" href="#feature-extractor-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-feature_extractor.CarLidarFeatureExtractor">
+<span id="feature-extractor-carlidarfeatureextractor-module"></span><h2>feature_extractor.CarLidarFeatureExtractor module<a class="headerlink" href="#module-feature_extractor.CarLidarFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.CarLidarFeatureExtractor.</code><code class="sig-name descname">CarLidarFeatureExtractor</code><span class="sig-paren">(</span><em class="sig-param">carlidar_nbeams: int = 20</em>, <em class="sig-param">extract_carlidar_rangerate: bool = True</em>, <em class="sig-param">carlidar_max_range: float = 50.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#CarLidarFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#CarLidarFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#CarLidarFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">veh_idx: int</em>, <em class="sig-param">models: {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#CarLidarFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.CarLidarFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="feature_extractor.CarLidarFeatureExtractor.LidarSensor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.CarLidarFeatureExtractor.</code><code class="sig-name descname">LidarSensor</code><span class="sig-paren">(</span><em class="sig-param">nbeams: int</em>, <em class="sig-param">max_range: float = 100.0</em>, <em class="sig-param">angle_offset: float = 0.0</em>, <em class="sig-param">angle_spread: float = 6.283185307179586</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#LidarSensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.LidarSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.CarLidarFeatureExtractor.LidarSensor.nbeams">
+<em class="property">property </em><code class="sig-name descname">nbeams</code><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.LidarSensor.nbeams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.CarLidarFeatureExtractor.observe">
+<code class="sig-prename descclassname">feature_extractor.CarLidarFeatureExtractor.</code><code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param">lidar: feature_extractor.CarLidarFeatureExtractor.LidarSensor</em>, <em class="sig-param">scene: src.Record.frame.Frame</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CarLidarFeatureExtractor.html#observe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CarLidarFeatureExtractor.observe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.CoreFeatureExtractor">
+<span id="feature-extractor-corefeatureextractor-module"></span><h2>feature_extractor.CoreFeatureExtractor module<a class="headerlink" href="#module-feature_extractor.CoreFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.CoreFeatureExtractor.</code><code class="sig-name descname">CoreFeatureExtractor</code><a class="reference internal" href="_modules/feature_extractor/CoreFeatureExtractor.html#CoreFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CoreFeatureExtractor.html#CoreFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CoreFeatureExtractor.html#CoreFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">veh_idx: int</em>, <em class="sig-param">models: {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/CoreFeatureExtractor.html#CoreFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.CoreFeatureExtractor.CoreFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.FeatureState">
+<span id="feature-extractor-featurestate-module"></span><h2>feature_extractor.FeatureState module<a class="headerlink" href="#module-feature_extractor.FeatureState" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.FeatureState.FeatureValue">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.FeatureState.</code><code class="sig-name descname">FeatureValue</code><span class="sig-paren">(</span><em class="sig-param">v: float</em>, <em class="sig-param">i: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/FeatureState.html#FeatureValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.FeatureState.FeatureValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.FeatureState.inverse_ttc_to_ttc">
+<code class="sig-prename descclassname">feature_extractor.FeatureState.</code><code class="sig-name descname">inverse_ttc_to_ttc</code><span class="sig-paren">(</span><em class="sig-param">inv_ttc: feature_extractor.FeatureState.FeatureValue</em>, <em class="sig-param">censor_hi: float = 30.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/FeatureState.html#inverse_ttc_to_ttc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.FeatureState.inverse_ttc_to_ttc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.ForeForeFeatureExtractor">
+<span id="feature-extractor-foreforefeatureextractor-module"></span><h2>feature_extractor.ForeForeFeatureExtractor module<a class="headerlink" href="#module-feature_extractor.ForeForeFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.ForeForeFeatureExtractor.</code><code class="sig-name descname">ForeForeFeatureExtractor</code><span class="sig-paren">(</span><em class="sig-param">deltas_censor_hi: float = 100.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/ForeForeFeatureExtractor.html#ForeForeFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/ForeForeFeatureExtractor.html#ForeForeFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/ForeForeFeatureExtractor.html#ForeForeFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">veh_idx: int</em>, <em class="sig-param">models: {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/ForeForeFeatureExtractor.html#ForeForeFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.Get">
+<span id="feature-extractor-get-module"></span><h2>feature_extractor.Get module<a class="headerlink" href="#module-feature_extractor.Get" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="feature_extractor.Get.get_AngularRateF">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_AngularRateF</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_AngularRateF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_AngularRateF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_AngularRateG">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_AngularRateG</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_AngularRateG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_AngularRateG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_Inv_TTC">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_Inv_TTC</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em>, <em class="sig-param">neighborfore: feature_extractor.neighbor_feature.NeighborLongitudinalResult = None</em>, <em class="sig-param">censor_hi: float = 10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_Inv_TTC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_Inv_TTC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_Is_Colliding">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_Is_Colliding</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em>, <em class="sig-param">mem: feature_extractor.collision_detection.CPAMemory = &lt;feature_extractor.collision_detection.CPAMemory object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_Is_Colliding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_Is_Colliding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_LaneCurvature">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_LaneCurvature</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_LaneCurvature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_LaneCurvature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lane Curvature extractor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_PosFyaw">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_PosFyaw</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_PosFyaw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_PosFyaw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_RoadEdgeDist_Left">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_RoadEdgeDist_Left</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_RoadEdgeDist_Left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_RoadEdgeDist_Left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_RoadEdgeDist_Right">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_RoadEdgeDist_Right</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_RoadEdgeDist_Right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_RoadEdgeDist_Right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_Speed">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_Speed</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_Speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_Speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the speed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_TimeGap">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_TimeGap</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em>, <em class="sig-param">neighborfore: feature_extractor.neighbor_feature.NeighborLongitudinalResult = None</em>, <em class="sig-param">censor_hi: float = 10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_TimeGap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_TimeGap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_TurnRateF">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_TurnRateF</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_TurnRateF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_TurnRateF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_TurnRateG">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_TurnRateG</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em>, <em class="sig-param">frames_back: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_TurnRateG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_TurnRateG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_VelFs">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_VelFs</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_VelFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_VelFs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity along the lane</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.Get.get_VelFt">
+<code class="sig-prename descclassname">feature_extractor.Get.</code><code class="sig-name descname">get_VelFt</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/Get.html#get_VelFt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.Get.get_VelFt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity perpendicular to the lane</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.TemporalFeatureExtractor">
+<span id="feature-extractor-temporalfeatureextractor-module"></span><h2>feature_extractor.TemporalFeatureExtractor module<a class="headerlink" href="#module-feature_extractor.TemporalFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.TemporalFeatureExtractor.</code><code class="sig-name descname">TemporalFeatureExtractor</code><a class="reference internal" href="_modules/feature_extractor/TemporalFeatureExtractor.html#TemporalFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/TemporalFeatureExtractor.html#TemporalFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/TemporalFeatureExtractor.html#TemporalFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">veh_idx: int</em>, <em class="sig-param">models: {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/TemporalFeatureExtractor.html#TemporalFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.TemporalFeatureExtractor.TemporalFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.WellBehavedFeatureExtractor">
+<span id="feature-extractor-wellbehavedfeatureextractor-module"></span><h2>feature_extractor.WellBehavedFeatureExtractor module<a class="headerlink" href="#module-feature_extractor.WellBehavedFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.WellBehavedFeatureExtractor.</code><code class="sig-name descname">WellBehavedFeatureExtractor</code><a class="reference internal" href="_modules/feature_extractor/WellBehavedFeatureExtractor.html#WellBehavedFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/WellBehavedFeatureExtractor.html#WellBehavedFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/WellBehavedFeatureExtractor.html#WellBehavedFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">veh_idx: int</em>, <em class="sig-param">models: {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/WellBehavedFeatureExtractor.html#WellBehavedFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.WellBehavedFeatureExtractor.WellBehavedFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.collision_detection">
+<span id="feature-extractor-collision-detection-module"></span><h2>feature_extractor.collision_detection module<a class="headerlink" href="#module-feature_extractor.collision_detection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.collision_detection.CPAMemory">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">CPAMemory</code><span class="sig-paren">(</span><em class="sig-param">vehA: feature_extractor.collision_detection.ConvexPolygon = &lt;feature_extractor.collision_detection.ConvexPolygon object&gt;</em>, <em class="sig-param">vehB: feature_extractor.collision_detection.ConvexPolygon = &lt;feature_extractor.collision_detection.ConvexPolygon object&gt;</em>, <em class="sig-param">mink: feature_extractor.collision_detection.ConvexPolygon = &lt;feature_extractor.collision_detection.ConvexPolygon object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#CPAMemory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.CPAMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="feature_extractor.collision_detection.CollisionCheckResult">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">CollisionCheckResult</code><span class="sig-paren">(</span><em class="sig-param">is_colliding: bool</em>, <em class="sig-param">A: int</em>, <em class="sig-param">B: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#CollisionCheckResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.CollisionCheckResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="feature_extractor.collision_detection.ConvexPolygon">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">ConvexPolygon</code><span class="sig-paren">(</span><em class="sig-param">npts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#ConvexPolygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.ConvexPolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.collision_detection.ConvexPolygon.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">poly</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#ConvexPolygon.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.ConvexPolygon.set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.cyclic_shift_left">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">cyclic_shift_left</code><span class="sig-paren">(</span><em class="sig-param">arr: list</em>, <em class="sig-param">d: int</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#cyclic_shift_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.cyclic_shift_left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.empty">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">empty</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.ensure_pts_sorted_by_min_polar_angle">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">ensure_pts_sorted_by_min_polar_angle</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#ensure_pts_sorted_by_min_polar_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.ensure_pts_sorted_by_min_polar_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.get_collision_time">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">get_collision_time</code><span class="sig-paren">(</span><em class="sig-param">ray: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">ray_speed: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#get_collision_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.get_collision_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.get_edge">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">get_edge</code><span class="sig-paren">(</span><em class="sig-param">pts: list</em>, <em class="sig-param">i: int</em>, <em class="sig-param">npts: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#get_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.get_edge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.get_first_collision">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">get_first_collision</code><span class="sig-paren">(</span><em class="sig-param">scene: src.Record.frame.Frame</em>, <em class="sig-param">target_index: int</em>, <em class="sig-param">mem: feature_extractor.collision_detection.CPAMemory = &lt;feature_extractor.collision_detection.CPAMemory object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#get_first_collision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.get_first_collision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.get_poly_edge">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">get_poly_edge</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">i: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#get_poly_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.get_poly_edge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.get_signed_area">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">get_signed_area</code><span class="sig-paren">(</span><em class="sig-param">pts: []</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#get_signed_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.get_signed_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.in_poly">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">in_poly</code><span class="sig-paren">(</span><em class="sig-param">v: src.Vec.VecE2.VecE2</em>, <em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#in_poly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.in_poly" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.is_colliding_1">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">is_colliding_1</code><span class="sig-paren">(</span><em class="sig-param">mem: feature_extractor.collision_detection.CPAMemory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#is_colliding_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.is_colliding_1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.is_colliding_2">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">is_colliding_2</code><span class="sig-paren">(</span><em class="sig-param">P: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">Q: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">temp: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#is_colliding_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.is_colliding_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.is_potentially_colliding">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">is_potentially_colliding</code><span class="sig-paren">(</span><em class="sig-param">A: src.Basic.Vehicle.Vehicle</em>, <em class="sig-param">B: src.Basic.Vehicle.Vehicle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#is_potentially_colliding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.is_potentially_colliding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.isempty">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">isempty</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#isempty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.isempty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.minkowksi_sum">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">minkowksi_sum</code><span class="sig-paren">(</span><em class="sig-param">retval: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">P: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">Q: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#minkowksi_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.minkowksi_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>For two convex polygons P and Q in the plane with m and n vertices, their Minkowski sum is a
+convex polygon with at most m + n vertices and may be computed in time O (m + n) by a very simple procedure,
+which may be informally described as follows.
+Assume that the edges of a polygon are given and the direction, say, counterclockwise, along the polygon boundary.
+Then it is easily seen that these edges of the convex polygon are ordered by polar angle.
+Let us merge the ordered sequences of the directed edges from P and Q into a single ordered sequence S.
+Imagine that these edges are solid arrows which can be moved freely while keeping them parallel to their original direction.
+Assemble these arrows in the order of the sequence S by attaching the tail of the next arrow to the head of the previous arrow.
+It turns out that the resulting polygonal chain will in fact be a convex polygon which is the Minkowski sum of P and Q.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.minkowski_difference">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">minkowski_difference</code><span class="sig-paren">(</span><em class="sig-param">retval: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">P: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">Q: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#minkowski_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.minkowski_difference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.mirror">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">mirror</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#mirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.mirror" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.push">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">push</code><span class="sig-paren">(</span><em class="sig-param">poly: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">v: src.Vec.VecE2.VecE2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.push" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.to_oriented_bounding_box_1">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">to_oriented_bounding_box_1</code><span class="sig-paren">(</span><em class="sig-param">retval: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">center: src.Vec.VecSE2.VecSE2</em>, <em class="sig-param">len: float</em>, <em class="sig-param">wid: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#to_oriented_bounding_box_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.to_oriented_bounding_box_1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.collision_detection.to_oriented_bounding_box_2">
+<code class="sig-prename descclassname">feature_extractor.collision_detection.</code><code class="sig-name descname">to_oriented_bounding_box_2</code><span class="sig-paren">(</span><em class="sig-param">retval: feature_extractor.collision_detection.ConvexPolygon</em>, <em class="sig-param">veh: src.Basic.Vehicle.Vehicle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/collision_detection.html#to_oriented_bounding_box_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.collision_detection.to_oriented_bounding_box_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.feature_extractor">
+<span id="feature-extractor-feature-extractor-module"></span><h2>feature_extractor.feature_extractor module<a class="headerlink" href="#module-feature_extractor.feature_extractor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.feature_extractor.MultiFeatureExtractor">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.feature_extractor.</code><code class="sig-name descname">MultiFeatureExtractor</code><span class="sig-paren">(</span><em class="sig-param">extractors: []</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#MultiFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.MultiFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="feature_extractor.feature_extractor.MultiFeatureExtractor.feature_info">
+<code class="sig-name descname">feature_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#MultiFeatureExtractor.feature_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.MultiFeatureExtractor.feature_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.feature_extractor.MultiFeatureExtractor.feature_names">
+<code class="sig-name descname">feature_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#MultiFeatureExtractor.feature_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.MultiFeatureExtractor.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="feature_extractor.feature_extractor.MultiFeatureExtractor.pull_features">
+<code class="sig-name descname">pull_features</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">models: {} = {}</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#MultiFeatureExtractor.pull_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.MultiFeatureExtractor.pull_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.feature_extractor.set_dual_feature">
+<code class="sig-prename descclassname">feature_extractor.feature_extractor.</code><code class="sig-name descname">set_dual_feature</code><span class="sig-paren">(</span><em class="sig-param">features: list</em>, <em class="sig-param">i: int</em>, <em class="sig-param">f: feature_extractor.FeatureState.FeatureValue</em>, <em class="sig-param">censor: float = 0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#set_dual_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.set_dual_feature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.feature_extractor.set_feature">
+<code class="sig-prename descclassname">feature_extractor.feature_extractor.</code><code class="sig-name descname">set_feature</code><span class="sig-paren">(</span><em class="sig-param">features: list</em>, <em class="sig-param">i: int</em>, <em class="sig-param">v: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#set_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.set_feature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.feature_extractor.set_feature_missing">
+<code class="sig-prename descclassname">feature_extractor.feature_extractor.</code><code class="sig-name descname">set_feature_missing</code><span class="sig-paren">(</span><em class="sig-param">features: list</em>, <em class="sig-param">i: int</em>, <em class="sig-param">censor: float = 0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/feature_extractor.html#set_feature_missing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.feature_extractor.set_feature_missing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.interface">
+<span id="feature-extractor-interface-module"></span><h2>feature_extractor.interface module<a class="headerlink" href="#module-feature_extractor.interface" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="feature_extractor.interface.convert_2_float">
+<code class="sig-prename descclassname">feature_extractor.interface.</code><code class="sig-name descname">convert_2_float</code><span class="sig-paren">(</span><em class="sig-param">fv: feature_extractor.FeatureState.FeatureValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/interface.html#convert_2_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.interface.convert_2_float" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.interface.get_Acc">
+<code class="sig-prename descclassname">feature_extractor.interface.</code><code class="sig-name descname">get_Acc</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/interface.html#get_Acc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.interface.get_Acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.interface.get_AccFs">
+<code class="sig-prename descclassname">feature_extractor.interface.</code><code class="sig-name descname">get_AccFs</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/interface.html#get_AccFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.interface.get_AccFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.interface.get_Jerk">
+<code class="sig-prename descclassname">feature_extractor.interface.</code><code class="sig-name descname">get_Jerk</code><span class="sig-paren">(</span><em class="sig-param">rec: src.Record.record.SceneRecord</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">pastframe: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/interface.html#get_Jerk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.interface.get_Jerk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.neighbor_feature">
+<span id="feature-extractor-neighbor-feature-module"></span><h2>feature_extractor.neighbor_feature module<a class="headerlink" href="#module-feature_extractor.neighbor_feature" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="feature_extractor.neighbor_feature.NeighborLongitudinalResult">
+<em class="property">class </em><code class="sig-prename descclassname">feature_extractor.neighbor_feature.</code><code class="sig-name descname">NeighborLongitudinalResult</code><span class="sig-paren">(</span><em class="sig-param">ind: int</em>, <em class="sig-param">delta_s: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/neighbor_feature.html#NeighborLongitudinalResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.neighbor_feature.NeighborLongitudinalResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_1">
+<code class="sig-prename descclassname">feature_extractor.neighbor_feature.</code><code class="sig-name descname">get_neighbor_fore_along_lane_1</code><span class="sig-paren">(</span><em class="sig-param">scene: src.Record.frame.Frame</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">tag_start: src.Roadway.roadway.LaneTag</em>, <em class="sig-param">s_base: float</em>, <em class="sig-param">targetpoint_primary: str</em>, <em class="sig-param">targetpoint_valid: str</em>, <em class="sig-param">max_distance_fore: float = 250.0</em>, <em class="sig-param">index_to_ignore: int = -1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/neighbor_feature.html#get_neighbor_fore_along_lane_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_2">
+<code class="sig-prename descclassname">feature_extractor.neighbor_feature.</code><code class="sig-name descname">get_neighbor_fore_along_lane_2</code><span class="sig-paren">(</span><em class="sig-param">scene: src.Record.frame.Frame</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">targetpoint_ego: str</em>, <em class="sig-param">targetpoint_primary: str</em>, <em class="sig-param">targetpoint_valid: str</em>, <em class="sig-param">max_distance_fore: float = 250.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/neighbor_feature.html#get_neighbor_fore_along_lane_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_3">
+<code class="sig-prename descclassname">feature_extractor.neighbor_feature.</code><code class="sig-name descname">get_neighbor_fore_along_lane_3</code><span class="sig-paren">(</span><em class="sig-param">scene: src.Record.frame.Frame</em>, <em class="sig-param">vehicle_index: int</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em>, <em class="sig-param">max_distance_fore: float = 250.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/neighbor_feature.html#get_neighbor_fore_along_lane_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.neighbor_feature.get_neighbor_fore_along_lane_3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor.utils">
+<span id="feature-extractor-utils-module"></span><h2>feature_extractor.utils module<a class="headerlink" href="#module-feature_extractor.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="feature_extractor.utils.build_feature_extractor">
+<code class="sig-prename descclassname">feature_extractor.utils.</code><code class="sig-name descname">build_feature_extractor</code><span class="sig-paren">(</span><em class="sig-param">params={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/feature_extractor/utils.html#build_feature_extractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#feature_extractor.utils.build_feature_extractor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-feature_extractor">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-feature_extractor" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">envs package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">feature_extractor package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.CarLidarFeatureExtractor">feature_extractor.CarLidarFeatureExtractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.CoreFeatureExtractor">feature_extractor.CoreFeatureExtractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.FeatureState">feature_extractor.FeatureState module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.ForeForeFeatureExtractor">feature_extractor.ForeForeFeatureExtractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.Get">feature_extractor.Get module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.TemporalFeatureExtractor">feature_extractor.TemporalFeatureExtractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.WellBehavedFeatureExtractor">feature_extractor.WellBehavedFeatureExtractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.collision_detection">feature_extractor.collision_detection module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.feature_extractor">feature_extractor.feature_extractor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.interface">feature_extractor.interface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.neighbor_feature">feature_extractor.neighbor_feature module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor.utils">feature_extractor.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-feature_extractor">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="envs.html" title="previous chapter">envs package</a></li>
+      <li>Next: <a href="preprocessing.html" title="next chapter">preprocessing package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/feature_extractor.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

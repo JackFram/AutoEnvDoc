@@ -1,0 +1,30 @@
+algorithms.dataset package
+==========================
+
+Submodules
+----------
+
+algorithms.dataset.CriticDataset module
+---------------------------------------
+
+.. automodule:: algorithms.dataset.CriticDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+algorithms.dataset.utils module
+-------------------------------
+
+.. automodule:: algorithms.dataset.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: algorithms.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:

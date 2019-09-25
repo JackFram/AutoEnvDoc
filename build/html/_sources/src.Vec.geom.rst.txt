@@ -1,0 +1,38 @@
+src.Vec.geom package
+====================
+
+Submodules
+----------
+
+src.Vec.geom.geom module
+------------------------
+
+.. automodule:: src.Vec.geom.geom
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.Vec.geom.line\_segment module
+---------------------------------
+
+.. automodule:: src.Vec.geom.line_segment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.Vec.geom.projectile module
+------------------------------
+
+.. automodule:: src.Vec.geom.projectile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.Vec.geom
+   :members:
+   :undoc-members:
+   :show-inheritance:
