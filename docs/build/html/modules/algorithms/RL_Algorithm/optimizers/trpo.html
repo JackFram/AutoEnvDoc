@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.RL_Algorithm.optimizers.trpo &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.RL_Algorithm.optimizers.trpo</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy.optimize</span>
+<span class="kn">from</span> <span class="nn">algorithms.RL_Algorithm.optimizers.utils</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="conjugate_gradients"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.optimizers.html#algorithms.RL_Algorithm.optimizers.trpo.conjugate_gradients">[docs]</a><span class="k">def</span> <span class="nf">conjugate_gradients</span><span class="p">(</span><span class="n">Avp_f</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">,</span> <span class="n">rdotr_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param Avp_f: Hessian Vector function</span>
+<span class="sd">    :param b: negative loss gradient</span>
+<span class="sd">    :param nsteps: how many steps to search</span>
+<span class="sd">    :param rdotr_tol: the minimum improvement of rdotr</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">device</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;p: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="n">rdotr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsteps</span><span class="p">):</span>
+        <span class="n">Avp</span> <span class="o">=</span> <span class="n">Avp_f</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">rdotr</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">Avp</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">p</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;step: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="s2">&quot;Avp: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Avp</span><span class="p">),</span> <span class="s2">&quot;p: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="s2">&quot;rdotr: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rdotr</span><span class="p">),</span> <span class="s2">&quot;x: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">r</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">Avp</span>
+        <span class="n">new_rdotr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">betta</span> <span class="o">=</span> <span class="n">new_rdotr</span> <span class="o">/</span> <span class="n">rdotr</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">betta</span> <span class="o">*</span> <span class="n">p</span>
+        <span class="n">rdotr</span> <span class="o">=</span> <span class="n">new_rdotr</span>
+        <span class="k">if</span> <span class="n">rdotr</span> <span class="o">&lt;</span> <span class="n">rdotr_tol</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="line_search"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.optimizers.html#algorithms.RL_Algorithm.optimizers.trpo.line_search">[docs]</a><span class="k">def</span> <span class="nf">line_search</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">fullstep</span><span class="p">,</span> <span class="n">expected_improve_full</span><span class="p">,</span> <span class="n">max_backtracks</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">accept_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param model: our policy model</span>
+<span class="sd">    :param f: evaluation function</span>
+<span class="sd">    :param x: params of the model</span>
+<span class="sd">    :param fullstep: full step size</span>
+<span class="sd">    :param expected_improve_full: expected improve</span>
+<span class="sd">    :param max_backtracks: max iterative steps .5^n</span>
+<span class="sd">    :param accept_ratio: accepted improving rate</span>
+<span class="sd">    :return: a boolean var indicating if the update step is success, if true return new param</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">stepfrac</span> <span class="ow">in</span> <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_backtracks</span><span class="p">)]:</span>
+        <span class="n">x_new</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">stepfrac</span> <span class="o">*</span> <span class="n">fullstep</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">stepfrac</span><span class="p">,</span> <span class="n">x_new</span><span class="p">)</span>
+        <span class="n">set_flat_params_to</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_new</span><span class="p">)</span>
+        <span class="n">fval_new</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">actual_improve</span> <span class="o">=</span> <span class="n">fval</span> <span class="o">-</span> <span class="n">fval_new</span>
+        <span class="n">expected_improve</span> <span class="o">=</span> <span class="n">expected_improve_full</span> <span class="o">*</span> <span class="n">stepfrac</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">actual_improve</span> <span class="o">/</span> <span class="n">expected_improve</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stepfrac: </span><span class="si">{}</span><span class="s2">, actual improve: </span><span class="si">{}</span><span class="s2">, expected improve: </span><span class="si">{}</span><span class="s2">, accept ratio: </span><span class="si">{}</span><span class="s2">, actual ratio: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">stepfrac</span><span class="p">,</span>
+            <span class="n">actual_improve</span><span class="p">,</span>
+            <span class="n">expected_improve</span><span class="p">,</span>
+            <span class="n">accept_ratio</span><span class="p">,</span>
+            <span class="n">ratio</span>
+        <span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="n">accept_ratio</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">x_new</span>
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="trpo_step"><a class="viewcode-back" href="../../../../algorithms.RL_Algorithm.optimizers.html#algorithms.RL_Algorithm.optimizers.trpo.trpo_step">[docs]</a><span class="k">def</span> <span class="nf">trpo_step</span><span class="p">(</span><span class="n">policy_net</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">advantages</span><span class="p">,</span> <span class="n">max_kl</span><span class="p">,</span> <span class="n">damping</span><span class="p">,</span> <span class="n">use_fim</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    optimize param of policy net given states and actions and advantages using TRPO</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="sd">&quot;&quot;&quot;update policy&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">fixed_log_probs</span> <span class="o">=</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">get_log_prob</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;define the loss function for TRPO&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_loss</span><span class="p">(</span><span class="n">volatile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="ow">not</span> <span class="n">volatile</span><span class="p">):</span>
+            <span class="n">log_probs</span> <span class="o">=</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">get_log_prob</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="n">action_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">advantages</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span> \
+                              <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_probs</span> <span class="o">-</span> <span class="n">fixed_log_probs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">advantages</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_probs</span> <span class="o">-</span> <span class="n">fixed_log_probs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">action_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="sd">&quot;&quot;&quot;use fisher information matrix for Hessian*vector&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">Fvp_fim</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="n">M</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">get_fim</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">filter_input_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="k">if</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">is_disc_action</span> <span class="k">else</span> <span class="p">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;std_id&#39;</span><span class="p">]}</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="n">mu</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">mu</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">mu_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">Jt</span> <span class="o">=</span> <span class="n">compute_flat_grad</span><span class="p">(</span><span class="n">mu_t</span><span class="p">,</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">filter_input_ids</span><span class="o">=</span><span class="n">filter_input_ids</span><span class="p">,</span> <span class="n">create_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Jtv</span> <span class="o">=</span> <span class="p">(</span><span class="n">Jt</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">Jv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">Jtv</span><span class="p">,</span> <span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">MJv</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="n">Jv</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">mu_MJv</span> <span class="o">=</span> <span class="p">(</span><span class="n">MJv</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">JTMJv</span> <span class="o">=</span> <span class="n">compute_flat_grad</span><span class="p">(</span><span class="n">mu_MJv</span><span class="p">,</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">filter_input_ids</span><span class="o">=</span><span class="n">filter_input_ids</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">JTMJv</span> <span class="o">/=</span> <span class="n">states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">is_disc_action</span><span class="p">:</span>
+            <span class="n">std_index</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;std_index&#39;</span><span class="p">]</span>
+            <span class="n">JTMJv</span><span class="p">[</span><span class="n">std_index</span><span class="p">:</span> <span class="n">std_index</span> <span class="o">+</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="n">std_index</span><span class="p">:</span> <span class="n">std_index</span> <span class="o">+</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">JTMJv</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">damping</span>
+
+    <span class="sd">&quot;&quot;&quot;directly compute Hessian*vector from KL&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">Fvp_direct</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="n">kl</span> <span class="o">=</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">get_kl</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+        <span class="n">kl</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="n">grads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">kl</span><span class="p">,</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">create_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">flat_grad_kl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">grad</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">grad</span> <span class="ow">in</span> <span class="n">grads</span><span class="p">])</span>
+
+        <span class="n">kl_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_grad_kl</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">grads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">kl_v</span><span class="p">,</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+        <span class="n">flat_grad_grad_kl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">grad</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">grad</span> <span class="ow">in</span> <span class="n">grads</span><span class="p">])</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">flat_grad_grad_kl</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">damping</span>
+
+    <span class="n">Fvp</span> <span class="o">=</span> <span class="n">Fvp_fim</span> <span class="k">if</span> <span class="n">use_fim</span> <span class="k">else</span> <span class="n">Fvp_direct</span>
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loss: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span>
+    <span class="n">grads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">allow_unused</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">grads</span> <span class="o">=</span> <span class="p">[</span><span class="n">grad</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span> <span class="k">for</span> <span class="n">grad</span> <span class="ow">in</span> <span class="n">grads</span><span class="p">]</span>
+    <span class="n">loss_grad</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">grad</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">grad</span> <span class="ow">in</span> <span class="n">grads</span><span class="p">])</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">stepdir</span> <span class="o">=</span> <span class="n">conjugate_gradients</span><span class="p">(</span><span class="n">Fvp</span><span class="p">,</span> <span class="o">-</span><span class="n">loss_grad</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stepdir: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stepdir</span><span class="p">))</span>
+
+    <span class="n">shs</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">stepdir</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Fvp</span><span class="p">(</span><span class="n">stepdir</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;shs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shs</span><span class="p">))</span>
+    <span class="n">lm</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">max_kl</span> <span class="o">/</span> <span class="n">shs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lm: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lm</span><span class="p">))</span>
+    <span class="n">fullstep</span> <span class="o">=</span> <span class="n">stepdir</span> <span class="o">*</span> <span class="n">lm</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fullstep: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullstep</span><span class="p">))</span>
+    <span class="n">expected_improve</span> <span class="o">=</span> <span class="o">-</span><span class="n">loss_grad</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">fullstep</span><span class="p">)</span>
+    <span class="c1"># print(&quot;loss: {}, loss_grad: {}, stepdir: {}, shs: {}, lm: {}, fullstep: {}, expected_improve: {}&quot;.format(</span>
+    <span class="c1">#     loss, loss_grad, stepdir, shs, lm, fullstep, expected_improve</span>
+    <span class="c1"># ))</span>
+
+    <span class="n">prev_params</span> <span class="o">=</span> <span class="n">get_flat_params_from</span><span class="p">(</span><span class="n">policy_net</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;prev_params: &quot;</span><span class="p">,</span> <span class="n">prev_params</span><span class="p">)</span>
+    <span class="n">success</span><span class="p">,</span> <span class="n">new_params</span> <span class="o">=</span> <span class="n">line_search</span><span class="p">(</span><span class="n">policy_net</span><span class="p">,</span> <span class="n">get_loss</span><span class="p">,</span> <span class="n">prev_params</span><span class="p">,</span> <span class="n">fullstep</span><span class="p">,</span> <span class="n">expected_improve</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new_params: &quot;</span><span class="p">,</span> <span class="n">new_params</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;success flag: &quot;</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+    <span class="n">set_flat_params_to</span><span class="p">(</span><span class="n">policy_net</span><span class="p">,</span> <span class="n">new_params</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">success</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.dataset.CriticDataset &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.dataset.CriticDataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">algorithms.dataset.utils</span> <span class="k">import</span> <span class="n">pad_tensor</span><span class="p">,</span> <span class="n">compute_n_batches</span>
+
+
+<div class="viewcode-block" id="select_batch_idxs"><a class="viewcode-back" href="../../../algorithms.dataset.html#algorithms.dataset.CriticDataset.select_batch_idxs">[docs]</a><span class="k">def</span> <span class="nf">select_batch_idxs</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">min_idx</span><span class="p">,</span> <span class="n">max_idx</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param start_idx: starting index</span>
+<span class="sd">    :param batch_size: batch size</span>
+<span class="sd">    :param min_idx: minimum index</span>
+<span class="sd">    :param max_idx: maximum index</span>
+<span class="sd">    :return: the selected list of indexes</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">batch_size</span>
+    <span class="n">end_idx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end_idx</span><span class="p">,</span> <span class="n">max_idx</span><span class="p">)</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># if too few samples selected, then randomly select the rest from the full range</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
+        <span class="n">n_additional</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span>
+        <span class="n">additional_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">min_idx</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">max_idx</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_additional</span><span class="p">)</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">idxs</span><span class="p">,</span> <span class="n">additional_idxs</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">idxs</span><span class="p">,</span> <span class="n">end_idx</span></div>
+
+
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../algorithms.dataset.html#algorithms.dataset.CriticDataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">action_normalizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">observation_normalizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">replay_memory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">recurrent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">flat_recurrent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">use_random_scaling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">random_scale_factor</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">use_random_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">random_noise_factor</span><span class="o">=.</span><span class="mi">003</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param data: data</span>
+<span class="sd">        :param batch_size: batch size</span>
+<span class="sd">        :param action_normalizer: action normalizer</span>
+<span class="sd">        :param observation_normalizer: observation normalizer</span>
+<span class="sd">        :param replay_memory: replay memory buffer</span>
+<span class="sd">        :param recurrent: boolean recurrent indicator of the model</span>
+<span class="sd">        :param flat_recurrent: boolean flat recurrent indicator of the model</span>
+<span class="sd">        :param use_random_scaling: boolean use random scaling indicator</span>
+<span class="sd">        :param random_scale_factor: if use random scaling, the factor</span>
+<span class="sd">        :param use_random_noise: boolean use random noise indicator</span>
+<span class="sd">        :param random_noise_factor: if use random noise, the factor</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">assert</span> <span class="s1">&#39;observations&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s1">&#39;actions&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="n">flat_recurrent</span> <span class="ow">and</span> <span class="n">recurrent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">recurrent</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;valids&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="c1"># expert data has already been padded to the max sequence length</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_seq_len</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_normalizer</span> <span class="o">=</span> <span class="n">action_normalizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_normalizer</span> <span class="o">=</span> <span class="n">observation_normalizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replay_memory</span> <span class="o">=</span> <span class="n">replay_memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span> <span class="o">=</span> <span class="n">recurrent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flat_recurrent</span> <span class="o">=</span> <span class="n">flat_recurrent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_random_scaling</span> <span class="o">=</span> <span class="n">use_random_scaling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_scale_factor</span> <span class="o">=</span> <span class="n">random_scale_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_random_noise</span> <span class="o">=</span> <span class="n">use_random_noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_noise_factor</span> <span class="o">=</span> <span class="n">random_noise_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">])</span>  <span class="c1"># number of real samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># normalize actions in the dataset to ensure consistency with generated actions</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_normalizer</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_normalizer</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">])</span>
+
+        <span class="c1"># typically obs will be normalized through an environment wrapper, but in some</span>
+        <span class="c1"># cases it is more convenient to do it in the dataset</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_normalizer</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_normalizer</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_apply_random_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        randomly scales the time dimensions</span>
+<span class="sd">        i.e., x is assumed to be shape (batch_size, timesteps, input_dim), and</span>
+<span class="sd">        the same rescale factor is applied across timesteps for a given input_dim</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">random</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="p">(</span><span class="n">random</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_scale_factor</span> <span class="o">+</span> <span class="mf">1.</span>
+        <span class="n">x</span> <span class="o">*=</span> <span class="n">scales</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">_apply_random_scale_to_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_random_scaling</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span><span class="p">:</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rx&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_scale</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rx&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;ra&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_scale</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;ra&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">batch</span>
+
+    <span class="k">def</span> <span class="nf">_apply_random_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_noise_factor</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">noise</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">_apply_random_noise_to_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_random_noise</span><span class="p">:</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rx&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_noise</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;rx&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;ra&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_noise</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s1">&#39;ra&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">batch</span>
+
+    <span class="k">def</span> <span class="nf">_apply_randomness_to_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_scale_to_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_random_noise_to_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">batch</span>
+
+    <span class="k">def</span> <span class="nf">_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;valids&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="c1"># pad to max sequence length</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_recurrent</span><span class="p">:</span>
+            <span class="n">act_dim</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">act_dim</span><span class="p">))</span>
+            <span class="n">obs_dim</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">obs_dim</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Dataset.batches"><a class="viewcode-back" href="../../../algorithms.dataset.html#algorithms.dataset.CriticDataset.Dataset.batches">[docs]</a>    <span class="k">def</span> <span class="nf">batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CriticDataset"><a class="viewcode-back" href="../../../algorithms.dataset.html#algorithms.dataset.CriticDataset.CriticDataset">[docs]</a><span class="k">class</span> <span class="nc">CriticDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param data: data set</span>
+<span class="sd">        :param shuffle: shuffle or not</span>
+<span class="sd">        :param kwargs: other kwargs</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CriticDataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
+
+    <span class="k">def</span> <span class="nf">_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        shuffle data set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># optionally shuffle when wrapping around</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span><span class="p">:</span>
+            <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CriticDataset.batches"><a class="viewcode-back" href="../../../algorithms.dataset.html#algorithms.dataset.CriticDataset.CriticDataset.batches">[docs]</a>    <span class="k">def</span> <span class="nf">batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples_data</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param samples_data: batches of sampled observation action pairs</span>
+<span class="sd">        :param store: indicator of whether store sampled data in replay buffer or not</span>
+<span class="sd">        :return: yielded batch</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;observations&#39;</span> <span class="ow">in</span> <span class="n">samples_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s1">&#39;actions&#39;</span> <span class="ow">in</span> <span class="n">samples_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="c1"># copy in order to avoid mutating data used elsewhere</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">samples_data</span><span class="p">)</span>
+
+        <span class="c1"># format incoming data if necessary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+
+        <span class="c1"># normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+
+        <span class="c1"># n_samples will determine the total number of samples on which to train</span>
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sd</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">])</span>
+
+        <span class="c1"># if using replay memory, store info from this samples_data</span>
+        <span class="c1"># and then sample a batch from the previously stored data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay_memory</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">,</span> <span class="s1">&#39;actions&#39;</span><span class="p">]</span>
+            <span class="n">keys</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">store</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay_memory</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay_memory</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+
+        <span class="c1"># compute and yield batches</span>
+        <span class="n">n_batches</span> <span class="o">=</span> <span class="n">compute_n_batches</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bidx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batches</span><span class="p">):</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+            <span class="c1"># batch of generated data</span>
+            <span class="n">gidxs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select_batch_idxs</span><span class="p">(</span><span class="n">bidx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">gx</span> <span class="o">=</span> <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">][</span><span class="n">gidxs</span><span class="p">]</span>
+            <span class="n">ga</span> <span class="o">=</span> <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">][</span><span class="n">gidxs</span><span class="p">]</span>
+
+            <span class="c1"># batch of real data</span>
+            <span class="n">ridxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_idx</span> <span class="o">=</span> <span class="n">select_batch_idxs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">next_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">rx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">][</span><span class="n">ridxs</span><span class="p">]</span>
+            <span class="n">ra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">][</span><span class="n">ridxs</span><span class="p">]</span>
+
+            <span class="c1"># build batch</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rx</span><span class="o">=</span><span class="n">rx</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">gx</span><span class="o">=</span><span class="n">gx</span><span class="p">,</span> <span class="n">ga</span><span class="o">=</span><span class="n">ga</span><span class="p">)</span>
+
+            <span class="c1"># valids if recurrent critic</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recurrent</span><span class="p">:</span>
+                <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;g_valids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">][</span><span class="n">gidxs</span><span class="p">]</span>
+                <span class="n">batch</span><span class="p">[</span><span class="s1">&#39;r_valids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;valids&#39;</span><span class="p">][</span><span class="n">ridxs</span><span class="p">]</span>
+
+            <span class="c1"># wrap around real data if reached the end of it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_idx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">:</span>
+                <span class="c1"># optionally shuffle when wrapping around</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># optional random scaling</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_randomness_to_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+            <span class="c1"># yield a batch of data</span>
+            <span class="k">yield</span> <span class="n">batch</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

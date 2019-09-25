@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.utils &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">algorithms.dataset.utils</span> <span class="k">import</span> <span class="n">KeyValueReplayMemory</span>
+<span class="kn">from</span> <span class="nn">algorithms.dataset.CriticDataset</span> <span class="k">import</span> <span class="n">CriticDataset</span>
+<span class="kn">from</span> <span class="nn">algorithms.AGen.critic.model</span> <span class="k">import</span> <span class="n">ObservationActionMLP</span>
+<span class="kn">from</span> <span class="nn">algorithms.AGen.critic.base</span> <span class="k">import</span> <span class="n">Critic</span>
+<span class="kn">from</span> <span class="nn">algorithms.policy.GaussianGRUPolicy</span> <span class="k">import</span> <span class="n">GaussianGRUPolicy</span>
+<span class="kn">from</span> <span class="nn">algorithms.policy.GaussianMLPBaseline</span> <span class="k">import</span> <span class="n">GaussianMLPBaseline</span>
+<span class="kn">from</span> <span class="nn">algorithms.RL_Algorithm.utils</span> <span class="k">import</span> <span class="n">RewardHandler</span>
+<span class="kn">from</span> <span class="nn">envs.make</span> <span class="k">import</span> <span class="n">Env</span>
+<span class="kn">from</span> <span class="nn">hgail.envs.vectorized_normalized_env</span> <span class="k">import</span> <span class="n">vectorized_normalized_env</span><span class="p">,</span> <span class="n">VectorizedNormalizedEnv</span>
+<span class="kn">from</span> <span class="nn">sandbox.rocky.tf.envs.base</span> <span class="k">import</span> <span class="n">TfEnv</span>
+<span class="kn">from</span> <span class="nn">rllab.envs.normalized_env</span> <span class="k">import</span> <span class="n">NormalizedEnv</span>
+<span class="kn">from</span> <span class="nn">envs.utils</span> <span class="k">import</span> <span class="n">add_kwargs_to_reset</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="maybe_mkdir"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.maybe_mkdir">[docs]</a><span class="k">def</span> <span class="nf">maybe_mkdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    if there is a dir, skip. Else make one</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_ngsim_env"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.build_ngsim_env">[docs]</a><span class="k">def</span> <span class="nf">build_ngsim_env</span><span class="p">(</span>
+        <span class="n">args</span><span class="p">,</span>
+        <span class="n">n_veh</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param args: args for building the env</span>
+<span class="sd">    :param n_veh: n vehicles in one episode</span>
+<span class="sd">    :return: env, trajectory information, lower bound and higher bound for action space</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/Autoenv/data&#39;</span><span class="p">)</span>
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">ngsim_filename</span><span class="p">)]</span>
+    <span class="c1"># if render_params is None:</span>
+    <span class="c1">#     render_params = dict(</span>
+    <span class="c1">#         viz_dir=os.path.join(exp_dir, &#39;imitate/viz&#39;),</span>
+    <span class="c1">#         zoom=5.</span>
+    <span class="c1">#     )</span>
+    <span class="n">env_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">trajectory_filepaths</span><span class="o">=</span><span class="n">filepaths</span><span class="p">,</span>
+        <span class="n">H</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_H</span><span class="p">,</span>
+        <span class="n">primesteps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_primesteps</span><span class="p">,</span>
+        <span class="n">action_repeat</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_action_repeat</span><span class="p">,</span>
+        <span class="n">terminate_on_collision</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">terminate_on_off_road</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="c1"># render_params=render_params,</span>
+        <span class="n">n_envs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_envs</span><span class="p">,</span>
+        <span class="n">n_veh</span><span class="o">=</span><span class="n">n_veh</span><span class="p">,</span>
+        <span class="n">remove_ngsim_veh</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">remove_ngsim_veh</span><span class="p">,</span>
+        <span class="n">reward</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">env_reward</span>
+    <span class="p">)</span>
+    <span class="c1"># order matters here because multiagent is a subset of vectorized</span>
+    <span class="c1"># i.e., if you want to run with multiagent = true, then vectorize must</span>
+    <span class="c1"># also be true</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">env_multiagent</span><span class="p">:</span>
+        <span class="n">env_id</span> <span class="o">=</span> <span class="s2">&quot;MultiAgentAutoEnv&quot;</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">n_envs</span>
+        <span class="n">normalize_wrapper</span> <span class="o">=</span> <span class="n">vectorized_normalized_env</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;No single agent env&quot;</span><span class="p">)</span>
+
+    <span class="c1"># print(env_params)</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Env</span><span class="p">(</span><span class="n">env_id</span><span class="o">=</span><span class="n">env_id</span><span class="p">,</span> <span class="n">env_params</span><span class="o">=</span><span class="n">env_params</span><span class="p">)</span>
+    <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+    <span class="n">trajinfos</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">trajinfos</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">TfEnv</span><span class="p">(</span><span class="n">normalize_wrapper</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">normalize_obs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">obs_alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="c1"># get low and high values for normalizing _real_ actions</span>
+    <span class="n">add_kwargs_to_reset</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">env</span><span class="p">,</span> <span class="n">trajinfos</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span></div>
+
+
+<div class="viewcode-block" id="build_critic"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.build_critic">[docs]</a><span class="k">def</span> <span class="nf">build_critic</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    build critic handler</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_critic_replay_memory</span><span class="p">:</span>
+        <span class="n">critic_replay_memory</span> <span class="o">=</span> <span class="n">KeyValueReplayMemory</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">3</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">critic_replay_memory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">critic_dataset</span> <span class="o">=</span> <span class="n">CriticDataset</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">replay_memory</span><span class="o">=</span><span class="n">critic_replay_memory</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">critic_batch_size</span><span class="p">,</span>
+        <span class="n">flat_recurrent</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">policy_recurrent</span>
+    <span class="p">)</span>
+
+    <span class="n">critic_network</span> <span class="o">=</span> <span class="n">ObservationActionMLP</span><span class="p">(</span>
+        <span class="n">hidden_layer_dims</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">critic_hidden_layer_dims</span><span class="p">,</span>
+        <span class="n">dropout_keep_prob</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">critic_dropout_keep_prob</span><span class="p">,</span>
+        <span class="n">obs_size</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">flat_dim</span><span class="p">,</span>
+        <span class="n">act_size</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flat_dim</span>
+    <span class="p">)</span>
+
+    <span class="n">critic</span> <span class="o">=</span> <span class="n">Critic</span><span class="p">(</span>
+        <span class="n">obs_dim</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">flat_dim</span><span class="p">,</span>
+        <span class="n">act_dim</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">flat_dim</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">critic_dataset</span><span class="p">,</span>
+        <span class="n">network</span><span class="o">=</span><span class="n">critic_network</span><span class="p">,</span>
+        <span class="n">n_train_epochs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_critic_train_epochs</span><span class="p">,</span>
+        <span class="n">summary_writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span>
+        <span class="n">grad_norm_rescale</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">critic_grad_rescale</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">debug_nan</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">critic</span></div>
+
+
+<div class="viewcode-block" id="build_policy"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.build_policy">[docs]</a><span class="k">def</span> <span class="nf">build_policy</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param args: args to build policy</span>
+<span class="sd">    :param env: env</span>
+<span class="sd">    :param mode: 0 for training, 1 for testing</span>
+<span class="sd">    :return: a policy model object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">policy_recurrent</span><span class="p">:</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">GaussianGRUPolicy</span><span class="p">(</span>
+            <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">recurrent_hidden_dim</span><span class="p">,</span>
+            <span class="n">output_nonlinearity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Hasn&#39;t implement none recurrent policy yet.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">policy</span></div>
+
+
+<div class="viewcode-block" id="build_baseline"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.build_baseline">[docs]</a><span class="k">def</span> <span class="nf">build_baseline</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param args: args for building baseline</span>
+<span class="sd">    :param env: env</span>
+<span class="sd">    :return: baseline model object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">GaussianMLPBaseline</span><span class="p">(</span><span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_reward_handler"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.build_reward_handler">[docs]</a><span class="k">def</span> <span class="nf">build_reward_handler</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param args: args for building reward handler</span>
+<span class="sd">    :param writer: None</span>
+<span class="sd">    :return: a reward handler</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">reward_handler</span> <span class="o">=</span> <span class="n">RewardHandler</span><span class="p">(</span>
+        <span class="n">use_env_rewards</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_use_env_rewards</span><span class="p">,</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_max_epochs</span><span class="p">,</span>
+        <span class="n">critic_final_scale</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_critic_final_scale</span><span class="p">,</span>
+        <span class="n">recognition_initial_scale</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="n">recognition_final_scale</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">reward_handler_recognition_final_scale</span><span class="p">,</span>
+        <span class="n">summary_writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span>
+        <span class="n">normalize_rewards</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">critic_clip_low</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">critic_clip_high</span><span class="o">=</span><span class="mi">100</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">reward_handler</span></div>
+
+
+<div class="viewcode-block" id="set_up_experiment"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.set_up_experiment">[docs]</a><span class="k">def</span> <span class="nf">set_up_experiment</span><span class="p">(</span>
+        <span class="n">exp_name</span><span class="p">,</span>
+        <span class="n">phase</span><span class="p">,</span>
+        <span class="n">exp_home</span><span class="o">=</span><span class="s1">&#39;./data/experiments/&#39;</span><span class="p">,</span>
+        <span class="n">snapshot_gap</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">maybe_mkdir</span><span class="p">(</span><span class="n">exp_home</span><span class="p">)</span>
+    <span class="n">exp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exp_home</span><span class="p">,</span> <span class="n">exp_name</span><span class="p">)</span>
+    <span class="n">maybe_mkdir</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">)</span>
+    <span class="n">phase_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="n">maybe_mkdir</span><span class="p">(</span><span class="n">phase_dir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp_dir</span></div>
+
+
+<div class="viewcode-block" id="save_params"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.save_params">[docs]</a><span class="k">def</span> <span class="nf">save_params</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">max_to_keep</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param output_dir: output directory</span>
+<span class="sd">    :param params: params to save</span>
+<span class="sd">    :param epoch: epoch number</span>
+<span class="sd">    :param max_to_keep: the maximum number of co-exist params file</span>
+<span class="sd">    :return: no return, write params for the given output directory</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># make sure output_dir exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+
+    <span class="c1"># save</span>
+    <span class="n">output_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;itr_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;params are saved to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># delete files if in excess of max_to_keep</span>
+    <span class="k">if</span> <span class="n">max_to_keep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="s1">&#39;itr_&#39;</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
+        <span class="n">sorted_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_to_keep</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">sorted_files</span><span class="p">[</span><span class="n">max_to_keep</span><span class="p">:]:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_params"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.load_params">[docs]</a><span class="k">def</span> <span class="nf">load_params</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepath: file path to load parameters</span>
+<span class="sd">    :return: the loaded parameters</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="s1">&#39;params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">rllab utils</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="extract_wrapped_env"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.extract_wrapped_env">[docs]</a><span class="k">def</span> <span class="nf">extract_wrapped_env</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
+        <span class="c1"># descend to wrapped env</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s1">&#39;wrapped_env&#39;</span><span class="p">):</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">wrapped_env</span>
+        <span class="c1"># not the desired type, and has no wrapped env, return None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># reaches this point, then the env is of the desired type, return it</span>
+    <span class="k">return</span> <span class="n">env</span></div>
+
+
+<div class="viewcode-block" id="extract_normalizing_env"><a class="viewcode-back" href="../../algorithms.html#algorithms.utils.extract_normalizing_env">[docs]</a><span class="k">def</span> <span class="nf">extract_normalizing_env</span><span class="p">(</span><span class="n">env</span><span class="p">):</span>
+    <span class="n">normalizing_env</span> <span class="o">=</span> <span class="n">extract_wrapped_env</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">NormalizedEnv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalizing_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">normalizing_env</span> <span class="o">=</span> <span class="n">extract_wrapped_env</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">VectorizedNormalizedEnv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">normalizing_env</span></div>
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

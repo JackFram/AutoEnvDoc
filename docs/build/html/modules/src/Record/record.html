@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Record.record &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.Record.record</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">src.Basic</span> <span class="k">import</span> <span class="n">Vehicle</span>
+<span class="kn">from</span> <span class="nn">src.Record.frame</span> <span class="k">import</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">copyto</span>
+<span class="kn">from</span> <span class="nn">src.Basic.Vehicle</span> <span class="k">import</span> <span class="n">read_def</span><span class="p">,</span> <span class="n">read_state</span>
+
+
+<div class="viewcode-block" id="RecordFrame"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.RecordFrame">[docs]</a><span class="k">class</span> <span class="nc">RecordFrame</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lo</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param lo: low index</span>
+<span class="sd">        :param hi: high index</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">lo</span>  <span class="c1"># low index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi</span> <span class="o">=</span> <span class="n">hi</span>  <span class="c1"># high index</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: the length of the record</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hi</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">+</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="RecordFrame.write"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.RecordFrame.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param fp: the file pointer to write</span>
+<span class="sd">        :return: write to file, no return</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hi</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="read_frame"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.read_frame">[docs]</a><span class="k">def</span> <span class="nf">read_frame</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param fp: the frame pointer to read</span>
+<span class="sd">    :return: a RecordFrame object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">hi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">RecordFrame</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RecordState"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.RecordState">[docs]</a><span class="k">class</span> <span class="nc">RecordState</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    used to record the information of a state</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Vehicle</span><span class="o">.</span><span class="n">VehicleState</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param state: Vehicle State</span>
+<span class="sd">        :param id: id of the state</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>  <span class="c1"># vehicle state object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>  <span class="c1"># corresponding vehicle id</span></div>
+
+
+<div class="viewcode-block" id="ListRecord"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.ListRecord">[docs]</a><span class="k">class</span> <span class="nc">ListRecord</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">frames</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">states</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">defs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        timestep::Float64</span>
+<span class="sd">        frames::List of record frame, indicating the index range</span>
+<span class="sd">        states::list of record state indicating the vehicle</span>
+<span class="sd">        defs::Dict{I, D}</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestep</span> <span class="o">=</span> <span class="n">timestep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defs</span> <span class="o">=</span> <span class="n">defs</span>
+
+<div class="viewcode-block" id="ListRecord.write"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.ListRecord.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param fp: the frame pointer to write</span>
+<span class="sd">        :return: write file, no return</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ListRecord{</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">}(</span><span class="si">%d</span><span class="s2"> frames)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;NGSIM_TIMESTEP&#39;</span><span class="p">,</span> <span class="s1">&#39;Array</span><span class="si">{RecordFrame}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;Array{RecordState{VehicleState, Int}}&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">)))</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.16e</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestep</span><span class="p">)</span>
+
+        <span class="c1"># defs</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defs</span><span class="p">)))</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defs</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">defs</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ids &amp; states</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)))</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">recstate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">recstate</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">recstate</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># frames</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">)))</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">recframe</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">:</span>
+            <span class="n">recframe</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ListRecord.n_objects_in_frame"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.ListRecord.n_objects_in_frame">[docs]</a>    <span class="k">def</span> <span class="nf">n_objects_in_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param frame_index: the index of the frame</span>
+<span class="sd">        :return: the length of the frame given the index</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">frame_index</span><span class="p">])</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: the number of all the frames</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nstates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: the number of all the states</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: the number of all the vehicles</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="read_trajdata"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.read_trajdata">[docs]</a><span class="k">def</span> <span class="nf">read_trajdata</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param fp: the frame pointer to read</span>
+<span class="sd">    :return: a ListRecord object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>  <span class="c1"># skip first line</span>
+    <span class="c1"># lines = fp.readline()  # skip second line</span>
+
+    <span class="n">timestep</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+    <span class="n">defs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># read defs</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+        <span class="c1"># TODO: check if need parse /n</span>
+        <span class="n">defs</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_def</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="c1"># read states</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">read_state</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">RecordState</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+
+    <span class="c1"># read frames</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
+    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_frame</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ListRecord</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">defs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SceneRecord"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord">[docs]</a><span class="k">class</span> <span class="nc">SceneRecord</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        frames::List{Frame{Vehicle}}</span>
+<span class="sd">        timestep::Float64</span>
+<span class="sd">        nframes::Int # number of active Frames</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param item: the number of frames before the frame you want to retrieve</span>
+<span class="sd">        :return: the frame you want</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="n">item</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SceneRecord.init"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timestep</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">frame_capacity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        Initializing the SceneRecord object</span>
+<span class="sd">        :param capacity: the capacity of the object</span>
+<span class="sd">        :param timestep: timestep indicator</span>
+<span class="sd">        :param frame_capacity: the capacity of a single frame</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">capacity</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">()</span>
+            <span class="n">frame</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">frame_capacity</span><span class="p">)</span>
+            <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestep</span> <span class="o">=</span> <span class="n">timestep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: capacity of the SceneRecord object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SceneRecord.empty"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :return: empty the SceneRecord Stack</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="SceneRecord.insert"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param frame: the frame to be inserted</span>
+<span class="sd">        :param pastframe: &lt;=0, -n represent past n frame</span>
+<span class="sd">        :return: no return</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">pastframe</span><span class="p">]</span> <span class="o">=</span> <span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="n">pastframe</span><span class="p">],</span> <span class="n">frame</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SceneRecord.push_back_records"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord.push_back_records">[docs]</a>    <span class="k">def</span> <span class="nf">push_back_records</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        push back frames from tail to head</span>
+<span class="sd">        :return: no return</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">copyto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SceneRecord.update"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.SceneRecord.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">Frame</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        update the first frame</span>
+<span class="sd">        :param frame: the frame to be updated</span>
+<span class="sd">        :return: no return</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_back_records</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="frame_inbounds"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.frame_inbounds">[docs]</a><span class="k">def</span> <span class="nf">frame_inbounds</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">ListRecord</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    check if the index is in bound</span>
+<span class="sd">    :param rec: ListRecord</span>
+<span class="sd">    :param frame_index: index of the frame to be checked</span>
+<span class="sd">    :return: false if out of bound true otherwise</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">frame_index</span> <span class="o">&lt;</span> <span class="n">rec</span><span class="o">.</span><span class="n">nframes</span></div>
+
+
+<div class="viewcode-block" id="pastframe_inbounds"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.pastframe_inbounds">[docs]</a><span class="k">def</span> <span class="nf">pastframe_inbounds</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    check if the query pastframe is out of bound</span>
+<span class="sd">    :param rec: SceneRecord</span>
+<span class="sd">    :param pastframe: the query pastframe number</span>
+<span class="sd">    :return: false if out of bound true otherwise</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">pastframe</span> <span class="o">&lt;=</span> <span class="n">rec</span><span class="o">.</span><span class="n">nframes</span> <span class="o">-</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="get_elapsed_time_3"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.get_elapsed_time_3">[docs]</a><span class="k">def</span> <span class="nf">get_elapsed_time_3</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">pastframe_farthest_back</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe_most_recent</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">pastframe_most_recent</span> <span class="o">-</span> <span class="n">pastframe_farthest_back</span><span class="p">)</span><span class="o">*</span><span class="n">rec</span><span class="o">.</span><span class="n">timestep</span></div>
+
+
+<div class="viewcode-block" id="get_def"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.get_def">[docs]</a><span class="k">def</span> <span class="nf">get_def</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">ListRecord</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the vehicle definition given a query id</span>
+<span class="sd">    :param rec: ListRecord object</span>
+<span class="sd">    :param id: query id</span>
+<span class="sd">    :return: the vehicle definition for the query id</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">rec</span><span class="o">.</span><span class="n">defs</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_vehicle"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.get_vehicle">[docs]</a><span class="k">def</span> <span class="nf">get_vehicle</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">ListRecord</span><span class="p">,</span> <span class="n">stateindex</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get vehicle state given a state index</span>
+<span class="sd">    :param rec: ListRecord object</span>
+<span class="sd">    :param stateindex: query state index</span>
+<span class="sd">    :return: the vehicle state for the query state index</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">recstate</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">stateindex</span><span class="p">]</span>
+    <span class="c1"># print(recstate.id)</span>
+    <span class="k">return</span> <span class="n">Vehicle</span><span class="o">.</span><span class="n">Vehicle</span><span class="p">(</span><span class="n">recstate</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">get_def</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">recstate</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">recstate</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_scene"><a class="viewcode-back" href="../../../src.Record.html#src.Record.record.get_scene">[docs]</a><span class="k">def</span> <span class="nf">get_scene</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">rec</span><span class="p">:</span> <span class="n">ListRecord</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the scene given a query frame index</span>
+<span class="sd">    :param frame: the buffer for the frame</span>
+<span class="sd">    :param rec: the ListRecord object</span>
+<span class="sd">    :param frame_index: the frame index</span>
+<span class="sd">    :return: the frame for the query index</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+    <span class="n">frame_index</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># different index for julia and python</span>
+    <span class="k">if</span> <span class="n">frame_inbounds</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">):</span>
+        <span class="n">recframe</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">frame_index</span><span class="p">]</span>
+        <span class="c1"># print(recframe.lo, recframe.hi)</span>
+        <span class="k">for</span> <span class="n">stateindex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">recframe</span><span class="o">.</span><span class="n">lo</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">recframe</span><span class="o">.</span><span class="n">hi</span><span class="p">):</span>
+            <span class="n">frame</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">get_vehicle</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">stateindex</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">frame</span></div>
+
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

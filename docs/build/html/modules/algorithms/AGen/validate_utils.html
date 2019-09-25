@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>algorithms.AGen.validate_utils &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for algorithms.AGen.validate_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">h5py</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">pdb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">envs</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">envs</span> <span class="k">import</span> <span class="n">hyperparams</span>
+<span class="kn">from</span> <span class="nn">envs.make</span> <span class="k">import</span> <span class="n">make_env</span>
+<span class="kn">from</span> <span class="nn">algorithms.AGen.my_gaussian_gru_policy</span> <span class="k">import</span> <span class="n">myGaussianGRUPolicy</span>
+<span class="kn">from</span> <span class="nn">src.const</span> <span class="k">import</span> <span class="n">NGSIM_FILENAME_TO_ID</span>
+
+<span class="c1"># NGSIM_FILENAME_TO_ID = {</span>
+<span class="c1">#     &#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;: 1,</span>
+<span class="c1">#     &#39;trajdata_i101-22agents-0750am-0805am.txt&#39;: 1,</span>
+<span class="c1">#     &#39;trajdata_holo_trajectories.txt&#39;: 0</span>
+<span class="c1"># }</span>
+
+
+<div class="viewcode-block" id="load_validate_data"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.load_validate_data">[docs]</a><span class="k">def</span> <span class="nf">load_validate_data</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">act_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accel&#39;</span><span class="p">,</span> <span class="s1">&#39;turn_rate_global&#39;</span><span class="p">],</span>
+        <span class="n">ngsim_filename</span><span class="o">=</span><span class="s1">&#39;trajdata_holo_trajectories.txt&#39;</span><span class="p">,</span>
+        <span class="n">debug_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">normalize_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">act_low</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">act_high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">clip_std_multiple</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+    <span class="c1"># loading varies based on dataset type</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">veh_2_index</span><span class="p">,</span> <span class="n">feature_names</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">load_x_feature_names</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">ngsim_filename</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Load validate data&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># no need to flatten</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">veh_2_index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">act_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">act_keys</span><span class="p">]</span>
+    <span class="n">act</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">act_idxs</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loading features: &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalize_data</span><span class="p">:</span>
+        <span class="n">obs</span><span class="p">,</span> <span class="n">obs_mean</span><span class="p">,</span> <span class="n">obs_std</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">clip_std_multiple</span><span class="p">)</span>
+        <span class="c1"># normalize actions to between -1 and 1</span>
+        <span class="n">act</span> <span class="o">=</span> <span class="n">normalize_range</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">act_low</span><span class="p">,</span> <span class="n">act_high</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">obs_mean</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">obs_std</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">observations</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span>
+        <span class="n">actions</span><span class="o">=</span><span class="n">act</span><span class="p">,</span>
+        <span class="n">obs_mean</span><span class="o">=</span><span class="n">obs_mean</span><span class="p">,</span>
+        <span class="n">obs_std</span><span class="o">=</span><span class="n">obs_std</span><span class="p">,</span>
+    <span class="p">),</span> <span class="n">veh_2_index</span></div>
+
+
+<div class="viewcode-block" id="build_policy"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.build_policy">[docs]</a><span class="k">def</span> <span class="nf">build_policy</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">latent_sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GaussianGRUPolicy&quot;</span><span class="p">)</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="n">myGaussianGRUPolicy</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;policy&quot;</span><span class="p">,</span>
+        <span class="n">env_spec</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">recurrent_hidden_dim</span><span class="p">,</span>
+        <span class="n">output_nonlinearity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">learn_std</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">policy</span></div>
+
+
+<div class="viewcode-block" id="normalize"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.normalize">[docs]</a><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">clip_std_multiple</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">mean</span>
+    <span class="n">x_flatten</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">66</span><span class="p">])</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x_flatten</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-8</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">clip_std_multiple</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="o">-</span> <span class="n">std</span> <span class="o">*</span> <span class="n">clip_std_multiple</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">up</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">std</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span></div>
+
+
+<div class="viewcode-block" id="normalize_range"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.normalize_range">[docs]</a><span class="k">def</span> <span class="nf">normalize_range</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+    <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">low</span><span class="p">)</span>
+    <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">high</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">+</span> <span class="n">low</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="n">half_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">-</span> <span class="n">low</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">half_range</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="get_ground_truth"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.get_ground_truth">[docs]</a><span class="k">def</span> <span class="nf">get_ground_truth</span><span class="p">(</span><span class="n">ngsim_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">h5_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># filepath = &#39;../../data/trajectories/ngsim_22agents.h5&#39;</span>
+    <span class="c1"># ngsim_filename=&#39;trajdata_i101-22agents-0750am-0805am.txt&#39;</span>
+    <span class="c1"># filepath = &#39;../../data/trajectories/ngsim.h5&#39;</span>
+    <span class="c1"># ngsim_filename=&#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;</span>
+    <span class="c1"># x, feature_names = load_x_feature_names(filepath, ngsim_filename)</span>
+    <span class="c1"># clip_std_multiple = 10.</span>
+    <span class="c1"># x, obs_mean, obs_std = normalize(x, clip_std_multiple)</span>
+    <span class="c1"># # x.shape = [2150, 1010, 66]</span>
+    <span class="c1"># hyperparamters</span>
+    <span class="sd">&#39;&#39;&#39;Namespace(batch_size=10000, critic_batch_size=1000, critic_dropout_keep_prob=0.8, critic_grad_rescale=40.0, critic_hidden_layer_dims=(128, 128, 64), critic_learning_rate=0.0004, decay_reward=False, discount=0.95, do_curriculum=False, env_H=200, env_action_repeat=1, env_multiagent=False, env_primesteps=50, env_reward=0, exp_dir=&#39;../../data/experiments&#39;, exp_name=&#39;singleagent_def_3&#39;, expert_filepath=&#39;../../data/trajectories/ngsim.h5&#39;, gradient_penalty=2.0, itrs_per_decay=25, latent_dim=4, load_params_init=&#39;NONE&#39;, max_path_length=1000, n_critic_train_epochs=40, n_envs=1, n_envs_end=50, n_envs_start=10, n_envs_step=10, n_itr=1000, n_recognition_train_epochs=30, ngsim_filename=&#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;, normalize_clip_std_multiple=10.0, params_filepath=&#39;&#39;, policy_mean_hidden_layer_dims=(128, 128, 64), policy_recurrent=True, policy_std_hidden_layer_dims=(128, 64), recognition_hidden_layer_dims=(128, 64), recognition_learning_rate=0.0005, recurrent_hidden_dim=64, remove_ngsim_veh=False, render_every=25, reward_handler_critic_final_scale=1.0, reward_handler_max_epochs=100, reward_handler_recognition_final_scale=0.2, reward_handler_use_env_rewards=True, scheduler_k=20, trpo_step_size=0.01, use_critic_replay_memory=True, use_infogail=False, validator_render=False, vectorize=True)&#39;&#39;&#39;</span>
+
+    <span class="c1"># build components</span>
+    <span class="c1"># env, act_low, act_high = utils.build_ngsim_env(args, exp_dir, vectorize=True)</span>
+    <span class="n">act_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">])</span>
+    <span class="n">act_high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">load_validate_data</span><span class="p">(</span>
+        <span class="n">h5_filename</span><span class="p">,</span>
+        <span class="n">act_low</span><span class="o">=</span><span class="n">act_low</span><span class="p">,</span>
+        <span class="n">act_high</span><span class="o">=</span><span class="n">act_high</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">200</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">clip_std_multiple</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">ngsim_filename</span><span class="o">=</span><span class="n">ngsim_filename</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="get_multiagent_ground_truth"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.get_multiagent_ground_truth">[docs]</a><span class="k">def</span> <span class="nf">get_multiagent_ground_truth</span><span class="p">(</span><span class="n">ngsim_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">h5_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># filepath = &#39;../../data/trajectories/ngsim_22agents.h5&#39;</span>
+    <span class="c1"># ngsim_filename=&#39;trajdata_i101-22agents-0750am-0805am.txt&#39;</span>
+    <span class="c1"># filepath = &#39;../../data/trajectories/ngsim.h5&#39;</span>
+    <span class="c1"># ngsim_filename=&#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;</span>
+    <span class="c1"># x, feature_names = load_x_feature_names(filepath, ngsim_filename)</span>
+    <span class="c1"># clip_std_multiple = 10.</span>
+    <span class="c1"># x, obs_mean, obs_std = normalize(x, clip_std_multiple)</span>
+    <span class="c1"># # x.shape = [2150, 1010, 66]</span>
+    <span class="c1"># hyperparamters</span>
+    <span class="sd">&#39;&#39;&#39;Namespace(batch_size=10000, critic_batch_size=1000, critic_dropout_keep_prob=0.8, critic_grad_rescale=40.0, critic_hidden_layer_dims=(128, 128, 64), critic_learning_rate=0.0004, decay_reward=False, discount=0.95, do_curriculum=False, env_H=200, env_action_repeat=1, env_multiagent=False, env_primesteps=50, env_reward=0, exp_dir=&#39;../../data/experiments&#39;, exp_name=&#39;singleagent_def_3&#39;, expert_filepath=&#39;../../data/trajectories/ngsim.h5&#39;, gradient_penalty=2.0, itrs_per_decay=25, latent_dim=4, load_params_init=&#39;NONE&#39;, max_path_length=1000, n_critic_train_epochs=40, n_envs=1, n_envs_end=50, n_envs_start=10, n_envs_step=10, n_itr=1000, n_recognition_train_epochs=30, ngsim_filename=&#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;, normalize_clip_std_multiple=10.0, params_filepath=&#39;&#39;, policy_mean_hidden_layer_dims=(128, 128, 64), policy_recurrent=True, policy_std_hidden_layer_dims=(128, 64), recognition_hidden_layer_dims=(128, 64), recognition_learning_rate=0.0005, recurrent_hidden_dim=64, remove_ngsim_veh=False, render_every=25, reward_handler_critic_final_scale=1.0, reward_handler_max_epochs=100, reward_handler_recognition_final_scale=0.2, reward_handler_use_env_rewards=True, scheduler_k=20, trpo_step_size=0.01, use_critic_replay_memory=True, use_infogail=False, validator_render=False, vectorize=True)&#39;&#39;&#39;</span>
+
+    <span class="c1"># build components</span>
+    <span class="c1"># env, act_low, act_high = utils.build_ngsim_env(args, exp_dir, vectorize=True)</span>
+    <span class="n">act_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">])</span>
+    <span class="n">act_high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">])</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">veh_2_index</span> <span class="o">=</span> <span class="n">load_validate_data</span><span class="p">(</span>
+        <span class="n">h5_filename</span><span class="p">,</span>
+        <span class="n">act_low</span><span class="o">=</span><span class="n">act_low</span><span class="p">,</span>
+        <span class="n">act_high</span><span class="o">=</span><span class="n">act_high</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">200</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">clip_std_multiple</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">ngsim_filename</span><span class="o">=</span><span class="n">ngsim_filename</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">veh_2_index</span><span class="p">[</span><span class="n">NGSIM_FILENAME_TO_ID</span><span class="p">[</span><span class="n">ngsim_filename</span><span class="p">]]</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_multiagent_ground_truth</span><span class="p">()</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">196</span><span class="p">]</span>
+
+    <span class="n">get_ground_truth</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="build_ngsim_env"><a class="viewcode-back" href="../../../algorithms.AGen.html#algorithms.AGen.validate_utils.build_ngsim_env">[docs]</a><span class="k">def</span> <span class="nf">build_ngsim_env</span><span class="p">(</span>
+        <span class="n">args</span><span class="p">,</span>
+        <span class="n">exp_dir</span><span class="o">=</span><span class="s1">&#39;/tmp&#39;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">render_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">videoMaking</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.julia/v0.6/NGSIM/data&#39;</span><span class="p">)</span>
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="s1">&#39;trajdata_i101_trajectories-0750am-0805am.txt&#39;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">render_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">render_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">viz_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">,</span> <span class="s1">&#39;imitate/viz&#39;</span><span class="p">),</span>
+            <span class="n">zoom</span><span class="o">=</span><span class="mf">5.</span>
+        <span class="p">)</span>
+    <span class="n">env_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">trajectory_filepaths</span><span class="o">=</span><span class="n">filepaths</span><span class="p">,</span>
+        <span class="n">H</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">primesteps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">action_repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">terminate_on_collision</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">terminate_on_off_road</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">render_params</span><span class="o">=</span><span class="n">render_params</span><span class="p">,</span>
+        <span class="n">n_envs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">n_veh</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">remove_ngsim_veh</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">reward</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
+    <span class="c1"># order matters here because multiagent is a subset of vectorized</span>
+    <span class="c1"># i.e., if you want to run with multiagent = true, then vectorize must</span>
+    <span class="c1"># also be true</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">env_multiagent</span><span class="p">:</span>
+        <span class="n">env_id</span> <span class="o">=</span> <span class="s2">&quot;MultiAgentAutoEnv&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">env_id</span> <span class="o">=</span> <span class="s2">&quot;NGSIMEnv&quot;</span>
+
+    <span class="n">env</span> <span class="o">=</span> <span class="n">make_env</span><span class="p">(</span><span class="n">env_id</span><span class="o">=</span><span class="n">env_id</span><span class="p">,</span> <span class="n">env_params</span><span class="o">=</span><span class="n">env_params</span><span class="p">)</span>
+    <span class="c1"># get low and high values for normalizing _real_ actions</span>
+    <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">env</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

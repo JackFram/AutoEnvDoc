@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Vec.VecE2 &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.Vec.VecE2</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Zhihao Zhang</span>
+<span class="c1"># VecE2 class in python</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="VecE2"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2">[docs]</a><span class="k">class</span> <span class="nc">VecE2</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    VecE2 is a class to deal with 2 dimension vector</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param x: x value, default is 0.0</span>
+<span class="sd">        :param y: y value, default is 0.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VecE2.show"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;VecE2(</span><span class="si">{:.3f}</span><span class="s2">, </span><span class="si">{:.3f}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="VecE2.atan"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.atan">[docs]</a>    <span class="k">def</span> <span class="nf">atan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VecE2.hypot"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.hypot">[docs]</a>    <span class="k">def</span> <span class="nf">hypot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VecE2.rot180"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.rot180">[docs]</a>    <span class="k">def</span> <span class="nf">rot180</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VecE2.rotl90"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.rotl90">[docs]</a>    <span class="k">def</span> <span class="nf">rotl90</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VecE2.rotr90"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.VecE2.rotr90">[docs]</a>    <span class="k">def</span> <span class="nf">rotr90</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">/</span><span class="n">scaler</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">/</span><span class="n">scaler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="polar"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.polar">[docs]</a><span class="k">def</span> <span class="nf">polar</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">r</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="dist"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.dist">[docs]</a><span class="k">def</span> <span class="nf">dist</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dist2"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.dist2">[docs]</a><span class="k">def</span> <span class="nf">dist2</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="proj"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.proj">[docs]</a><span class="k">def</span> <span class="nf">proj</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># dot(a,b)/|b|</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">VecE2</span><span class="p">:</span>
+        <span class="c1"># dot(a,b) / dot(b,b) ⋅ b</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="o">*</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong type!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="proj_"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.proj_">[docs]</a><span class="k">def</span> <span class="nf">proj_</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># dot(a,b)/|b|</span></div>
+
+
+<div class="viewcode-block" id="lerp"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.lerp">[docs]</a><span class="k">def</span> <span class="nf">lerp</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rot"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.rot">[docs]</a><span class="k">def</span> <span class="nf">rot</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    rotate counter-clockwise about the origin</span>
+<span class="sd">    :param a: VecE2</span>
+<span class="sd">    :param theta: rotate angle</span>
+<span class="sd">    :return: VecE2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">VecE2</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="o">+</span><span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">c</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="norm"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.norm">[docs]</a><span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">normsquared</span><span class="p">(</span><span class="n">v</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="normsquared"><a class="viewcode-back" href="../../../src.Vec.html#src.Vec.VecE2.normsquared">[docs]</a><span class="k">def</span> <span class="nf">normsquared</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">VecE2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="o">*</span><span class="n">v</span><span class="o">.</span><span class="n">y</span></div>
+
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

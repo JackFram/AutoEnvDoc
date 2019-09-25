@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>feature_extractor.Get &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for feature_extractor.Get</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">src.Roadway.roadway</span> <span class="k">import</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">proj_1</span><span class="p">,</span> <span class="n">RoadIndex</span>
+<span class="kn">from</span> <span class="nn">src.Record.record</span> <span class="k">import</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">pastframe_inbounds</span><span class="p">,</span> <span class="n">get_elapsed_time_3</span>
+<span class="kn">from</span> <span class="nn">feature_extractor</span> <span class="k">import</span> <span class="n">FeatureState</span>
+<span class="kn">from</span> <span class="nn">feature_extractor.interface</span> <span class="k">import</span> <span class="n">_get_feature_derivative_backwards</span><span class="p">,</span> <span class="n">convert_2_float</span>
+<span class="kn">from</span> <span class="nn">src.Vec.VecSE2</span> <span class="k">import</span> <span class="n">deltaangle</span>
+<span class="kn">from</span> <span class="nn">feature_extractor.neighbor_feature</span> <span class="k">import</span> <span class="n">NeighborLongitudinalResult</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">feature_extractor.collision_detection</span> <span class="k">import</span> <span class="n">CPAMemory</span><span class="p">,</span> <span class="n">get_first_collision</span>
+<span class="kn">from</span> <span class="nn">src.Vec</span> <span class="k">import</span> <span class="n">VecE2</span>
+
+
+<div class="viewcode-block" id="get_LaneCurvature"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_LaneCurvature">[docs]</a><span class="k">def</span> <span class="nf">get_LaneCurvature</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    Lane Curvature extractor</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">veh</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span>
+    <span class="n">curvept</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_roadindex</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">roadind</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">curvept</span><span class="o">.</span><span class="n">k</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">MISSING</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_VelFs"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_VelFs">[docs]</a><span class="k">def</span> <span class="nf">get_VelFs</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    Velocity along the lane</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">veh</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">phi</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_VelFt"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_VelFt">[docs]</a><span class="k">def</span> <span class="nf">get_VelFt</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    Velocity perpendicular to the lane</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">veh</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">phi</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_Speed"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_Speed">[docs]</a><span class="k">def</span> <span class="nf">get_Speed</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the speed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_TurnRateG"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_TurnRateG">[docs]</a><span class="k">def</span> <span class="nf">get_TurnRateG</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">frames_back</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">INSUF_HIST</span><span class="p">)</span>
+    <span class="n">pastframe2</span> <span class="o">=</span> <span class="n">pastframe</span> <span class="o">-</span> <span class="n">frames_back</span>
+    <span class="k">if</span> <span class="n">pastframe_inbounds</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">pastframe2</span><span class="p">):</span>
+        <span class="n">veh_index_curr</span> <span class="o">=</span> <span class="n">vehicle_index</span>
+        <span class="n">veh_index_prev</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe2</span><span class="p">]</span><span class="o">.</span><span class="n">findfirst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">veh_index_prev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">veh_index_curr</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posG</span><span class="o">.</span><span class="n">theta</span>
+            <span class="n">past</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe2</span><span class="p">][</span><span class="n">veh_index_prev</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posG</span><span class="o">.</span><span class="n">theta</span>
+            <span class="n">delta_t</span> <span class="o">=</span> <span class="n">get_elapsed_time_3</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">pastframe2</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">)</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">deltaangle</span><span class="p">(</span><span class="n">past</span><span class="p">,</span> <span class="n">curr</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta_t</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="get_AngularRateG"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_AngularRateG">[docs]</a><span class="k">def</span> <span class="nf">get_AngularRateG</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_get_feature_derivative_backwards</span><span class="p">(</span><span class="s2">&quot;TURNRATEG&quot;</span><span class="p">,</span> <span class="n">rec</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_PosFyaw"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_PosFyaw">[docs]</a><span class="k">def</span> <span class="nf">get_PosFyaw</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">phi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_TurnRateF"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_TurnRateF">[docs]</a><span class="k">def</span> <span class="nf">get_TurnRateF</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_get_feature_derivative_backwards</span><span class="p">(</span><span class="s2">&quot;POSFYAW&quot;</span><span class="p">,</span><span class="n">rec</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_AngularRateF"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_AngularRateF">[docs]</a><span class="k">def</span> <span class="nf">get_AngularRateF</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_get_feature_derivative_backwards</span><span class="p">(</span><span class="s2">&quot;TURNRATEF&quot;</span><span class="p">,</span> <span class="n">rec</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_TimeGap"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_TimeGap">[docs]</a><span class="k">def</span> <span class="nf">get_TimeGap</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">neighborfore</span><span class="p">:</span> <span class="n">NeighborLongitudinalResult</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">censor_hi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">):</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">neighborfore</span><span class="o">.</span><span class="n">ind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">censor_hi</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">CENSORED_HI</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">]</span>
+        <span class="n">len_ego</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">vehicle_index</span><span class="p">]</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span>
+        <span class="n">len_oth</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">neighborfore</span><span class="o">.</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span>
+        <span class="n">delta_s</span> <span class="o">=</span> <span class="n">neighborfore</span><span class="o">.</span><span class="n">delta_s</span> <span class="o">-</span> <span class="n">len_ego</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">len_oth</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">delta_s</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">delta_s</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># collision!</span></div>
+
+
+<div class="viewcode-block" id="get_Inv_TTC"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_Inv_TTC">[docs]</a><span class="k">def</span> <span class="nf">get_Inv_TTC</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">neighborfore</span><span class="p">:</span> <span class="n">NeighborLongitudinalResult</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">censor_hi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">neighborfore</span><span class="o">.</span><span class="n">ind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">MISSING</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">]</span>
+
+        <span class="n">veh_fore</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">neighborfore</span><span class="o">.</span><span class="n">ind</span><span class="p">]</span>
+        <span class="n">veh_rear</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">vehicle_index</span><span class="p">]</span>
+
+        <span class="n">len_ego</span> <span class="o">=</span> <span class="n">veh_fore</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span>
+        <span class="n">len_oth</span> <span class="o">=</span> <span class="n">veh_rear</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span>
+
+        <span class="n">delta_s</span> <span class="o">=</span> <span class="n">neighborfore</span><span class="o">.</span><span class="n">delta_s</span> <span class="o">-</span> <span class="n">len_ego</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">len_oth</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">delta_v</span> <span class="o">=</span> <span class="n">veh_fore</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">veh_rear</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span>
+
+        <span class="k">if</span> <span class="n">delta_s</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>  <span class="c1"># collision!</span>
+            <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">censor_hi</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">CENSORED_HI</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">delta_v</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>  <span class="c1"># front car is pulling away</span>
+            <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="o">-</span> <span class="n">delta_v</span> <span class="o">/</span> <span class="n">delta_s</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="o">&gt;</span> <span class="n">censor_hi</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">CENSORED_HI</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_Is_Colliding"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_Is_Colliding">[docs]</a><span class="k">def</span> <span class="nf">get_Is_Colliding</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                     <span class="n">mem</span><span class="p">:</span> <span class="n">CPAMemory</span> <span class="o">=</span> <span class="n">CPAMemory</span><span class="p">()):</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">]</span>
+    <span class="n">is_colliding</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">get_first_collision</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">,</span> <span class="n">mem</span><span class="p">)</span><span class="o">.</span><span class="n">is_colliding</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">is_colliding</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_RoadEdgeDist_Left"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_RoadEdgeDist_Left">[docs]</a><span class="k">def</span> <span class="nf">get_RoadEdgeDist_Left</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">veh</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">t</span>
+    <span class="n">footpoint</span> <span class="o">=</span> <span class="n">veh</span><span class="o">.</span><span class="n">get_footpoint</span>
+    <span class="n">seg</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">roadind</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">)</span>
+    <span class="n">lane</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">lanes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">roadproj</span> <span class="o">=</span> <span class="n">proj_1</span><span class="p">(</span><span class="n">footpoint</span><span class="p">,</span> <span class="n">lane</span><span class="p">,</span> <span class="n">roadway</span><span class="p">)</span>
+    <span class="n">curvept</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_roadindex</span><span class="p">(</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">roadproj</span><span class="o">.</span><span class="n">curveproj</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="n">roadproj</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+    <span class="n">lane</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">roadproj</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">curvept</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">footpoint</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">vec</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_RoadEdgeDist_Right"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.Get.get_RoadEdgeDist_Right">[docs]</a><span class="k">def</span> <span class="nf">get_RoadEdgeDist_Right</span><span class="p">(</span><span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">vehicle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">veh</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">][</span><span class="n">vehicle_index</span><span class="p">]</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">t</span>
+    <span class="n">footpoint</span> <span class="o">=</span> <span class="n">veh</span><span class="o">.</span><span class="n">get_footpoint</span>
+    <span class="n">seg</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posF</span><span class="o">.</span><span class="n">roadind</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">segment</span><span class="p">)</span>
+    <span class="n">lane</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">lanes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">roadproj</span> <span class="o">=</span> <span class="n">proj_1</span><span class="p">(</span><span class="n">footpoint</span><span class="p">,</span> <span class="n">lane</span><span class="p">,</span> <span class="n">roadway</span><span class="p">)</span>
+    <span class="n">curvept</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_roadindex</span><span class="p">(</span><span class="n">RoadIndex</span><span class="p">(</span><span class="n">roadproj</span><span class="o">.</span><span class="n">curveproj</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="n">roadproj</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+    <span class="n">lane</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">get_by_tag</span><span class="p">(</span><span class="n">roadproj</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">curvept</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">footpoint</span>
+    <span class="k">return</span> <span class="n">FeatureState</span><span class="o">.</span><span class="n">FeatureValue</span><span class="p">(</span><span class="n">lane</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">vec</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span></div>
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

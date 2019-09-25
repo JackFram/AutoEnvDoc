@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <title>src package &#8212; AutoEnv 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="src.Basic package" href="src.Basic.html" />
     <link rel="prev" title="Welcome to AutoEnv’s documentation!" href="index.html" />
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -101,20 +101,20 @@
 <span id="src-ngsim-trajdata-module"></span><h2>src.ngsim_trajdata module<a class="headerlink" href="#module-src.ngsim_trajdata" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="src.ngsim_trajdata.NGSIMTrajdata">
-<em class="property">class </em><code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">NGSIMTrajdata</code><span class="sig-paren">(</span><em class="sig-param">file_path: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#NGSIMTrajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.NGSIMTrajdata" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">NGSIMTrajdata</code><span class="sig-paren">(</span><em class="sig-param">file_path: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#NGSIMTrajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.NGSIMTrajdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.car_df_index">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">car_df_index</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#car_df_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.car_df_index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">car_df_index</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#car_df_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.car_df_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>given frame and carid, find index of car in trajdata
 Returns 0 if it does not exist</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.carid_set">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">carid_set</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#carid_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.carid_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">carid_set</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#carid_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.carid_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>get all the vehicle id
 :param trajdata: NGSIMTrajdata
 :return: all the vehicle id</p>
@@ -122,7 +122,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.carsinframe">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">carsinframe</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#carsinframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.carsinframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">carsinframe</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#carsinframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.carsinframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the vehicles in a given frame
 :param trajdata: NGSIMTrajdata
 :param frame: frame index
@@ -131,7 +131,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.first_carid">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">first_carid</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#first_carid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.first_carid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">first_carid</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#first_carid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.first_carid" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the first vehicle’s id in a given frame
 :param trajdata: NGSIMTrajdata
 :param frame: frame
@@ -140,7 +140,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.get_frame_range">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">get_frame_range</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#get_frame_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.get_frame_range" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">get_frame_range</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#get_frame_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.get_frame_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the frame range for a car given the car id
 :param trajdata: NGSIMTrajdata
 :param carid: car id
@@ -149,7 +149,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.iscarinframe">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">iscarinframe</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#iscarinframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.iscarinframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">iscarinframe</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em>, <em class="sig-param">frame: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#iscarinframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.iscarinframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>check if a car is in a frame given the car id and the frame
 :param trajdata: NGSIMTrajdata
 :param carid: car id
@@ -159,7 +159,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.load_ngsim_trajdata">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">load_ngsim_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#load_ngsim_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.load_ngsim_trajdata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">load_ngsim_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#load_ngsim_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.load_ngsim_trajdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>load NGSIMTrajdata from a file given the file path
 :param filepath: file path
 :return: the loaded NGSIMTrajdata object</p>
@@ -167,7 +167,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.ngsim_trajdata.nth_carid">
-<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">nth_carid</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ngsim_trajdata.html#nth_carid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.nth_carid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.ngsim_trajdata.</code><code class="sig-name descname">nth_carid</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">frame: int</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/ngsim_trajdata.html#nth_carid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ngsim_trajdata.nth_carid" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the nth vehicle’s id in a given frame
 :param trajdata: NGSIMTrajdata
 :param frame: frame
@@ -180,19 +180,19 @@ Returns 0 if it does not exist</p>
 <span id="src-roadway-module"></span><h2>src.roadway module<a class="headerlink" href="#module-src.roadway" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="src.roadway.NGSIMRoadway">
-<em class="property">class </em><code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">NGSIMRoadway</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">boundaries: list</em>, <em class="sig-param">centerlines: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#NGSIMRoadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.NGSIMRoadway" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">NGSIMRoadway</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">boundaries: list</em>, <em class="sig-param">centerlines: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#NGSIMRoadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.NGSIMRoadway" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="src.roadway.RoadwayInputParams">
-<em class="property">class </em><code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">RoadwayInputParams</code><span class="sig-paren">(</span><em class="sig-param">filepath_boundaries: str</em>, <em class="sig-param">filepath_centerlines: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#RoadwayInputParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.RoadwayInputParams" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">RoadwayInputParams</code><span class="sig-paren">(</span><em class="sig-param">filepath_boundaries: str</em>, <em class="sig-param">filepath_centerlines: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#RoadwayInputParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.RoadwayInputParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.roadway.convert_curves_feet_to_meters">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">convert_curves_feet_to_meters</code><span class="sig-paren">(</span><em class="sig-param">roadWay: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#convert_curves_feet_to_meters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.convert_curves_feet_to_meters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">convert_curves_feet_to_meters</code><span class="sig-paren">(</span><em class="sig-param">roadWay: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#convert_curves_feet_to_meters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.convert_curves_feet_to_meters" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert all feet unit to meters
 :param roadWay: Roadway object
 :return: converted Roadway object</p>
@@ -200,7 +200,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.roadway.get_segid">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">get_segid</code><span class="sig-paren">(</span><em class="sig-param">lane: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#get_segid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.get_segid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">get_segid</code><span class="sig-paren">(</span><em class="sig-param">lane: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#get_segid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.get_segid" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>lane</strong> – list of CurvePt</p>
@@ -213,7 +213,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.roadway.integrate">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">centerline_fn: str</em>, <em class="sig-param">boundary_fn: str</em>, <em class="sig-param">dist_threshold_lane_connect: float = 2.0</em>, <em class="sig-param">desired_distance_between_curve_samples: float = 1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#integrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.integrate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">integrate</code><span class="sig-paren">(</span><em class="sig-param">centerline_fn: str</em>, <em class="sig-param">boundary_fn: str</em>, <em class="sig-param">dist_threshold_lane_connect: float = 2.0</em>, <em class="sig-param">desired_distance_between_curve_samples: float = 1.0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#integrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -231,7 +231,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.roadway.read_boundaries">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_boundaries</code><span class="sig-paren">(</span><em class="sig-param">filepath_boundaries: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#read_boundaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_boundaries" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_boundaries</code><span class="sig-paren">(</span><em class="sig-param">filepath_boundaries: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#read_boundaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_boundaries" title="Permalink to this definition">¶</a></dt>
 <dd><p>load boundaries from a file given the file path
 :param filepath_boundaries: the file path of the boundary
 :return: the loaded boundary</p>
@@ -239,7 +239,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.roadway.read_centerlines">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_centerlines</code><span class="sig-paren">(</span><em class="sig-param">filepath_centerlines: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#read_centerlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_centerlines" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_centerlines</code><span class="sig-paren">(</span><em class="sig-param">filepath_centerlines: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#read_centerlines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_centerlines" title="Permalink to this definition">¶</a></dt>
 <dd><p>load centerlines from a file given the file path
 :param filepath_centerlines: the file path of the center line
 :return: the loaded center line</p>
@@ -247,7 +247,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.roadway.read_roadway">
-<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_roadway</code><span class="sig-paren">(</span><em class="sig-param">input_params: src.roadway.RoadwayInputParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/roadway.html#read_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_roadway" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.roadway.</code><code class="sig-name descname">read_roadway</code><span class="sig-paren">(</span><em class="sig-param">input_params: src.roadway.RoadwayInputParams</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/roadway.html#read_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.roadway.read_roadway" title="Permalink to this definition">¶</a></dt>
 <dd><p>load roadway
 :param input_params: RoadwayInputParams
 :return: the loaded NGSIMRoadway object</p>
@@ -258,92 +258,92 @@ Returns 0 if it does not exist</p>
 <span id="src-splines-module"></span><h2>src.splines module<a class="headerlink" href="#module-src.splines" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="src.splines.arclength_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">arclength_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_min: float = 0.0</em>, <em class="sig-param">t_max: float = 1.0</em>, <em class="sig-param">n_intervals: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#arclength_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.arclength_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">arclength_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_min: float = 0.0</em>, <em class="sig-param">t_max: float = 1.0</em>, <em class="sig-param">n_intervals: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#arclength_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.arclength_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.arclength_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">arclength_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_min: float = 0.0</em>, <em class="sig-param">t_max: float = None</em>, <em class="sig-param">n_intervals_per_segment: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#arclength_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.arclength_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">arclength_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_min: float = 0.0</em>, <em class="sig-param">t_max: float = None</em>, <em class="sig-param">n_intervals_per_segment: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#arclength_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.arclength_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.calc_curve_length_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_length_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">n_intervals: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#calc_curve_length_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_length_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_length_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">n_intervals: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#calc_curve_length_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_length_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.calc_curve_length_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_length_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">n_intervals_per_segment: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#calc_curve_length_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_length_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_length_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">n_intervals_per_segment: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#calc_curve_length_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_length_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.calc_curve_param_given_arclen">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_param_given_arclen</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">s_arr</em>, <em class="sig-param">max_iterations: int = 50</em>, <em class="sig-param">curve_length: float = None</em>, <em class="sig-param">epsilon: float = 0.0001</em>, <em class="sig-param">n_intervals_in_arclen: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#calc_curve_param_given_arclen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_param_given_arclen" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">calc_curve_param_given_arclen</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">s_arr</em>, <em class="sig-param">max_iterations: int = 50</em>, <em class="sig-param">curve_length: float = None</em>, <em class="sig-param">epsilon: float = 0.0001</em>, <em class="sig-param">n_intervals_in_arclen: int = 100</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#calc_curve_param_given_arclen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.calc_curve_param_given_arclen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.fit_cubic_spline">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">fit_cubic_spline</code><span class="sig-paren">(</span><em class="sig-param">pts</em>, <em class="sig-param">open: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#fit_cubic_spline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.fit_cubic_spline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">fit_cubic_spline</code><span class="sig-paren">(</span><em class="sig-param">pts</em>, <em class="sig-param">open: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#fit_cubic_spline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.fit_cubic_spline" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_curvature_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_curvature_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_curvature_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_curvature_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_curvature_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_curvature_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_curvature_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_curvature_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_curvature_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_curvature_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_curvature_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_curvature_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_curvature_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_curvature_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_derivative">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_derivative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_derivative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_derivative2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_derivative2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_derivative2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_derivative_of_curvature_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative_of_curvature_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_derivative_of_curvature_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative_of_curvature_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative_of_curvature_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_derivative_of_curvature_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative_of_curvature_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_derivative_of_curvature_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative_of_curvature_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_derivative_of_curvature_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative_of_curvature_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_derivative_of_curvature_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_derivative_of_curvature_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_derivative_of_curvature_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_speed_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_speed_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_speed_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_speed_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_speed_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_speed_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_speed_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_speed_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_speed_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_speed_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_speed_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_speed_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_speed_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_speed_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_theta_1">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_theta_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_theta_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_theta_1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_theta_1</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t: float</em>, <em class="sig-param">stepsize=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_theta_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_theta_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.splines.sample_spline_theta_2">
-<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_theta_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/splines.html#sample_spline_theta_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_theta_2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.splines.</code><code class="sig-name descname">sample_spline_theta_2</code><span class="sig-paren">(</span><em class="sig-param">spline_coeffs_x</em>, <em class="sig-param">spline_coeffs_y</em>, <em class="sig-param">t_arr</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/splines.html#sample_spline_theta_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.splines.sample_spline_theta_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -351,13 +351,13 @@ Returns 0 if it does not exist</p>
 <span id="src-trajdata-module"></span><h2>src.trajdata module<a class="headerlink" href="#module-src.trajdata" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="src.trajdata.FilterTrajectoryResult">
-<em class="property">class </em><code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">FilterTrajectoryResult</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#FilterTrajectoryResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.FilterTrajectoryResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">FilterTrajectoryResult</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#FilterTrajectoryResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.FilterTrajectoryResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.trajdata.convert">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param">tdraw: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.convert" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param">tdraw: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">roadway: src.Roadway.roadway.Roadway</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.convert" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -373,19 +373,19 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.trajdata.convert_raw_ngsim_to_trajdatas">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">convert_raw_ngsim_to_trajdatas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#convert_raw_ngsim_to_trajdatas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.convert_raw_ngsim_to_trajdatas" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">convert_raw_ngsim_to_trajdatas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#convert_raw_ngsim_to_trajdatas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.convert_raw_ngsim_to_trajdatas" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert the raw trajectory data and roadway to a integrated version and save to a file
 :return: no return</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.trajdata.copy">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">ftr: src.trajdata.FilterTrajectoryResult</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">ftr: src.trajdata.FilterTrajectoryResult</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajdata.filter_given_trajectory">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">filter_given_trajectory</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#filter_given_trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.filter_given_trajectory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">filter_given_trajectory</code><span class="sig-paren">(</span><em class="sig-param">trajdata: src.ngsim_trajdata.NGSIMTrajdata</em>, <em class="sig-param">carid: int</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#filter_given_trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.filter_given_trajectory" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -401,12 +401,12 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.trajdata.filter_trajectory">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">filter_trajectory</code><span class="sig-paren">(</span><em class="sig-param">ftr: src.trajdata.FilterTrajectoryResult</em>, <em class="sig-param">v: src.trajectory_smoothing.VehicleSystem = &lt;src.trajectory_smoothing.VehicleSystem object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#filter_trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.filter_trajectory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">filter_trajectory</code><span class="sig-paren">(</span><em class="sig-param">ftr: src.trajdata.FilterTrajectoryResult</em>, <em class="sig-param">v: src.trajectory_smoothing.VehicleSystem = &lt;src.trajectory_smoothing.VehicleSystem object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#filter_trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.filter_trajectory" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajdata.get_corresponding_roadway">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">get_corresponding_roadway</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#get_corresponding_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.get_corresponding_roadway" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">get_corresponding_roadway</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#get_corresponding_roadway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.get_corresponding_roadway" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>filename</strong> – the path of the saved roadway file</p>
@@ -419,7 +419,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.trajdata.load_ngsim_trajdata">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">load_ngsim_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">autofilter: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#load_ngsim_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.load_ngsim_trajdata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">load_ngsim_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">autofilter: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#load_ngsim_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.load_ngsim_trajdata" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -435,7 +435,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.trajdata.load_trajdata">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">load_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#load_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.load_trajdata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">load_trajdata</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#load_trajdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.load_trajdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>load trajdata from the file given the file path
 :param filepath: file path
 :return: ListRecord object</p>
@@ -443,7 +443,7 @@ Returns 0 if it does not exist</p>
 
 <dl class="function">
 <dt id="src.trajdata.symmetric_exponential_moving_average">
-<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">symmetric_exponential_moving_average</code><span class="sig-paren">(</span><em class="sig-param">arr: list</em>, <em class="sig-param">T: float</em>, <em class="sig-param">dt: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajdata.html#symmetric_exponential_moving_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.symmetric_exponential_moving_average" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajdata.</code><code class="sig-name descname">symmetric_exponential_moving_average</code><span class="sig-paren">(</span><em class="sig-param">arr: list</em>, <em class="sig-param">T: float</em>, <em class="sig-param">dt: float = 0.1</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajdata.html#symmetric_exponential_moving_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajdata.symmetric_exponential_moving_average" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -451,7 +451,7 @@ Returns 0 if it does not exist</p>
 <span id="src-trajectory-smoothing-module"></span><h2>src.trajectory_smoothing module<a class="headerlink" href="#module-src.trajectory_smoothing" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="src.trajectory_smoothing.EKF">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">EKF</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">mu: list</em>, <em class="sig-param">Cov</em>, <em class="sig-param">u: list</em>, <em class="sig-param">o: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#EKF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.EKF" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">EKF</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">mu: list</em>, <em class="sig-param">Cov</em>, <em class="sig-param">u: list</em>, <em class="sig-param">o: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#EKF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.EKF" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -470,20 +470,20 @@ Returns 0 if it does not exist</p>
 
 <dl class="class">
 <dt id="src.trajectory_smoothing.SimulationResults">
-<em class="property">class </em><code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">SimulationResults</code><span class="sig-paren">(</span><em class="sig-param">x_arr</em>, <em class="sig-param">z_arr</em>, <em class="sig-param">u_arr</em>, <em class="sig-param">mu_arr</em>, <em class="sig-param">Cov_arr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#SimulationResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.SimulationResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">SimulationResults</code><span class="sig-paren">(</span><em class="sig-param">x_arr</em>, <em class="sig-param">z_arr</em>, <em class="sig-param">u_arr</em>, <em class="sig-param">mu_arr</em>, <em class="sig-param">Cov_arr</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#SimulationResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.SimulationResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="src.trajectory_smoothing.VehicleSystem">
-<em class="property">class </em><code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">VehicleSystem</code><span class="sig-paren">(</span><em class="sig-param">process_noise: float = 0.077</em>, <em class="sig-param">observation_noise: float = 16.7</em>, <em class="sig-param">control_noise_accel: float = 16.7</em>, <em class="sig-param">control_noise_turnrate: float = 0.46</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#VehicleSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.VehicleSystem" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">VehicleSystem</code><span class="sig-paren">(</span><em class="sig-param">process_noise: float = 0.077</em>, <em class="sig-param">observation_noise: float = 16.7</em>, <em class="sig-param">control_noise_accel: float = 16.7</em>, <em class="sig-param">control_noise_turnrate: float = 0.46</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#VehicleSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.VehicleSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>used to do trajectory smoothing</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.compute_dynamics_jacobian">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">compute_dynamics_jacobian</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#compute_dynamics_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.compute_dynamics_jacobian" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">compute_dynamics_jacobian</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#compute_dynamics_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.compute_dynamics_jacobian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the dynamics Jacobian
 Inputs:</p>
 <blockquote>
@@ -497,7 +497,7 @@ Inputs:</p>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.compute_observation_jacobian">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">compute_observation_jacobian</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#compute_observation_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.compute_observation_jacobian" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">compute_observation_jacobian</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#compute_observation_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.compute_observation_jacobian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the observation Jacobian (H matrix)
 Inputs:</p>
 <blockquote>
@@ -510,17 +510,17 @@ Inputs:</p>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.draw_obs_noise">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">draw_obs_noise</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#draw_obs_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.draw_obs_noise" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">draw_obs_noise</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#draw_obs_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.draw_obs_noise" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.draw_proc_noise">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">draw_proc_noise</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#draw_proc_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.draw_proc_noise" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">draw_proc_noise</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#draw_proc_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.draw_proc_noise" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.get_control_noise_in_control_space">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_control_noise_in_control_space</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#get_control_noise_in_control_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_control_noise_in_control_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_control_noise_in_control_space</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#get_control_noise_in_control_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_control_noise_in_control_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>To derive the covariance of the additional motion noise,
 we first determine the covariance matrix of the noise in control space
 Inputs:</p>
@@ -534,17 +534,17 @@ Inputs:</p>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.get_observation_noise_covariance">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_observation_noise_covariance</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#get_observation_noise_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_observation_noise_covariance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_observation_noise_covariance</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#get_observation_noise_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_observation_noise_covariance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.get_process_noise_covariance">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_process_noise_covariance</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#get_process_noise_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_process_noise_covariance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_process_noise_covariance</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#get_process_noise_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_process_noise_covariance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.get_transform_control_noise_to_state_space">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_transform_control_noise_to_state_space</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">u: list</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#get_transform_control_noise_to_state_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_transform_control_noise_to_state_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">get_transform_control_noise_to_state_space</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">u: list</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#get_transform_control_noise_to_state_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.get_transform_control_noise_to_state_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>To derive the covariance of the additional motion noise,
 we transform the covariance of noise in the control space
 by a linear approximation to the derivative of the motion function
@@ -561,7 +561,7 @@ Inputs:</p>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.observe">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#observe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.observe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#observe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.observe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vehicle observation, returns a saturated observation
 Inputs:</p>
 <blockquote>
@@ -574,7 +574,7 @@ Inputs:</p>
 
 <dl class="function">
 <dt id="src.trajectory_smoothing.step">
-<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/trajectory_smoothing.html#step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.step" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">src.trajectory_smoothing.</code><code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param">v: src.trajectory_smoothing.VehicleSystem</em>, <em class="sig-param">x: list</em>, <em class="sig-param">u: list</em><span class="sig-paren">)</span><a class="reference internal" href="modules/src/trajectory_smoothing.html#step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.trajectory_smoothing.step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vehicle dynamics, return the new state
 Inputs:</p>
 <blockquote>
@@ -676,7 +676,7 @@ Inputs:</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/src.rst.txt"
+      <a href="sources/src.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

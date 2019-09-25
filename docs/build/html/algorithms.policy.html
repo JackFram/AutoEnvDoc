@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <title>algorithms.policy package &#8212; AutoEnv 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="envs package" href="envs.html" />
     <link rel="prev" title="algorithms.distribution package" href="algorithms.distribution.html" />
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -41,11 +41,11 @@
 <span id="algorithms-policy-grucell-module"></span><h2>algorithms.policy.GRUCell module<a class="headerlink" href="#module-algorithms.policy.GRUCell" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.policy.GRUCell.GRUCell">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUCell.</code><code class="sig-name descname">GRUCell</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUCell.html#GRUCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUCell.</code><code class="sig-name descname">GRUCell</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GRUCell.html#GRUCell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.policy.GRUCell.GRUCell.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUCell.html#GRUCell.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GRUCell.html#GRUCell.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUCell.GRUCell.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -64,11 +64,11 @@ registered hooks while the latter silently ignores them.</p>
 <span id="algorithms-policy-grunetwork-module"></span><h2>algorithms.policy.GRUNetwork module<a class="headerlink" href="#module-algorithms.policy.GRUNetwork" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.policy.GRUNetwork.GRUNetwork">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUNetwork.</code><code class="sig-name descname">GRUNetwork</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">hidden_dim</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUNetwork.html#GRUNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GRUNetwork.</code><code class="sig-name descname">GRUNetwork</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">hidden_dim</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GRUNetwork.html#GRUNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.policy.GRUNetwork.GRUNetwork.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GRUNetwork.html#GRUNetwork.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GRUNetwork.html#GRUNetwork.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GRUNetwork.GRUNetwork.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -87,7 +87,7 @@ registered hooks while the latter silently ignores them.</p>
 <span id="algorithms-policy-gaussiangrupolicy-module"></span><h2>algorithms.policy.GaussianGRUPolicy module<a class="headerlink" href="#module-algorithms.policy.GaussianGRUPolicy" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianGRUPolicy.</code><code class="sig-name descname">GaussianGRUPolicy</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">hidden_dim=32</em>, <em class="sig-param">feature_network=None</em>, <em class="sig-param">state_include_action=True</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em>, <em class="sig-param">mode: int = 0</em>, <em class="sig-param">log_std=0</em>, <em class="sig-param">cuda_enable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianGRUPolicy.</code><code class="sig-name descname">GaussianGRUPolicy</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">hidden_dim=32</em>, <em class="sig-param">feature_network=None</em>, <em class="sig-param">state_include_action=True</em>, <em class="sig-param">gru_layer=&lt;class 'algorithms.policy.GRUCell.GRUCell'&gt;</em>, <em class="sig-param">output_nonlinearity=None</em>, <em class="sig-param">mode: int = 0</em>, <em class="sig-param">log_std=0</em>, <em class="sig-param">cuda_enable=True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.action_space">
@@ -96,7 +96,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.dist_info_sym">
-<code class="sig-name descname">dist_info_sym</code><span class="sig-paren">(</span><em class="sig-param">obs_var</em>, <em class="sig-param">state_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.dist_info_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.dist_info_sym" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dist_info_sym</code><span class="sig-paren">(</span><em class="sig-param">obs_var</em>, <em class="sig-param">state_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.dist_info_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.dist_info_sym" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -106,7 +106,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -122,7 +122,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_action">
-<code class="sig-name descname">get_action</code><span class="sig-paren">(</span><em class="sig-param">observation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_action" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_action</code><span class="sig-paren">(</span><em class="sig-param">observation</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_action" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>observation</strong> – input observation</p>
@@ -135,7 +135,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions">
-<code class="sig-name descname">get_actions</code><span class="sig-paren">(</span><em class="sig-param">observations</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_actions</code><span class="sig-paren">(</span><em class="sig-param">observations</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>observations</strong> – a batch of observations</p>
@@ -148,7 +148,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions_with_prev">
-<code class="sig-name descname">get_actions_with_prev</code><span class="sig-paren">(</span><em class="sig-param">observations</em>, <em class="sig-param">prev_actions</em>, <em class="sig-param">prev_hiddens</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions_with_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions_with_prev" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_actions_with_prev</code><span class="sig-paren">(</span><em class="sig-param">observations</em>, <em class="sig-param">prev_actions</em>, <em class="sig-param">prev_hiddens</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_actions_with_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_actions_with_prev" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -165,7 +165,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_fim">
-<code class="sig-name descname">get_fim</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_fim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_fim" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_fim</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_fim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_fim" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -181,7 +181,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_kl">
-<code class="sig-name descname">get_kl</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_kl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_kl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_kl</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em>, <em class="sig-param">h=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_kl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_kl" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -198,7 +198,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_log_prob">
-<code class="sig-name descname">get_log_prob</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_log_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_log_prob" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_log_prob</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">actions</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.get_log_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.get_log_prob" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -214,7 +214,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.load_param">
-<code class="sig-name descname">load_param</code><span class="sig-paren">(</span><em class="sig-param">param_path: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.load_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.load_param" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_param</code><span class="sig-paren">(</span><em class="sig-param">param_path: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.load_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.load_param" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>param_path</strong> – saved parameter file path</p>
@@ -237,7 +237,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.reset">
-<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dones=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dones=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianGRUPolicy.html#GaussianGRUPolicy.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianGRUPolicy.GaussianGRUPolicy.reset" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dones</strong> – indicators of whether all the agent have finished their episode or not</p>
@@ -265,11 +265,11 @@ registered hooks while the latter silently ignores them.</p>
 <span id="algorithms-policy-gaussianmlpbaseline-module"></span><h2>algorithms.policy.GaussianMLPBaseline module<a class="headerlink" href="#module-algorithms.policy.GaussianMLPBaseline" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLP</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">mean_network=None</em>, <em class="sig-param">optimizer=None</em>, <em class="sig-param">hidden_size=(32</em>, <em class="sig-param">32)</em>, <em class="sig-param">step_size=0.01</em>, <em class="sig-param">init_std=1.0</em>, <em class="sig-param">normalize_inputs=True</em>, <em class="sig-param">normalize_outputs=True</em>, <em class="sig-param">subsample_factor=1.0</em>, <em class="sig-param">max_itr=20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLP</code><span class="sig-paren">(</span><em class="sig-param">input_dim</em>, <em class="sig-param">output_dim</em>, <em class="sig-param">mean_network=None</em>, <em class="sig-param">optimizer=None</em>, <em class="sig-param">hidden_size=(32</em>, <em class="sig-param">32)</em>, <em class="sig-param">step_size=0.01</em>, <em class="sig-param">init_std=1.0</em>, <em class="sig-param">normalize_inputs=True</em>, <em class="sig-param">normalize_outputs=True</em>, <em class="sig-param">subsample_factor=1.0</em>, <em class="sig-param">max_itr=20</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">ys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">ys</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -285,7 +285,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -299,7 +299,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLP.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">xs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">xs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLP.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLP.predict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>xs</strong> – input feature</p>
@@ -314,12 +314,12 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="class">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLPBaseline</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">subsample_factor=1</em>, <em class="sig-param">num_seq_inputs=1</em>, <em class="sig-param">regressor_args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.GaussianMLPBaseline.</code><code class="sig-name descname">GaussianMLPBaseline</code><span class="sig-paren">(</span><em class="sig-param">env_spec</em>, <em class="sig-param">subsample_factor=1</em>, <em class="sig-param">num_seq_inputs=1</em>, <em class="sig-param">regressor_args=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Baseline model to reduce variance</p>
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>paths</strong> – observations and rewards</p>
@@ -332,12 +332,12 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.parameters">
-<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.predict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> – giving observations</p>
@@ -350,7 +350,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="method">
 <dt id="algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.set_cuda">
-<code class="sig-name descname">set_cuda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.set_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.set_cuda" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_cuda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/GaussianMLPBaseline.html#GaussianMLPBaseline.set_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.GaussianMLPBaseline.GaussianMLPBaseline.set_cuda" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -360,11 +360,11 @@ registered hooks while the latter silently ignores them.</p>
 <span id="algorithms-policy-mlp-module"></span><h2>algorithms.policy.MLP module<a class="headerlink" href="#module-algorithms.policy.MLP" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.policy.MLP.MLP">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.MLP.</code><code class="sig-name descname">MLP</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em>, <em class="sig-param">output_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/MLP.html#MLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.policy.MLP.</code><code class="sig-name descname">MLP</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_size</em>, <em class="sig-param">output_size</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/MLP.html#MLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.policy.MLP.MLP.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/policy/MLP.html#MLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/policy/MLP.html#MLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.policy.MLP.MLP.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -473,7 +473,7 @@ registered hooks while the latter silently ignores them.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/algorithms.policy.rst.txt"
+      <a href="sources/algorithms.policy.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

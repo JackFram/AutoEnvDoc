@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>feature_extractor.collision_detection &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for feature_extractor.collision_detection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">src.Record.frame</span> <span class="k">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">src.Vec</span> <span class="k">import</span> <span class="n">VecE2</span><span class="p">,</span> <span class="n">VecSE2</span>
+<span class="kn">from</span> <span class="nn">src.Basic.Vehicle</span> <span class="k">import</span> <span class="n">Vehicle</span>
+<span class="kn">from</span> <span class="nn">src.Vec.geom.line_segment</span> <span class="k">import</span> <span class="n">LineSegment</span><span class="p">,</span> <span class="n">get_polar_angle</span>
+<span class="kn">from</span> <span class="nn">src.Vec.geom.projectile</span> <span class="k">import</span> <span class="n">Projectile</span><span class="p">,</span> <span class="n">get_intersection_time</span>
+<span class="kn">from</span> <span class="nn">src.Vec.geom.geom</span> <span class="k">import</span> <span class="n">sign</span><span class="p">,</span> <span class="n">cross_product</span>
+
+
+<div class="viewcode-block" id="ConvexPolygon"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.ConvexPolygon">[docs]</a><span class="k">class</span> <span class="nc">ConvexPolygon</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">npts</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">npts</span>
+
+<div class="viewcode-block" id="ConvexPolygon.set"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.ConvexPolygon.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">poly</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pts</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">pts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">npts</span></div></div>
+
+
+<div class="viewcode-block" id="CollisionCheckResult"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.CollisionCheckResult">[docs]</a><span class="k">class</span> <span class="nc">CollisionCheckResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_colliding</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param is_colliding: Bool</span>
+<span class="sd">        :param A: index of 1st vehicle</span>
+<span class="sd">        :param B: index of 2nd vehicle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_colliding</span> <span class="o">=</span> <span class="n">is_colliding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">B</span></div>
+
+
+<div class="viewcode-block" id="CPAMemory"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.CPAMemory">[docs]</a><span class="k">class</span> <span class="nc">CPAMemory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehA</span><span class="p">:</span> <span class="n">ConvexPolygon</span> <span class="o">=</span> <span class="n">ConvexPolygon</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">vehB</span><span class="p">:</span> <span class="n">ConvexPolygon</span> <span class="o">=</span> <span class="n">ConvexPolygon</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                 <span class="n">mink</span><span class="p">:</span> <span class="n">ConvexPolygon</span> <span class="o">=</span> <span class="n">ConvexPolygon</span><span class="p">(</span><span class="mi">8</span><span class="p">)):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param vehA: bounding box for vehicle A</span>
+<span class="sd">        :param vehB: bounding box for vehicle B</span>
+<span class="sd">        :param mink: minkowski bounding box</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehA</span> <span class="o">=</span> <span class="n">vehA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehB</span> <span class="o">=</span> <span class="n">vehB</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mink</span> <span class="o">=</span> <span class="n">mink</span></div>
+
+
+<div class="viewcode-block" id="empty"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.empty">[docs]</a><span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="n">poly</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+<div class="viewcode-block" id="isempty"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.isempty">[docs]</a><span class="k">def</span> <span class="nf">isempty</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">poly</span><span class="o">.</span><span class="n">npts</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="push"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.push">[docs]</a><span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">):</span>
+    <span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">poly</span><span class="o">.</span><span class="n">npts</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">poly</span><span class="o">.</span><span class="n">npts</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+<div class="viewcode-block" id="get_signed_area"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.get_signed_area">[docs]</a><span class="k">def</span> <span class="nf">get_signed_area</span><span class="p">(</span><span class="n">pts</span><span class="p">:</span> <span class="p">[]):</span>
+    <span class="n">npts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+
+    <span class="c1"># https://en.wikipedia.org/wiki/Shoelace_formula</span>
+    <span class="c1"># sign of -1 means clockwise, sign of 1 means counterclockwise</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="n">npts</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">*</span><span class="n">pts</span><span class="p">[</span><span class="n">npts</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">+=</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">retval</span> <span class="o">-=</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+
+    <span class="k">return</span> <span class="n">retval</span><span class="o">/</span><span class="mi">2</span></div>
+
+
+<span class="k">def</span> <span class="nf">_bounding_radius</span><span class="p">(</span><span class="n">veh</span><span class="p">:</span> <span class="n">Vehicle</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span> <span class="o">*</span> <span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">width_</span> <span class="o">*</span> <span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">width_</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="is_potentially_colliding"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.is_potentially_colliding">[docs]</a><span class="k">def</span> <span class="nf">is_potentially_colliding</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">Vehicle</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="n">Vehicle</span><span class="p">):</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posG</span> <span class="o">-</span> <span class="n">B</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">posG</span>
+    <span class="n">delta_square</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">normsquared</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">vec</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+    <span class="n">r_a</span> <span class="o">=</span> <span class="n">_bounding_radius</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">r_b</span> <span class="o">=</span> <span class="n">_bounding_radius</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">delta_square</span> <span class="o">&lt;=</span> <span class="n">r_a</span><span class="o">*</span><span class="n">r_a</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">r_a</span><span class="o">*</span><span class="n">r_b</span> <span class="o">+</span> <span class="n">r_b</span><span class="o">*</span><span class="n">r_b</span></div>
+
+
+<div class="viewcode-block" id="cyclic_shift_left"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.cyclic_shift_left">[docs]</a><span class="k">def</span> <span class="nf">cyclic_shift_left</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)):</span>
+        <span class="c1"># move i-th values of blocks</span>
+
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">-</span> <span class="n">n</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="ensure_pts_sorted_by_min_polar_angle"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.ensure_pts_sorted_by_min_polar_angle">[docs]</a><span class="k">def</span> <span class="nf">ensure_pts_sorted_by_min_polar_angle</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="n">npts</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">npts</span>
+    <span class="k">assert</span> <span class="n">npts</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+    <span class="k">assert</span> <span class="n">get_signed_area</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="c1"># must be counter-clockwise</span>
+
+    <span class="c1"># ensure that edges are sorted by minimum polar angle in [0,2π]</span>
+
+    <span class="n">angle_start</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">index_start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">npts</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">seg</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="n">angle_start</span><span class="p">:</span>
+            <span class="n">angle_start</span> <span class="o">=</span> <span class="n">theta</span>
+            <span class="n">index_start</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">if</span> <span class="n">index_start</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">poly</span><span class="o">.</span><span class="n">pts</span> <span class="o">=</span> <span class="n">cyclic_shift_left</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_start</span><span class="p">,</span> <span class="n">npts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+<div class="viewcode-block" id="to_oriented_bounding_box_1"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.to_oriented_bounding_box_1">[docs]</a><span class="k">def</span> <span class="nf">to_oriented_bounding_box_1</span><span class="p">(</span><span class="n">retval</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">,</span> <span class="nb">len</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">wid</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+
+    <span class="k">assert</span> <span class="nb">len</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">wid</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">center</span><span class="o">.</span><span class="n">theta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">center</span><span class="o">.</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">center</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">polar</span><span class="p">(</span><span class="nb">len</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">center</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">polar</span><span class="p">(</span><span class="n">wid</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">center</span><span class="o">.</span><span class="n">theta</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">C</span> <span class="o">=</span> <span class="n">VecSE2</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="o">+</span> <span class="n">C</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">C</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">C</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="o">+</span> <span class="n">C</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ensure_pts_sorted_by_min_polar_angle</span><span class="p">(</span><span class="n">retval</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="to_oriented_bounding_box_2"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.to_oriented_bounding_box_2">[docs]</a><span class="k">def</span> <span class="nf">to_oriented_bounding_box_2</span><span class="p">(</span><span class="n">retval</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">veh</span><span class="p">:</span> <span class="n">Vehicle</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">to_oriented_bounding_box_1</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">veh</span><span class="o">.</span><span class="n">get_center</span><span class="p">,</span> <span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">length_</span><span class="p">,</span> <span class="n">veh</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">width_</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_edge"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.get_edge">[docs]</a><span class="k">def</span> <span class="nf">get_edge</span><span class="p">(</span><span class="n">pts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">npts</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">npts</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">LineSegment</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_poly_edge"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.get_poly_edge">[docs]</a><span class="k">def</span> <span class="nf">get_poly_edge</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">poly</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_collision_time"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.get_collision_time">[docs]</a><span class="k">def</span> <span class="nf">get_collision_time</span><span class="p">(</span><span class="n">ray</span><span class="p">:</span> <span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">,</span> <span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">ray_speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">min_col_time</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">)):</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">get_poly_edge</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">col_time</span> <span class="o">=</span> <span class="n">get_intersection_time</span><span class="p">(</span><span class="n">Projectile</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="n">ray_speed</span><span class="p">),</span> <span class="n">seg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">col_time</span> <span class="ow">and</span> <span class="n">col_time</span> <span class="o">&lt;</span> <span class="n">min_col_time</span><span class="p">:</span>
+            <span class="n">min_col_time</span> <span class="o">=</span> <span class="n">col_time</span>
+    <span class="k">return</span> <span class="n">min_col_time</span></div>
+
+
+<div class="viewcode-block" id="mirror"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.mirror">[docs]</a><span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">)):</span>
+        <span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="n">poly</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ensure_pts_sorted_by_min_polar_angle</span><span class="p">(</span><span class="n">poly</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+<div class="viewcode-block" id="minkowksi_sum"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.minkowksi_sum">[docs]</a><span class="k">def</span> <span class="nf">minkowksi_sum</span><span class="p">(</span><span class="n">retval</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">P</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    For two convex polygons P and Q in the plane with m and n vertices, their Minkowski sum is a</span>
+<span class="sd">    convex polygon with at most m + n vertices and may be computed in time O (m + n) by a very simple procedure,</span>
+<span class="sd">    which may be informally described as follows.</span>
+<span class="sd">    Assume that the edges of a polygon are given and the direction, say, counterclockwise, along the polygon boundary.</span>
+<span class="sd">    Then it is easily seen that these edges of the convex polygon are ordered by polar angle.</span>
+<span class="sd">    Let us merge the ordered sequences of the directed edges from P and Q into a single ordered sequence S.</span>
+<span class="sd">    Imagine that these edges are solid arrows which can be moved freely while keeping them parallel to their original direction.</span>
+<span class="sd">    Assemble these arrows in the order of the sequence S by attaching the tail of the next arrow to the head of the previous arrow.</span>
+<span class="sd">    It turns out that the resulting polygonal chain will in fact be a convex polygon which is the Minkowski sum of P and Q.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">empty</span><span class="p">(</span><span class="n">retval</span><span class="p">))</span>
+
+    <span class="n">index_P</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">index_Q</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">theta_p</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_P</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span>
+    <span class="n">theta_q</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_Q</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="n">index_P</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="ow">or</span> <span class="n">index_Q</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Q</span><span class="p">):</span>
+        <span class="c1"># select next edge with minimum polar angle</span>
+
+        <span class="k">if</span> <span class="n">theta_p</span> <span class="o">==</span> <span class="n">theta_q</span><span class="p">:</span>
+            <span class="n">seg_p</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_P</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span>
+            <span class="n">seg_q</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_Q</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span>
+
+            <span class="n">O</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">isempty</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span> <span class="k">else</span> <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">retval</span><span class="o">.</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">push</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">O</span> <span class="o">+</span> <span class="n">seg_p</span><span class="o">.</span><span class="n">B</span> <span class="o">-</span> <span class="n">seg_p</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="n">seg_q</span><span class="o">.</span><span class="n">B</span> <span class="o">-</span> <span class="n">seg_q</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+            <span class="n">index_P</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">theta_p</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_P</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span> <span class="k">if</span> <span class="n">index_P</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="k">else</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">index_Q</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">theta_q</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_Q</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span> <span class="k">if</span> <span class="n">index_Q</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span> <span class="k">else</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">elif</span> <span class="n">theta_p</span> <span class="o">&lt;=</span> <span class="n">theta_q</span><span class="p">:</span>
+            <span class="n">seg</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_P</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span>
+            <span class="n">O</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">isempty</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span> <span class="k">else</span> <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">retval</span><span class="o">.</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">push</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">O</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">B</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+            <span class="n">index_P</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">theta_p</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_P</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span> <span class="k">if</span> <span class="n">index_P</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="k">else</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seg</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_Q</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span>
+            <span class="n">O</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">isempty</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span> <span class="k">else</span> <span class="n">retval</span><span class="o">.</span><span class="n">pts</span><span class="p">[</span><span class="n">retval</span><span class="o">.</span><span class="n">npts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">push</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">O</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">B</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+            <span class="n">index_Q</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">theta_q</span> <span class="o">=</span> <span class="n">get_polar_angle</span><span class="p">(</span><span class="n">get_edge</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">index_Q</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span> <span class="k">if</span> <span class="n">index_Q</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span> <span class="k">else</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+
+    <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ensure_pts_sorted_by_min_polar_angle</span><span class="p">(</span><span class="n">retval</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="minkowski_difference"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.minkowski_difference">[docs]</a><span class="k">def</span> <span class="nf">minkowski_difference</span><span class="p">(</span><span class="n">retval</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">P</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+
+    <span class="n">Q</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">mirror</span><span class="p">(</span><span class="n">Q</span><span class="p">))</span>
+    <span class="n">retval</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">minkowksi_sum</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">Q</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="is_colliding_1"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.is_colliding_1">[docs]</a><span class="k">def</span> <span class="nf">is_colliding_1</span><span class="p">(</span><span class="n">mem</span><span class="p">:</span> <span class="n">CPAMemory</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">is_colliding_2</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">vehA</span><span class="p">,</span> <span class="n">mem</span><span class="o">.</span><span class="n">vehB</span><span class="p">,</span> <span class="n">mem</span><span class="o">.</span><span class="n">mink</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_colliding_2"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.is_colliding_2">[docs]</a><span class="k">def</span> <span class="nf">is_colliding_2</span><span class="p">(</span><span class="n">P</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">,</span> <span class="n">temp</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="n">temp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">minkowski_difference</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">Q</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">in_poly</span><span class="p">(</span><span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">temp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="in_poly"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.in_poly">[docs]</a><span class="k">def</span> <span class="nf">in_poly</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">VecE2</span><span class="o">.</span><span class="n">VecE2</span><span class="p">,</span> <span class="n">poly</span><span class="p">:</span> <span class="n">ConvexPolygon</span><span class="p">):</span>
+    <span class="n">previous_side</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">)):</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">get_edge</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">pts</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">poly</span><span class="o">.</span><span class="n">npts</span><span class="p">)</span>
+        <span class="n">affine_segment</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">B</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">affine_point</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">seg</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">current_side</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">cross_product</span><span class="p">(</span><span class="n">affine_segment</span><span class="p">,</span> <span class="n">affine_point</span><span class="p">)))</span>  <span class="c1"># sign indicates side</span>
+        <span class="k">if</span> <span class="n">current_side</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># outside or over an edge</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">previous_side</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># first segment</span>
+            <span class="n">previous_side</span> <span class="o">=</span> <span class="n">current_side</span>
+        <span class="k">elif</span> <span class="n">previous_side</span> <span class="o">!=</span> <span class="n">current_side</span><span class="p">:</span>
+            <span class="c1"># all most be on the same side</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="get_first_collision"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.collision_detection.get_first_collision">[docs]</a><span class="k">def</span> <span class="nf">get_first_collision</span><span class="p">(</span><span class="n">scene</span><span class="p">:</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">target_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mem</span><span class="p">:</span> <span class="n">CPAMemory</span> <span class="o">=</span> <span class="n">CPAMemory</span><span class="p">()):</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">target_index</span>
+
+    <span class="n">vehA</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">A</span><span class="p">]</span>
+    <span class="n">mem</span><span class="o">.</span><span class="n">vehA</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">to_oriented_bounding_box_2</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">vehA</span><span class="p">,</span> <span class="n">vehA</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">B</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">vehB</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">B</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">B</span> <span class="o">!=</span> <span class="n">A</span><span class="p">:</span>
+            <span class="n">mem</span><span class="o">.</span><span class="n">vehB</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">to_oriented_bounding_box_2</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">vehB</span><span class="p">,</span> <span class="n">vehB</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">is_potentially_colliding</span><span class="p">(</span><span class="n">vehA</span><span class="p">,</span> <span class="n">vehB</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_colliding_1</span><span class="p">(</span><span class="n">mem</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">CollisionCheckResult</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">CollisionCheckResult</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

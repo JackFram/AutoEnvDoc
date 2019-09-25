@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>feature_extractor.ForeForeFeatureExtractor &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for feature_extractor.ForeForeFeatureExtractor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">src.Roadway.roadway</span> <span class="k">import</span> <span class="n">Roadway</span>
+<span class="kn">from</span> <span class="nn">src.Record.record</span> <span class="k">import</span> <span class="n">SceneRecord</span>
+<span class="kn">from</span> <span class="nn">feature_extractor.neighbor_feature</span> <span class="k">import</span> <span class="n">get_neighbor_fore_along_lane_2</span><span class="p">,</span> <span class="n">NeighborLongitudinalResult</span>
+<span class="kn">from</span> <span class="nn">feature_extractor.interface</span> <span class="k">import</span> <span class="n">get_AccFs</span><span class="p">,</span> <span class="n">convert_2_float</span>
+
+
+<div class="viewcode-block" id="ForeForeFeatureExtractor"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">ForeForeFeatureExtractor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deltas_censor_hi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &quot;fore_fore_dist&quot;: total distance of the front vehicle from ego vehicle, 0 if no fore vehicle</span>
+<span class="sd">        &quot;fore_fore_relative_vel&quot;: the relative velocity of the front vehicle to ego vehicle, 0 if no fore vehicle</span>
+<span class="sd">        &quot;fore_fore_accel&quot;: the absolute acceleration of the front vehicle, 0 if no fore vehicle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_features</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deltas_censor_hi</span> <span class="o">=</span> <span class="n">deltas_censor_hi</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span>
+
+<div class="viewcode-block" id="ForeForeFeatureExtractor.pull_features"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.pull_features">[docs]</a>    <span class="k">def</span> <span class="nf">pull_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec</span><span class="p">:</span> <span class="n">SceneRecord</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">Roadway</span><span class="p">,</span> <span class="n">veh_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                      <span class="n">models</span><span class="p">:</span> <span class="p">{},</span> <span class="n">pastframe</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># reset features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_features</span><span class="p">)]</span>
+
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">pastframe</span><span class="p">]</span>
+
+        <span class="n">ego_vel</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">veh_idx</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span>
+
+        <span class="n">vtpf</span> <span class="o">=</span> <span class="s2">&quot;Front&quot;</span>
+        <span class="n">vtpr</span> <span class="o">=</span> <span class="s2">&quot;Rear&quot;</span>
+        <span class="n">fore_M</span> <span class="o">=</span> <span class="n">get_neighbor_fore_along_lane_2</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">veh_idx</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">vtpf</span><span class="p">,</span> <span class="n">vtpr</span><span class="p">,</span> <span class="n">vtpf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fore_M</span><span class="o">.</span><span class="n">ind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fore_fore_M</span> <span class="o">=</span> <span class="n">get_neighbor_fore_along_lane_2</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">fore_M</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">vtpr</span><span class="p">,</span> <span class="n">vtpf</span><span class="p">,</span> <span class="n">vtpr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fore_fore_M</span> <span class="o">=</span> <span class="n">NeighborLongitudinalResult</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fore_fore_M</span><span class="o">.</span><span class="n">ind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># total distance from ego vehicle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fore_fore_M</span><span class="o">.</span><span class="n">delta_s</span> <span class="o">+</span> <span class="n">fore_M</span><span class="o">.</span><span class="n">delta_s</span>
+            <span class="c1"># relative velocity to ego vehicle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">scene</span><span class="p">[</span><span class="n">fore_fore_M</span><span class="o">.</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">ego_vel</span>
+            <span class="c1"># absolute acceleration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_2_float</span><span class="p">(</span><span class="n">get_AccFs</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">fore_fore_M</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="n">pastframe</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltas_censor_hi</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span></div>
+
+<div class="viewcode-block" id="ForeForeFeatureExtractor.feature_names"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;fore_fore_dist&quot;</span><span class="p">,</span> <span class="s2">&quot;fore_fore_relative_vel&quot;</span><span class="p">,</span> <span class="s2">&quot;fore_fore_accel&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ForeForeFeatureExtractor.feature_info"><a class="viewcode-back" href="../../feature_extractor.html#feature_extractor.ForeForeFeatureExtractor.ForeForeFeatureExtractor.feature_info">[docs]</a>    <span class="k">def</span> <span class="nf">feature_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;fore_fore_dist&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="mf">50.</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+            <span class="s2">&quot;fore_fore_relative_vel&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="mf">40.</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">20.</span><span class="p">},</span>
+            <span class="s2">&quot;fore_fore_accel&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="mf">9.</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">9.</span><span class="p">}</span>
+        <span class="p">}</span></div></div>
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

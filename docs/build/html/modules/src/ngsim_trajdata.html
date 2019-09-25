@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.ngsim_trajdata &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.ngsim_trajdata</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Zhihao Zhang</span>
+<span class="c1"># NGSIM dataset processor dataloader</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+
+<div class="viewcode-block" id="NGSIMTrajdata"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.NGSIMTrajdata">[docs]</a><span class="k">class</span> <span class="nc">NGSIMTrajdata</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        NGSIMTrajdata</span>
+<span class="sd">        The trajectory data stored in the original NGSIM dataset format.</span>
+<span class="sd">        The dataset is a white-space separated text file with columns:</span>
+<span class="sd">            id                  - I - Vehicle identification number (ascending by time of entry into section)</span>
+<span class="sd">            frame               - I - Frame Identification number (ascending by start time), units 1/10 of a second</span>
+<span class="sd">            n_frames_in_dataset - I - Total number of frames in which the vehicle appears in this data set, units 1/10 of a second</span>
+<span class="sd">            epoch               - I - Elapsed time since Jan 1, 1970, in milliseconds</span>
+<span class="sd">            local_x             - F - Lateral (X) coordinate of the front center of the vehicle with respect to the left-most edge of the section in the direction of travel, in feet</span>
+<span class="sd">            local_y             - F - Longitudinal (Y) coordinate of the front center of the vehicle with respect to the entry edge of the section in the direction of travel, in feet</span>
+<span class="sd">            global_x            - F - X Coordinate of the front center of the vehicle based on CA State Plane III in NAD83</span>
+<span class="sd">            global_y            - F - Y Coordinate of the front center of the vehicle based on CA State Plane III in NAD83</span>
+<span class="sd">            length              - F - Length of the vehicle, in feet</span>
+<span class="sd">            width               - F - Width of the vehicle, in feet</span>
+<span class="sd">            class               - I - vehicle class, 1 - motorcycle, 2 - auto, 3 - truck</span>
+<span class="sd">            speed               - F - Instantaneous velocity of vehicle, in ft/second</span>
+<span class="sd">            acc                 - F - Instantaneous acceleration of vehicle, in ft/second^2</span>
+<span class="sd">            lane                - I - Current lane position of vehicle</span>
+<span class="sd">            carind_front        - I - Vehicle Id of the lead vehicle in the same lane. A value of &#39;0&#39; represents no preceding vehicle</span>
+<span class="sd">            carind_rear         - I - Vehicle Id of the vehicle following the subject vehicle in the same lane. A value of &#39;0&#39; represents no following vehicle</span>
+<span class="sd">            dist_headway        - F - Spacing provides the distance between the front-center of a vehicle to the front-center of the preceding vehicle, in feet</span>
+<span class="sd">            time_headway        - F - Headway provides the time to travel from the front-center of a vehicle (at the speed of the vehicle) to the front-center of the preceding vehicle. A headway value of 9999.99 means that the vehicle is traveling at zero speed (congested conditions), in second</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">car2start</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame2cars</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="s1">&#39;n_frames_in_dataset&#39;</span><span class="p">,</span> <span class="s1">&#39;epoch&#39;</span><span class="p">,</span> <span class="s1">&#39;local_x&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;local_y&#39;</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;speed&#39;</span><span class="p">,</span> <span class="s1">&#39;acc&#39;</span><span class="p">,</span> <span class="s1">&#39;lane&#39;</span><span class="p">,</span> <span class="s1">&#39;carind_front&#39;</span><span class="p">,</span> <span class="s1">&#39;carind_rear&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;dist_headway&#39;</span><span class="p">,</span> <span class="s1">&#39;time_headway&#39;</span><span class="p">,</span> <span class="s1">&#39;global_heading&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">18</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">dfind</span><span class="p">,</span> <span class="n">carid</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="n">carid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">car2start</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">car2start</span><span class="p">[</span><span class="n">carid</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfind</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;frame&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">frame</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">carid</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">carid</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish data set initialization!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame2cars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="carsinframe"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.carsinframe">[docs]</a><span class="k">def</span> <span class="nf">carsinframe</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the vehicles in a given frame</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :param frame: frame index</span>
+<span class="sd">    :return: vehicles in the frame, [] if no such frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">frame</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="carid_set"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.carid_set">[docs]</a><span class="k">def</span> <span class="nf">carid_set</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get all the vehicle id</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :return: all the vehicle id</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">car2start</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="nth_carid"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.nth_carid">[docs]</a><span class="k">def</span> <span class="nf">nth_carid</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the nth vehicle&#39;s id in a given frame</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :param frame: frame</span>
+<span class="sd">    :param n: n</span>
+<span class="sd">    :return: the nth vehicle&#39;s id in a given frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">frame2cars</span><span class="p">[</span><span class="n">frame</span><span class="p">][</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="first_carid"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.first_carid">[docs]</a><span class="k">def</span> <span class="nf">first_carid</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the first vehicle&#39;s id in a given frame</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :param frame: frame</span>
+<span class="sd">    :return: the first vehicle&#39;s id in a given frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">nth_carid</span><span class="p">(</span><span class="n">trajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iscarinframe"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.iscarinframe">[docs]</a><span class="k">def</span> <span class="nf">iscarinframe</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    check if a car is in a frame given the car id and the frame</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :param carid: car id</span>
+<span class="sd">    :param frame: frame index</span>
+<span class="sd">    :return: true if in the frame, false otherwise</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">carid</span> <span class="ow">in</span> <span class="n">carsinframe</span><span class="p">(</span><span class="n">trajdata</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span></div>
+
+    <span class="c1"># given frame and carid, find index of car in trajdata</span>
+    <span class="c1"># Returns 0 if it does not exist</span>
+
+
+<div class="viewcode-block" id="car_df_index"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.car_df_index">[docs]</a><span class="k">def</span> <span class="nf">car_df_index</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    given frame and carid, find index of car in trajdata</span>
+<span class="sd">    Returns 0 if it does not exist</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">car2start</span><span class="p">[</span><span class="n">carid</span><span class="p">]</span>
+    <span class="n">framestart</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="s1">&#39;frame&#39;</span><span class="p">]</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">framestart</span> <span class="o">==</span> <span class="n">frame</span><span class="p">:</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">lo</span>
+    <span class="k">elif</span> <span class="n">frame</span> <span class="o">&gt;=</span> <span class="n">framestart</span><span class="p">:</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">frame</span> <span class="o">-</span> <span class="n">framestart</span> <span class="o">+</span> <span class="n">lo</span>
+        <span class="n">n_frames</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="s1">&#39;n_frames_in_dataset&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">retval</span> <span class="o">&gt;</span> <span class="n">lo</span> <span class="o">+</span> <span class="n">n_frames</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="get_frame_range"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.get_frame_range">[docs]</a><span class="k">def</span> <span class="nf">get_frame_range</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    get the frame range for a car given the car id</span>
+<span class="sd">    :param trajdata: NGSIMTrajdata</span>
+<span class="sd">    :param carid: car id</span>
+<span class="sd">    :return: frame range</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">car2start</span><span class="p">[</span><span class="n">carid</span><span class="p">]</span>
+    <span class="n">framestart</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="s1">&#39;frame&#39;</span><span class="p">]</span>
+
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="s1">&#39;n_frames_in_dataset&#39;</span><span class="p">]</span>
+    <span class="n">frameend</span> <span class="o">=</span> <span class="n">framestart</span> <span class="o">+</span> <span class="n">n_frames</span>  <span class="c1"># in julia there us a -1 but since python&#39;s range doesn&#39;t include end index</span>
+    <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="n">framestart</span><span class="p">,</span> <span class="n">frameend</span><span class="p">)</span></div>
+
+
+<span class="c1"># def pull_vehicle_headings(trajdata: NGSIMTrajdata, v_cutoff: float = 2.5, smoothing_width: float = 0.5):</span>
+<span class="c1">#     df = trajdata.df</span>
+<span class="c1">#</span>
+<span class="c1">#     for carid in carid_set(trajdata):</span>
+<span class="c1">#         frames = [i for i in get_frame_range(trajdata, carid)] TODO: if needed, to be updated</span>
+
+
+<div class="viewcode-block" id="load_ngsim_trajdata"><a class="viewcode-back" href="../../src.html#src.ngsim_trajdata.load_ngsim_trajdata">[docs]</a><span class="k">def</span> <span class="nf">load_ngsim_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load NGSIMTrajdata from a file given the file path</span>
+<span class="sd">    :param filepath: file path</span>
+<span class="sd">    :return: the loaded NGSIMTrajdata object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">NGSIMTrajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

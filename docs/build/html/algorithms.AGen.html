@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <title>algorithms.AGen package &#8212; AutoEnv 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="algorithms.AGen.critic package" href="algorithms.AGen.critic.html" />
     <link rel="prev" title="algorithms package" href="algorithms.html" />
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -56,11 +56,11 @@
 <span id="algorithms-agen-my-gaussian-gru-policy-module"></span><h2>algorithms.AGen.my_gaussian_gru_policy module<a class="headerlink" href="#module-algorithms.AGen.my_gaussian_gru_policy" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.my_gaussian_gru_policy.</code><code class="sig-name descname">myGaussianGRUPolicy</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">env_spec</em>, <em class="sig-param">hidden_dim=32</em>, <em class="sig-param">feature_network=None</em>, <em class="sig-param">state_include_action=True</em>, <em class="sig-param">hidden_nonlinearity=&lt;function tanh&gt;</em>, <em class="sig-param">gru_layer_cls=&lt;class 'sandbox.rocky.tf.core.layers.GRULayer'&gt;</em>, <em class="sig-param">learn_std=True</em>, <em class="sig-param">init_std=1.0</em>, <em class="sig-param">output_nonlinearity=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.my_gaussian_gru_policy.</code><code class="sig-name descname">myGaussianGRUPolicy</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">env_spec</em>, <em class="sig-param">hidden_dim=32</em>, <em class="sig-param">feature_network=None</em>, <em class="sig-param">state_include_action=True</em>, <em class="sig-param">hidden_nonlinearity=&lt;function tanh&gt;</em>, <em class="sig-param">gru_layer_cls=&lt;class 'sandbox.rocky.tf.core.layers.GRULayer'&gt;</em>, <em class="sig-param">learn_std=True</em>, <em class="sig-param">init_std=1.0</em>, <em class="sig-param">output_nonlinearity=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sandbox.rocky.tf.policies.base.StochasticPolicy</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sandbox.rocky.tf.core.layers_powered.LayersPowered</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rllab.core.serializable.Serializable</span></code></p>
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.dist_info_sym">
-<code class="sig-name descname">dist_info_sym</code><span class="sig-paren">(</span><em class="sig-param">obs_var</em>, <em class="sig-param">state_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.dist_info_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.dist_info_sym" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dist_info_sym</code><span class="sig-paren">(</span><em class="sig-param">obs_var</em>, <em class="sig-param">state_info_vars</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.dist_info_sym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.dist_info_sym" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the symbolic distribution information about the actions.
 :param obs_var: symbolic variable for observations
 :param state_info_vars: a dictionary whose values should contain information about the state of the policy at
@@ -76,22 +76,22 @@ the time it received the observation
 
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_action">
-<code class="sig-name descname">get_action</code><span class="sig-paren">(</span><em class="sig-param">observation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_action" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_action</code><span class="sig-paren">(</span><em class="sig-param">observation</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions">
-<code class="sig-name descname">get_actions</code><span class="sig-paren">(</span><em class="sig-param">observations</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_actions</code><span class="sig-paren">(</span><em class="sig-param">observations</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions_with_prev">
-<code class="sig-name descname">get_actions_with_prev</code><span class="sig-paren">(</span><em class="sig-param">observations</em>, <em class="sig-param">prev_actions</em>, <em class="sig-param">prev_hiddens</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_actions_with_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions_with_prev" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_actions_with_prev</code><span class="sig-paren">(</span><em class="sig-param">observations</em>, <em class="sig-param">prev_actions</em>, <em class="sig-param">prev_hiddens</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.get_actions_with_prev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.get_actions_with_prev" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.log_diagnostics">
-<code class="sig-name descname">log_diagnostics</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.log_diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.log_diagnostics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">log_diagnostics</code><span class="sig-paren">(</span><em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.log_diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.log_diagnostics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log extra information per iteration based on the collected paths</p>
 </dd></dl>
 
@@ -104,7 +104,7 @@ the time it received the observation
 
 <dl class="method">
 <dt id="algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.reset">
-<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dones=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">dones=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/my_gaussian_gru_policy.html#myGaussianGRUPolicy.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.my_gaussian_gru_policy.myGaussianGRUPolicy.reset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -128,17 +128,17 @@ with multiple simultaneous states.</p>
 <span id="algorithms-agen-rls-module"></span><h2>algorithms.AGen.rls module<a class="headerlink" href="#module-algorithms.AGen.rls" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.AGen.rls.rls">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.rls.</code><code class="sig-name descname">rls</code><span class="sig-paren">(</span><em class="sig-param">lbd</em>, <em class="sig-param">theta</em>, <em class="sig-param">nn_dim</em>, <em class="sig-param">output_dim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/rls.html#rls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.rls.</code><code class="sig-name descname">rls</code><span class="sig-paren">(</span><em class="sig-param">lbd</em>, <em class="sig-param">theta</em>, <em class="sig-param">nn_dim</em>, <em class="sig-param">output_dim</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/rls.html#rls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>docstring for ClassName</p>
 <dl class="method">
 <dt id="algorithms.AGen.rls.rls.initialize">
-<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/rls.html#rls.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.initialize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/rls.html#rls.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.initialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="algorithms.AGen.rls.rls.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">hidden_vec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/rls.html#rls.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">hidden_vec</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/rls.html#rls.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.predict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>hidden_vec</strong> – hidden vector</p>
@@ -151,7 +151,7 @@ with multiple simultaneous states.</p>
 
 <dl class="method">
 <dt id="algorithms.AGen.rls.rls.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">hidden_vec</em>, <em class="sig-param">obs_Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/rls.html#rls.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">hidden_vec</em>, <em class="sig-param">obs_Y</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/rls.html#rls.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.rls.rls.update" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -172,39 +172,39 @@ with multiple simultaneous states.</p>
 <span id="algorithms-agen-validate-utils-module"></span><h2>algorithms.AGen.validate_utils module<a class="headerlink" href="#module-algorithms.AGen.validate_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.build_ngsim_env">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">build_ngsim_env</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">exp_dir='/tmp'</em>, <em class="sig-param">alpha=0.001</em>, <em class="sig-param">vectorize=False</em>, <em class="sig-param">render_params=None</em>, <em class="sig-param">videoMaking=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#build_ngsim_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.build_ngsim_env" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">build_ngsim_env</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">exp_dir='/tmp'</em>, <em class="sig-param">alpha=0.001</em>, <em class="sig-param">vectorize=False</em>, <em class="sig-param">render_params=None</em>, <em class="sig-param">videoMaking=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#build_ngsim_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.build_ngsim_env" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.build_policy">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">build_policy</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">env</em>, <em class="sig-param">latent_sampler=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#build_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.build_policy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">build_policy</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">env</em>, <em class="sig-param">latent_sampler=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#build_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.build_policy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.get_ground_truth">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">get_ground_truth</code><span class="sig-paren">(</span><em class="sig-param">ngsim_filename: str</em>, <em class="sig-param">h5_filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#get_ground_truth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.get_ground_truth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">get_ground_truth</code><span class="sig-paren">(</span><em class="sig-param">ngsim_filename: str</em>, <em class="sig-param">h5_filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#get_ground_truth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.get_ground_truth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Namespace(batch_size=10000, critic_batch_size=1000, critic_dropout_keep_prob=0.8, critic_grad_rescale=40.0, critic_hidden_layer_dims=(128, 128, 64), critic_learning_rate=0.0004, decay_reward=False, discount=0.95, do_curriculum=False, env_H=200, env_action_repeat=1, env_multiagent=False, env_primesteps=50, env_reward=0, exp_dir=’../../data/experiments’, exp_name=’singleagent_def_3’, expert_filepath=’../../data/trajectories/ngsim.h5’, gradient_penalty=2.0, itrs_per_decay=25, latent_dim=4, load_params_init=’NONE’, max_path_length=1000, n_critic_train_epochs=40, n_envs=1, n_envs_end=50, n_envs_start=10, n_envs_step=10, n_itr=1000, n_recognition_train_epochs=30, ngsim_filename=’trajdata_i101_trajectories-0750am-0805am.txt’, normalize_clip_std_multiple=10.0, params_filepath=’‘, policy_mean_hidden_layer_dims=(128, 128, 64), policy_recurrent=True, policy_std_hidden_layer_dims=(128, 64), recognition_hidden_layer_dims=(128, 64), recognition_learning_rate=0.0005, recurrent_hidden_dim=64, remove_ngsim_veh=False, render_every=25, reward_handler_critic_final_scale=1.0, reward_handler_max_epochs=100, reward_handler_recognition_final_scale=0.2, reward_handler_use_env_rewards=True, scheduler_k=20, trpo_step_size=0.01, use_critic_replay_memory=True, use_infogail=False, validator_render=False, vectorize=True)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.get_multiagent_ground_truth">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">get_multiagent_ground_truth</code><span class="sig-paren">(</span><em class="sig-param">ngsim_filename: str</em>, <em class="sig-param">h5_filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#get_multiagent_ground_truth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.get_multiagent_ground_truth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">get_multiagent_ground_truth</code><span class="sig-paren">(</span><em class="sig-param">ngsim_filename: str</em>, <em class="sig-param">h5_filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#get_multiagent_ground_truth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.get_multiagent_ground_truth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Namespace(batch_size=10000, critic_batch_size=1000, critic_dropout_keep_prob=0.8, critic_grad_rescale=40.0, critic_hidden_layer_dims=(128, 128, 64), critic_learning_rate=0.0004, decay_reward=False, discount=0.95, do_curriculum=False, env_H=200, env_action_repeat=1, env_multiagent=False, env_primesteps=50, env_reward=0, exp_dir=’../../data/experiments’, exp_name=’singleagent_def_3’, expert_filepath=’../../data/trajectories/ngsim.h5’, gradient_penalty=2.0, itrs_per_decay=25, latent_dim=4, load_params_init=’NONE’, max_path_length=1000, n_critic_train_epochs=40, n_envs=1, n_envs_end=50, n_envs_start=10, n_envs_step=10, n_itr=1000, n_recognition_train_epochs=30, ngsim_filename=’trajdata_i101_trajectories-0750am-0805am.txt’, normalize_clip_std_multiple=10.0, params_filepath=’‘, policy_mean_hidden_layer_dims=(128, 128, 64), policy_recurrent=True, policy_std_hidden_layer_dims=(128, 64), recognition_hidden_layer_dims=(128, 64), recognition_learning_rate=0.0005, recurrent_hidden_dim=64, remove_ngsim_veh=False, render_every=25, reward_handler_critic_final_scale=1.0, reward_handler_max_epochs=100, reward_handler_recognition_final_scale=0.2, reward_handler_use_env_rewards=True, scheduler_k=20, trpo_step_size=0.01, use_critic_replay_memory=True, use_infogail=False, validator_render=False, vectorize=True)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.load_validate_data">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">load_validate_data</code><span class="sig-paren">(</span><em class="sig-param">filepath, act_keys=['accel', 'turn_rate_global'], ngsim_filename='trajdata_holo_trajectories.txt', debug_size=None, min_length=50, normalize_data=True, shuffle=False, act_low=-1, act_high=1, clip_std_multiple=inf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#load_validate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.load_validate_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">load_validate_data</code><span class="sig-paren">(</span><em class="sig-param">filepath, act_keys=['accel', 'turn_rate_global'], ngsim_filename='trajdata_holo_trajectories.txt', debug_size=None, min_length=50, normalize_data=True, shuffle=False, act_low=-1, act_high=1, clip_std_multiple=inf</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#load_validate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.load_validate_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.normalize">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">clip_std_multiple=inf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">clip_std_multiple=inf</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.normalize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="algorithms.AGen.validate_utils.normalize_range">
-<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">normalize_range</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">low</em>, <em class="sig-param">high</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/validate_utils.html#normalize_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.normalize_range" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.validate_utils.</code><code class="sig-name descname">normalize_range</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">low</em>, <em class="sig-param">high</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/validate_utils.html#normalize_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.validate_utils.normalize_range" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -301,7 +301,7 @@ with multiple simultaneous states.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/algorithms.AGen.rst.txt"
+      <a href="sources/algorithms.AGen.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

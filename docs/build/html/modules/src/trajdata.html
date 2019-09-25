@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.trajdata &#8212; AutoEnv 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.trajdata</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Zhihao Zhang</span>
+<span class="c1"># NGSIM dataset processor trajdata.py file</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src</span> <span class="k">import</span> <span class="n">ngsim_trajdata</span>
+<span class="kn">from</span> <span class="nn">src</span> <span class="k">import</span> <span class="n">trajectory_smoothing</span>
+<span class="kn">from</span> <span class="nn">src.Vec</span> <span class="k">import</span> <span class="n">VecSE2</span>
+<span class="kn">from</span> <span class="nn">src</span> <span class="k">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">src.Roadway</span> <span class="k">import</span> <span class="n">roadway</span>
+<span class="kn">from</span> <span class="nn">src.Record</span> <span class="k">import</span> <span class="n">record</span>
+<span class="kn">from</span> <span class="nn">src.Basic</span> <span class="k">import</span> <span class="n">Vehicle</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">src.Record.record</span> <span class="k">import</span> <span class="n">read_trajdata</span>
+
+
+<div class="viewcode-block" id="symmetric_exponential_moving_average"><a class="viewcode-back" href="../../src.html#src.trajdata.symmetric_exponential_moving_average">[docs]</a><span class="k">def</span> <span class="nf">symmetric_exponential_moving_average</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">T</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="n">D</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)),</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">D</span> <span class="o">&gt;</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">D</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">/</span><span class="n">delta</span><span class="p">)</span>
+            <span class="n">Z</span> <span class="o">+=</span> <span class="n">e</span>
+            <span class="n">x</span> <span class="o">+=</span> <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">e</span>
+
+        <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">Z</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="FilterTrajectoryResult"><a class="viewcode-back" href="../../src.html#src.trajdata.FilterTrajectoryResult">[docs]</a><span class="k">class</span> <span class="nc">FilterTrajectoryResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajdata</span><span class="p">:</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">dfstart</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">car2start</span><span class="p">[</span><span class="n">carid</span><span class="p">]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span><span class="p">,</span> <span class="s1">&#39;n_frames_in_dataset&#39;</span><span class="p">]</span>
+        <span class="n">x_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">theta_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">v_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">x_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">])</span>
+            <span class="n">y_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">])</span>
+        <span class="n">theta_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">y_arr</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_arr</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">v_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span><span class="p">,</span> <span class="s1">&#39;speed&#39;</span><span class="p">])</span>
+        <span class="c1"># hypot(ftr.y_arr[lookahead] - y₀, ftr.x_arr[lookahead] - x₀)/ν.Δt</span>
+        <span class="k">if</span> <span class="n">v_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>  <span class="c1"># small speed</span>
+            <span class="c1"># estimate with greater lookahead</span>
+            <span class="n">theta_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">y_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">carid</span> <span class="o">=</span> <span class="n">carid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_arr</span> <span class="o">=</span> <span class="n">x_arr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_arr</span> <span class="o">=</span> <span class="n">y_arr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theta_arr</span> <span class="o">=</span> <span class="n">theta_arr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_arr</span> <span class="o">=</span> <span class="n">v_arr</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_arr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filter_trajectory"><a class="viewcode-back" href="../../src.html#src.trajdata.filter_trajectory">[docs]</a><span class="k">def</span> <span class="nf">filter_trajectory</span><span class="p">(</span><span class="n">ftr</span><span class="p">:</span> <span class="n">FilterTrajectoryResult</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">trajectory_smoothing</span><span class="o">.</span><span class="n">VehicleSystem</span> <span class="o">=</span> <span class="n">trajectory_smoothing</span><span class="o">.</span><span class="n">VehicleSystem</span><span class="p">()):</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="p">[</span><span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ftr</span><span class="o">.</span><span class="n">theta_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ftr</span><span class="o">.</span><span class="n">v_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1e-1</span>
+    <span class="n">cov_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">sigma</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">sigma</span><span class="p">])</span>
+
+    <span class="c1"># assume control is centered</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ftr</span><span class="p">)):</span>
+
+        <span class="c1"># pull observation</span>
+        <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># apply extended Kalman filter</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">cov_</span> <span class="o">=</span> <span class="n">trajectory_smoothing</span><span class="o">.</span><span class="n">EKF</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov_</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="c1"># strong result</span>
+        <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ftr</span><span class="o">.</span><span class="n">theta_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">ftr</span><span class="o">.</span><span class="n">v_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">ftr</span></div>
+
+
+<div class="viewcode-block" id="copy"><a class="viewcode-back" href="../../src.html#src.trajdata.copy">[docs]</a><span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">ftr</span><span class="p">:</span> <span class="n">FilterTrajectoryResult</span><span class="p">):</span>
+    <span class="n">dfstart</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">car2start</span><span class="p">[</span><span class="n">ftr</span><span class="o">.</span><span class="n">carid</span><span class="p">]</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span><span class="p">,</span> <span class="s1">&#39;n_frames_in_dataset&#39;</span><span class="p">]</span>
+
+    <span class="c1"># copy results back to trajdata</span>
+    <span class="c1"># print(&quot;start copying: &quot;)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="c1">#print(dfstart, i, N)</span>
+        <span class="c1">#print(&#39;global_x&#39;)</span>
+        <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1">#print(&#39;global_y&#39;)</span>
+        <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">v_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1">#print(&quot;speed&quot;)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">-</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">NGSIM_TIMESTEP</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">-</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">NGSIM_TIMESTEP</span>
+        <span class="c1">#print(&quot;global_heading&quot;)</span>
+        <span class="n">trajdata</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfstart</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;global_heading&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftr</span><span class="o">.</span><span class="n">theta_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">trajdata</span></div>
+
+
+<div class="viewcode-block" id="filter_given_trajectory"><a class="viewcode-back" href="../../src.html#src.trajdata.filter_given_trajectory">[docs]</a><span class="k">def</span> <span class="nf">filter_given_trajectory</span><span class="p">(</span><span class="n">trajdata</span><span class="p">:</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param trajdata: trajectory data file, NGSIMTrajdata object</span>
+<span class="sd">    :param carid: the id of the car that we want to filter</span>
+<span class="sd">    :return: a smoothed trajectory</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Filters the given vehicle&#39;s trajectory using an Extended Kalman Filter</span>
+
+    <span class="n">ftr</span> <span class="o">=</span> <span class="n">FilterTrajectoryResult</span><span class="p">(</span><span class="n">trajdata</span><span class="p">,</span> <span class="n">carid</span><span class="p">)</span>
+
+    <span class="c1"># run pre-smoothing</span>
+    <span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span> <span class="o">=</span> <span class="n">symmetric_exponential_moving_average</span><span class="p">(</span><span class="n">ftr</span><span class="o">.</span><span class="n">x_arr</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">SMOOTHING_WIDTH_POS</span><span class="p">)</span>
+    <span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span> <span class="o">=</span> <span class="n">symmetric_exponential_moving_average</span><span class="p">(</span><span class="n">ftr</span><span class="o">.</span><span class="n">y_arr</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">SMOOTHING_WIDTH_POS</span><span class="p">)</span>
+
+    <span class="n">ftr</span> <span class="o">=</span> <span class="n">filter_trajectory</span><span class="p">(</span><span class="n">ftr</span><span class="p">)</span>
+
+    <span class="n">trajdata</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">trajdata</span><span class="p">,</span> <span class="n">ftr</span><span class="p">)</span>
+    <span class="c1"># print(&quot;finish copy&quot;)</span>
+
+    <span class="k">return</span> <span class="n">trajdata</span></div>
+
+
+<div class="viewcode-block" id="load_ngsim_trajdata"><a class="viewcode-back" href="../../src.html#src.trajdata.load_ngsim_trajdata">[docs]</a><span class="k">def</span> <span class="nf">load_ngsim_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">autofilter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filepath: the path of the raw trajectory data file</span>
+<span class="sd">    :param autofilter: indicates do the filter or not</span>
+<span class="sd">    :return: the filtered(or not) data class</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loading from file: &quot;</span><span class="p">)</span>
+    <span class="n">tdraw</span> <span class="o">=</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">NGSIMTrajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">autofilter</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.txt&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;filtering:         &quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">carid</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">carid_set</span><span class="p">(</span><span class="n">tdraw</span><span class="p">)):</span>
+            <span class="c1"># print(carid)</span>
+            <span class="n">tdraw</span> <span class="o">=</span> <span class="n">filter_given_trajectory</span><span class="p">(</span><span class="n">tdraw</span><span class="p">,</span> <span class="n">carid</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tdraw</span></div>
+
+
+<div class="viewcode-block" id="convert"><a class="viewcode-back" href="../../src.html#src.trajdata.convert">[docs]</a><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">tdraw</span><span class="p">:</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">NGSIMTrajdata</span><span class="p">,</span> <span class="n">roadway</span><span class="p">:</span> <span class="n">roadway</span><span class="o">.</span><span class="n">Roadway</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param tdraw: trajectory raw data</span>
+<span class="sd">    :param roadway: roadway class</span>
+<span class="sd">    :return: ListRecord(), a preprocessed and integrated version of tdraw and roadway</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">tdraw</span><span class="o">.</span><span class="n">df</span>
+    <span class="n">vehdefs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;convert: Vehicle definition&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">dfind</span> <span class="ow">in</span> <span class="n">tdraw</span><span class="o">.</span><span class="n">car2start</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">vehdefs</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">Vehicle</span><span class="o">.</span><span class="n">VehicleDef</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">],</span>
+                                         <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">METERS_PER_FOOT</span><span class="p">,</span>
+                                         <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">METERS_PER_FOOT</span><span class="p">)</span>
+
+    <span class="n">state_ind</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;convert: frames and states&quot;</span><span class="p">)</span>
+    <span class="n">prev_x</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">prev_y</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tdraw</span><span class="o">.</span><span class="n">nframes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>  <span class="c1"># change from 1 to 0</span>
+
+        <span class="n">frame_lo</span> <span class="o">=</span> <span class="n">state_ind</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c1"># print(&quot;frame: {}&quot;.format(frame))</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">carsinframe</span><span class="p">(</span><span class="n">tdraw</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+            <span class="c1"># print(&quot;id: {}&quot;.format(id))</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prev_x</span><span class="p">:</span>
+                <span class="n">prev_x</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">prev_y</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dfind</span> <span class="o">=</span> <span class="n">ngsim_trajdata</span><span class="o">.</span><span class="n">car_df_index</span><span class="p">(</span><span class="n">tdraw</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">dfind</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prev_y</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prev_x</span><span class="p">[</span><span class="nb">id</span><span class="p">])</span>
+            <span class="n">posG</span> <span class="o">=</span> <span class="n">VecSE2</span><span class="o">.</span><span class="n">VecSE2</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">METERS_PER_FOOT</span><span class="p">,</span>
+                                 <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">METERS_PER_FOOT</span><span class="p">,</span>
+                                 <span class="n">theta</span><span class="p">)</span>
+            <span class="n">prev_x</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_x&#39;</span><span class="p">]</span>
+            <span class="n">prev_y</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;global_y&#39;</span><span class="p">]</span>
+            <span class="c1"># print(df.at[dfind, &#39;global_heading&#39;])</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">dfind</span><span class="p">,</span> <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">METERS_PER_FOOT</span>
+            <span class="n">state_ind</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># print(state_ind)</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">Vehicle</span><span class="o">.</span><span class="n">VehicleState</span><span class="p">()</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">posG</span><span class="p">,</span> <span class="n">roadway</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span>
+            <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">RecordState</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span>
+
+        <span class="n">frame_hi</span> <span class="o">=</span> <span class="n">state_ind</span>
+        <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">RecordFrame</span><span class="p">(</span><span class="n">frame_lo</span><span class="p">,</span> <span class="n">frame_hi</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">ListRecord</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">NGSIM_TIMESTEP</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">vehdefs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_corresponding_roadway"><a class="viewcode-back" href="../../src.html#src.trajdata.get_corresponding_roadway">[docs]</a><span class="k">def</span> <span class="nf">get_corresponding_roadway</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    :param filename: the path of the saved roadway file</span>
+<span class="sd">    :return: the roadway class object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;i101&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/ngsim_80.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp_80</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">read_roadway</span><span class="p">(</span><span class="n">fp_80</span><span class="p">)</span>
+            <span class="n">fp_80</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="s2">&quot;i80&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/ngsim_101.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp_101</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">read_roadway</span><span class="p">(</span><span class="n">fp_101</span><span class="p">)</span>
+            <span class="n">fp_101</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="s2">&quot;holo&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/ngsim_HOLO.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp_holo</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">roadway</span><span class="o">.</span><span class="n">read_roadway</span><span class="p">(</span><span class="n">fp_holo</span><span class="p">)</span>
+            <span class="n">fp_holo</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no such roadway file, check your file name&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<div class="viewcode-block" id="convert_raw_ngsim_to_trajdatas"><a class="viewcode-back" href="../../src.html#src.trajdata.convert_raw_ngsim_to_trajdatas">[docs]</a><span class="k">def</span> <span class="nf">convert_raw_ngsim_to_trajdatas</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    convert the raw trajectory data and roadway to a integrated version and save to a file</span>
+<span class="sd">    :return: no return</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">NGSIM_TRAJDATA_PATHS</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;converting &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">roadway</span> <span class="o">=</span> <span class="n">get_corresponding_roadway</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finish loading roadway.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start loading NGSIM trajectory data.&quot;</span><span class="p">)</span>
+        <span class="n">tdraw</span> <span class="o">=</span> <span class="n">load_ngsim_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finish loading NGSIM trajectory data.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start converting.&quot;</span><span class="p">)</span>
+        <span class="c1"># no problems until here</span>
+        <span class="n">trajdata</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">tdraw</span><span class="p">,</span> <span class="n">roadway</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finish converting&quot;</span><span class="p">)</span>
+        <span class="n">outpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DIR</span><span class="p">,</span> <span class="s2">&quot;../data/trajdata_&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;save to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outpath</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outpath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">trajdata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish saving the file&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_trajdata"><a class="viewcode-back" href="../../src.html#src.trajdata.load_trajdata">[docs]</a><span class="k">def</span> <span class="nf">load_trajdata</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    load trajdata from the file given the file path</span>
+<span class="sd">    :param filepath: file path</span>
+<span class="sd">    :return: ListRecord object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">td</span> <span class="o">=</span> <span class="n">read_trajdata</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">td</span></div>
+
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">AutoEnv</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../src.html">src package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../algorithms.html">algorithms package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs.html">envs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_extractor.html">feature_extractor package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">preprocessing package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JackFram.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

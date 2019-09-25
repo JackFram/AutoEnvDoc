@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8" />
     <title>algorithms.AGen.critic package &#8212; AutoEnv 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="algorithms.RL_Algorithm package" href="algorithms.RL_Algorithm.html" />
     <link rel="prev" title="algorithms.AGen package" href="algorithms.AGen.html" />
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -41,12 +41,12 @@
 <span id="algorithms-agen-critic-base-module"></span><h2>algorithms.AGen.critic.base module<a class="headerlink" href="#module-algorithms.AGen.critic.base" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.AGen.critic.base.Critic">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.base.</code><code class="sig-name descname">Critic</code><span class="sig-paren">(</span><em class="sig-param">network</em>, <em class="sig-param">dataset</em>, <em class="sig-param">obs_dim</em>, <em class="sig-param">act_dim</em>, <em class="sig-param">optimizer=None</em>, <em class="sig-param">lr=0.0001</em>, <em class="sig-param">n_train_epochs=5</em>, <em class="sig-param">grad_norm_rescale=10000.0</em>, <em class="sig-param">grad_norm_clip=10000.0</em>, <em class="sig-param">summary_writer=None</em>, <em class="sig-param">debug_nan=False</em>, <em class="sig-param">verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/base.html#Critic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.base.</code><code class="sig-name descname">Critic</code><span class="sig-paren">(</span><em class="sig-param">network</em>, <em class="sig-param">dataset</em>, <em class="sig-param">obs_dim</em>, <em class="sig-param">act_dim</em>, <em class="sig-param">optimizer=None</em>, <em class="sig-param">lr=0.0001</em>, <em class="sig-param">n_train_epochs=5</em>, <em class="sig-param">grad_norm_rescale=10000.0</em>, <em class="sig-param">grad_norm_clip=10000.0</em>, <em class="sig-param">summary_writer=None</em>, <em class="sig-param">debug_nan=False</em>, <em class="sig-param">verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/base.html#Critic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Critic base class</p>
 <dl class="method">
 <dt id="algorithms.AGen.critic.base.Critic.critique">
-<code class="sig-name descname">critique</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/base.html#Critic.critique"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic.critique" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">critique</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">paths</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/base.html#Critic.critique"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic.critique" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Compute and return rewards based on the (obs, action) pairs in paths</dt><dd><p>where rewards are a list of numpy arrays of equal length as the
 corresponding path rewards</p>
@@ -59,7 +59,7 @@ paths: list of dictionaries {‘observations’: obs(list), ‘actions’: act(l
 
 <dl class="method">
 <dt id="algorithms.AGen.critic.base.Critic.train">
-<code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">samples_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/base.html#Critic.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic.train" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">samples_data</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/base.html#Critic.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.base.Critic.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train the critic using real and sampled data</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>itr: iteration count
@@ -75,11 +75,11 @@ samples_data: dictionary containing generated data</p>
 <span id="algorithms-agen-critic-model-module"></span><h2>algorithms.AGen.critic.model module<a class="headerlink" href="#module-algorithms.AGen.critic.model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="algorithms.AGen.critic.model.Block">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.model.</code><code class="sig-name descname">Block</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_layer_dims</em>, <em class="sig-param">activation_fn</em>, <em class="sig-param">drop_out_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/model.html#Block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.Block" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.model.</code><code class="sig-name descname">Block</code><span class="sig-paren">(</span><em class="sig-param">input_size</em>, <em class="sig-param">hidden_layer_dims</em>, <em class="sig-param">activation_fn</em>, <em class="sig-param">drop_out_fn</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/model.html#Block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.Block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.AGen.critic.model.Block.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/model.html#Block.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.Block.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/model.html#Block.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.Block.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -95,11 +95,11 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="class">
 <dt id="algorithms.AGen.critic.model.ObservationActionMLP">
-<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.model.</code><code class="sig-name descname">ObservationActionMLP</code><span class="sig-paren">(</span><em class="sig-param">hidden_layer_dims</em>, <em class="sig-param">obs_size</em>, <em class="sig-param">act_size</em>, <em class="sig-param">output_dim=1</em>, <em class="sig-param">obs_hidden_layer_dims=[]</em>, <em class="sig-param">act_hidden_layer_dims=[]</em>, <em class="sig-param">activation_fn=ReLU()</em>, <em class="sig-param">dropout_keep_prob=1.0</em>, <em class="sig-param">l2_reg=0.0</em>, <em class="sig-param">return_features=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/model.html#ObservationActionMLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.ObservationActionMLP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">algorithms.AGen.critic.model.</code><code class="sig-name descname">ObservationActionMLP</code><span class="sig-paren">(</span><em class="sig-param">hidden_layer_dims</em>, <em class="sig-param">obs_size</em>, <em class="sig-param">act_size</em>, <em class="sig-param">output_dim=1</em>, <em class="sig-param">obs_hidden_layer_dims=[]</em>, <em class="sig-param">act_hidden_layer_dims=[]</em>, <em class="sig-param">activation_fn=ReLU()</em>, <em class="sig-param">dropout_keep_prob=1.0</em>, <em class="sig-param">l2_reg=0.0</em>, <em class="sig-param">return_features=False</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/model.html#ObservationActionMLP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.ObservationActionMLP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="method">
 <dt id="algorithms.AGen.critic.model.ObservationActionMLP.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">act</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/model.html#ObservationActionMLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.ObservationActionMLP.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">obs</em>, <em class="sig-param">act</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/model.html#ObservationActionMLP.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.model.ObservationActionMLP.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -120,7 +120,7 @@ registered hooks while the latter silently ignores them.</p>
 <span id="algorithms-agen-critic-utils-module"></span><h2>algorithms.AGen.critic.utils module<a class="headerlink" href="#module-algorithms.AGen.critic.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="algorithms.AGen.critic.utils.batch_to_path_rewards">
-<code class="sig-prename descclassname">algorithms.AGen.critic.utils.</code><code class="sig-name descname">batch_to_path_rewards</code><span class="sig-paren">(</span><em class="sig-param">rewards</em>, <em class="sig-param">path_lengths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/algorithms/AGen/critic/utils.html#batch_to_path_rewards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.utils.batch_to_path_rewards" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">algorithms.AGen.critic.utils.</code><code class="sig-name descname">batch_to_path_rewards</code><span class="sig-paren">(</span><em class="sig-param">rewards</em>, <em class="sig-param">path_lengths</em><span class="sig-paren">)</span><a class="reference internal" href="modules/algorithms/AGen/critic/utils.html#batch_to_path_rewards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#algorithms.AGen.critic.utils.batch_to_path_rewards" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>rewards: numpy array of shape (batch size, reward_dim)</p></li>
@@ -226,7 +226,7 @@ registered hooks while the latter silently ignores them.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/algorithms.AGen.critic.rst.txt"
+      <a href="sources/algorithms.AGen.critic.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
