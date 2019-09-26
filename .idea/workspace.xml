@@ -2,92 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c48993ed-73b9-461f-9b9b-a815da25e57a" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/critic/base.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/critic/base.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/critic/model.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/critic/model.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/critic/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/critic/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/my_gaussian_gru_policy.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/my_gaussian_gru_policy.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/rls.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/rls.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/AGen/validate_utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/AGen/validate_utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/GAIL/gail.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/GAIL/gail.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/trpo.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/trpo.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/utils/math.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/utils/math.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/utils/replay_memory.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/utils/tools.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/utils/tools.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/utils/torch.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/utils/torch.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/optimizers/utils/zfilter.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/optimizers/utils/zfilter.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/RL_Algorithm/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/RL_Algorithm/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/dataset/CriticDataset.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/dataset/CriticDataset.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/dataset/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/dataset/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/distribution/base.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/distribution/base.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/distribution/diagonal_gaussian.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/distribution/diagonal_gaussian.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/policy/GRUCell.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/policy/GRUCell.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/policy/GRUNetwork.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/policy/GRUNetwork.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/policy/GaussianGRUPolicy.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/policy/GaussianGRUPolicy.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/policy/GaussianMLPBaseline.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/policy/GaussianMLPBaseline.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/policy/MLP.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/policy/MLP.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/algorithms/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/algorithms/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/action.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/action.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/base.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/base.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/build_env.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/build_env.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/hyperparams.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/hyperparams.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/make.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/make.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/multi_agent_env.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/multi_agent_env.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/envs/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/envs/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/CarLidarFeatureExtractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/CarLidarFeatureExtractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/CoreFeatureExtractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/CoreFeatureExtractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/FeatureState.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/FeatureState.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/ForeForeFeatureExtractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/ForeForeFeatureExtractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/Get.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/Get.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/TemporalFeatureExtractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/TemporalFeatureExtractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/WellBehavedFeatureExtractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/WellBehavedFeatureExtractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/collision_detection.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/collision_detection.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/feature_extractor.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/feature_extractor.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/interface.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/interface.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/neighbor_feature.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/neighbor_feature.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/feature_extractor/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/feature_extractor/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/index.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/index.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/preprocessing/clean_holo.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/preprocessing/clean_holo.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/preprocessing/extract_feature.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/preprocessing/extract_feature.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Basic/Vehicle.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Basic/Vehicle.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/MvNormal/MvNormal.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/MvNormal/MvNormal.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Record/frame.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Record/frame.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Record/record.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Record/record.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Roadway/roadway.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Roadway/roadway.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Roadway/utils.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Roadway/utils.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Vec/VecE2.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Vec/VecE2.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Vec/VecSE2.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Vec/VecSE2.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Vec/geom/geom.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Vec/geom/geom.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Vec/geom/line_segment.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Vec/geom/line_segment.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/Vec/geom/projectile.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/Vec/geom/projectile.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/curves/CurvePt.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/curves/CurvePt.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/ngsim_trajdata.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/ngsim_trajdata.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/roadway.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/roadway.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/splines.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/splines.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/trajdata.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/trajdata.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_modules/src/trajectory_smoothing.html" afterPath="$PROJECT_DIR$/docs/build/html/modules/src/trajectory_smoothing.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.AGen.critic.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.AGen.critic.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.AGen.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.AGen.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.RL_Algorithm.GAIL.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.RL_Algorithm.GAIL.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.RL_Algorithm.optimizers.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.RL_Algorithm.optimizers.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.RL_Algorithm.optimizers.utils.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.RL_Algorithm.optimizers.utils.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.RL_Algorithm.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.RL_Algorithm.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.dataset.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.dataset.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.distribution.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.distribution.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.policy.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.policy.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/algorithms.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/algorithms.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/envs.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/envs.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/feature_extractor.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/feature_extractor.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/index.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/index.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/modules.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/modules.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/preprocessing.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/preprocessing.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.Basic.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.Basic.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.MvNormal.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.MvNormal.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.Record.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.Record.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.Roadway.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.Roadway.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.Vec.geom.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.Vec.geom.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.Vec.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.Vec.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.curves.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.curves.rst.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/docs/build/html/_sources/src.rst.txt" afterPath="$PROJECT_DIR$/docs/build/html/sources/src.rst.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/build/html/index.html" afterPath="$PROJECT_DIR$/docs/build/html/index.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -97,12 +13,22 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docs/build/html/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="59" lean-forward="true" selection-start-line="14" selection-start-column="59" selection-end-line="14" selection-end-column="59" />
+            <state relative-caret-position="79">
+              <caret line="36" column="14" lean-forward="false" selection-start-line="36" selection-start-column="14" selection-end-line="36" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="75" lean-forward="false" selection-start-line="0" selection-start-column="75" selection-end-line="0" selection-end-column="75" />
               <folding />
             </state>
           </provider>
@@ -164,13 +90,6 @@
               <item name="docs" type="462c0819:PsiDirectoryNode" />
               <item name="build" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="AutoEnvDoc" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AutoEnvDoc" type="462c0819:PsiDirectoryNode" />
-              <item name="docs" type="462c0819:PsiDirectoryNode" />
-              <item name="build" type="462c0819:PsiDirectoryNode" />
-              <item name="html" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -211,24 +130,25 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="728" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959612" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2092084" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295082" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295082" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -244,18 +164,59 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/build/html/index.html">
+    <entry file="file://$PROJECT_DIR$/docs/build/html/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="40" lean-forward="true" selection-start-line="11" selection-start-column="40" selection-end-line="11" selection-end-column="40" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="75" lean-forward="false" selection-start-line="0" selection-start-column="75" selection-end-line="0" selection-end-column="75" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/docs/build/html/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="59" lean-forward="true" selection-start-line="14" selection-start-column="59" selection-end-line="14" selection-end-column="59" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="75" lean-forward="true" selection-start-line="0" selection-start-column="75" selection-end-line="0" selection-end-column="75" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/build/html/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/html/index.html" />
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="75" lean-forward="false" selection-start-line="0" selection-start-column="75" selection-end-line="0" selection-end-column="75" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/build/html/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="79">
+          <caret line="36" column="14" lean-forward="false" selection-start-line="36" selection-start-column="14" selection-end-line="36" selection-end-column="14" />
           <folding />
         </state>
       </provider>
